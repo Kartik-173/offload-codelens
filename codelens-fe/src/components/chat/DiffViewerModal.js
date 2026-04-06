@@ -1,15 +1,5 @@
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Typography,
-  IconButton,
-  Box,
-  Button,
-  CircularProgress,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import { X, Loader2 } from "lucide-react";
 import ReactDiffViewer from "react-diff-viewer-continued";
 import axios from "axios";
 import APIConstants from "../../services/APIConstants";
@@ -17,6 +7,9 @@ import SnackbarNotification, {
   SNACKBAR_THEME,
 } from "../../components/common/SnackbarNotification";
 import BusyBackdrop from "../common/BusyBackdrop";
+
+const Box = ({ children, className = "" }) => <div className={className}>{children}</div>;
+const Typography = ({ children, className = "" }) => <p className={className}>{children}</p>;
 
 const parsePatchToDiff = (patch) => {
   if (!patch) return { oldText: "", newText: "" };
@@ -109,73 +102,72 @@ const DiffViewerModal = ({ open, onClose, files = [] }) => {
     }
   };
 
+  if (!open) return null;
+
   return (
     <>
-      <Dialog
-        open={open}
-        onClose={onClose}
-        maxWidth="md"
-        fullWidth
-        scroll="paper"
-        PaperProps={{ className: "diff-dialog-paper" }}
-      >
-        <DialogTitle>
-          <Box className="diff-header-bar">
-            <Typography variant="h6" className="diff-title">
-              File Changes
-            </Typography>
-            <Box className="diff-action-buttons">
-              <Button
-                className="diff-btn danger"
+      <div className="fixed inset-0 z-50 bg-black/50">
+        <div className="diff-dialog-paper mx-auto my-8 h-[90vh] w-full max-w-4xl overflow-hidden rounded-lg bg-white shadow-lg">
+          <div className="diff-header-bar flex items-center justify-between border-b px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Typography className="diff-title text-lg font-semibold">File Changes</Typography>
+            </div>
+            <div className="diff-action-buttons flex items-center gap-2">
+              <button
+                className="diff-btn danger flex items-center gap-2 rounded border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
                 onClick={handleClosePR}
                 disabled={Boolean(actionLoading)}
-                startIcon={actionLoading === "close" ? <CircularProgress size={16} color="inherit" /> : null}
               >
+                {actionLoading === "close" && <Loader2 className="h-4 w-4 animate-spin" />}
                 {actionLoading === "close" ? "Closing PR..." : "Close PR"}
-              </Button>
-              <Button
-                className="diff-btn primary"
+              </button>
+              <button
+                className="diff-btn primary flex items-center gap-2 rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
                 onClick={handleMergePR}
                 disabled={Boolean(actionLoading)}
-                startIcon={actionLoading === "merge" ? <CircularProgress size={16} color="inherit" /> : null}
               >
+                {actionLoading === "merge" && <Loader2 className="h-4 w-4 animate-spin" />}
                 {actionLoading === "merge" ? "Merging PR..." : "Merge PR"}
-              </Button>
-              <IconButton className="diff-close-btn" onClick={onClose} disabled={Boolean(actionLoading)}>
-                <CloseIcon />
-              </IconButton>
-            </Box>
-          </Box>
-        </DialogTitle>
+              </button>
+              <button
+                className="diff-close-btn rounded p-1 hover:bg-slate-100 disabled:opacity-50"
+                onClick={onClose}
+                disabled={Boolean(actionLoading)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+          </div>
 
-        <DialogContent dividers>
-          {files.map((file, idx) => {
-            const { oldText, newText } = parsePatchToDiff(file.patch);
-            return (
-              <Box key={idx} className="diff-file-block">
-                <Box className="diff-file-header">
-                  <Typography component="span" className="filename">
-                    {file.filename}
-                  </Typography>
-                  <Typography component="span" className="status">
-                    ({file.status})
-                  </Typography>
+          <div className="h-[calc(90vh-60px)] overflow-auto p-4">
+            {files.map((file, idx) => {
+              const { oldText, newText } = parsePatchToDiff(file.patch);
+              return (
+                <Box key={idx} className="diff-file-block mb-4">
+                  <Box className="diff-file-header mb-2 flex items-center gap-2 bg-slate-100 px-3 py-2">
+                    <Typography component="span" className="filename font-medium">
+                      {file.filename}
+                    </Typography>
+                    <Typography component="span" className="status text-sm text-slate-500">
+                      ({file.status})
+                    </Typography>
+                  </Box>
+                  <Box className="diff-content">
+                    <ReactDiffViewer
+                      oldValue={oldText}
+                      newValue={newText}
+                      splitView={false}
+                      showDiffOnly
+                      hideLineNumbers={false}
+                      useDarkTheme={false}
+                    />
+                  </Box>
                 </Box>
-                <Box className="diff-content">
-                  <ReactDiffViewer
-                    oldValue={oldText}
-                    newValue={newText}
-                    splitView={false}
-                    showDiffOnly
-                    hideLineNumbers={false}
-                    useDarkTheme={false}
-                  />
-                </Box>
-              </Box>
-            );
-          })}
-        </DialogContent>
-      </Dialog>
+              );
+            })}
+          </div>
+        </div>
+      </div>
 
       {/* Global backdrop while merging/closing PR */}
       <BusyBackdrop

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Box, CircularProgress } from "@mui/material";
 
 import SummaryView from "../summaryTab/SummaryView";
 import IssuesView from "../issueTab/IssuesView";
@@ -49,9 +48,9 @@ const SonarDashboard = ({ reportKey, userId, onError }) => {
       <ReportTabs value={selectedTab} onChange={setSelectedTab} tabs={SONAR_TABS} />
 
       {loading ? (
-        <Box className="repo-list-loading">
-          <CircularProgress />
-        </Box>
+        <div className="repo-list-loading flex items-center justify-center py-8">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
+        </div>
       ) : (
         <>
           {selectedTab === 0 && (

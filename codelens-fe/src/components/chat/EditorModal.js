@@ -1,20 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import {
-  Modal,
-  Box,
-  List,
-  ListItem,
-  ListItemIcon,
-  Typography,
-  Button,
-  Divider,
-  TextareaAutosize,
-  IconButton,
-  CircularProgress,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
-import CodeIcon from "@mui/icons-material/Code";
+import { X, FileText, Code, Loader2 } from "lucide-react";
 import debounce from "lodash.debounce";
 import { ChatApiService } from "../../services";
 import DiffViewerModal from "./DiffViewerModal";
@@ -22,11 +7,17 @@ import PushToGitHubModal from "./PushToGitHubModal";
 import TerraformPlanModal from "./TerraformPlanModal";
 import TerraformErrorModal from "./TerraformErrorModal";
 import BusyBackdrop from "../common/BusyBackdrop";
-
-// ✅ Import SnackbarNotification
 import SnackbarNotification, {
   SNACKBAR_THEME,
 } from "../../components/common/SnackbarNotification";
+
+const Box = ({ children, className = "" }) => <div className={className}>{children}</div>;
+const Typography = ({ children, className = "" }) => <p className={className}>{children}</p>;
+const Divider = () => <hr className="my-4 border-slate-200" />;
+const List = ({ children, className = "" }) => <ul className={className}>{children}</ul>;
+const ListItem = ({ children, className = "", selected, onClick }) => (
+  <li className={`${className} cursor-pointer ${selected ? "bg-blue-50" : ""}`} onClick={onClick}>{children}</li>
+);
 
 const EditorModal = ({
   open,
@@ -165,19 +156,19 @@ const EditorModal = ({
     }
   };
 
+  if (!open) return null;
+
   return (
     <>
-      <Modal open={open} onClose={onClose}>
-        <Box className="editor-modal">
-          {/* Close (X) button like VS Code */}
-          <IconButton
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className="editor-modal relative w-full max-w-5xl rounded-lg bg-white p-6 shadow-lg">
+          <button
             aria-label="Close editor"
-            className="editor-close-btn"
-            size="small"
+            className="editor-close-btn absolute right-2 top-2 rounded p-1 hover:bg-slate-100"
             onClick={onClose}
           >
-            <CloseIcon fontSize="small" />
-          </IconButton>
+            <X size={18} />
+          </button>
           <Box className="editor-topbar">
             <Typography className="editor-title">Editor</Typography>
             <Typography className="editor-saving">
@@ -188,28 +179,27 @@ const EditorModal = ({
           {fileKeys.length === 0 ? (
             <Typography className="editor-empty">No files to show.</Typography>
           ) : (
-            <Box className="editor-body">
-              <Box className="editor-sidebar">
-                <Typography className="editor-title">
+            <Box className="editor-body flex gap-4">
+              <Box className="editor-sidebar w-64">
+                <Typography className="editor-title mb-2 font-semibold">
                   Terraform Files
                 </Typography>
                 <Divider />
-                <List>
+                <List className="mt-2">
                   {fileKeys.map((file) => (
                     <ListItem
                       key={file}
-                      button
                       selected={selectedFile === file}
                       onClick={() => setSelectedFile(file)}
-                      className="editor-file-item"
+                      className="editor-file-item flex items-center gap-2 rounded px-2 py-1 hover:bg-slate-100"
                     >
-                      <ListItemIcon className="editor-file-icon">
+                      <span className="editor-file-icon">
                         {file.endsWith(".tf") || file.endsWith(".tfvars") ? (
-                          <CodeIcon fontSize="small" color="primary" />
+                          <Code size={16} className="text-blue-500" />
                         ) : (
-                          <InsertDriveFileOutlinedIcon fontSize="small" />
+                          <FileText size={16} />
                         )}
-                      </ListItemIcon>
+                      </span>
                       {file}
                     </ListItem>
                   ))}
@@ -226,53 +216,53 @@ const EditorModal = ({
                       <div className="editor-gutter-line" key={i}>{i + 1}</div>
                     ))}
                   </Box>
-                  <TextareaAutosize
-                    className="editor-textarea"
-                    minRows={20}
+                  <textarea
+                    className="editor-textarea min-h-[400px] w-full rounded border border-slate-300 p-2 font-mono text-sm focus:border-blue-500 focus:outline-none"
+                    rows={20}
                     value={selectedContent}
                     onChange={(e) => handleFileChange(selectedFile, e.target.value)}
                     onScroll={handleEditorScroll}
                     ref={editorAreaRef}
                   />
                 </Box>
-                <Box className="editor-actions">
-                  <Button
-                    variant="outlined"
+                <Box className="editor-actions mt-4 flex gap-2">
+                  <button
+                    className="rounded border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
                     onClick={() => setShowTFModal(true)}
                     disabled={runningPlan}
                   >
                     {runningPlan ? "Running..." : "Terraform Plan"}
-                  </Button>
+                  </button>
 
-                  <Button
-                    variant="outlined"
+                  <button
+                    className="rounded border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
                     onClick={() => setShowTFModal(true)}
                     disabled={runningPlan}
                   >
                     {runningPlan ? "Running..." : "Terraform Apply"}
-                  </Button>
+                  </button>
 
-                  <Button
-                    variant="outlined"
+                  <button
+                    className="rounded border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
                     onClick={() => setShowDiff(true)}
                     disabled={!viewChangesEnabled}
                   >
                     View Changes
-                  </Button>
-                  <Button
-                    variant="contained"
+                  </button>
+                  <button
+                    className="flex items-center gap-2 rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
                     onClick={() => setShowPushModal(true)}
                     disabled={pushing}
-                    startIcon={pushing ? <CircularProgress size={16} color="inherit" /> : null}
                   >
-                    {pushing ? "Pushing..." : "Push to GitHub →"}
-                  </Button>
+                    {pushing && <Loader2 className="h-4 w-4 animate-spin" />}
+                    {pushing ? "Pushing..." : "Push to GitHub"}
+                  </button>
                 </Box>
               </Box>
             </Box>
           )}
-        </Box>
-      </Modal>
+        </div>
+      </div>
 
       {/* Global backdrop while pushing to GitHub */}
       <BusyBackdrop open={pushing} text="Pushing to GitHub..." />

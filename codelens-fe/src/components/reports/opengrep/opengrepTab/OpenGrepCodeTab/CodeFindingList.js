@@ -1,5 +1,12 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+
+const Box = ({ children, className = "", onClick }) => (
+  <div className={className} onClick={onClick}>{children}</div>
+);
+
+const Typography = ({ children, className = "", title }) => (
+  <p className={className} title={title}>{children}</p>
+);
 
 const CodeFindingList = ({ findings, selectedFinding, onSelect }) => {
   return (

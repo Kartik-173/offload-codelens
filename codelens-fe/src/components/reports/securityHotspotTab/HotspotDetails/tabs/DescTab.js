@@ -1,5 +1,4 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
 
 const DescTab = ({ hotspot }) => {
   if (!hotspot?.rule) return null;
@@ -10,24 +9,23 @@ const DescTab = ({ hotspot }) => {
   const createMarkup = (html) => ({ __html: html });
 
   return (
-    <Box className="desc-tab-wrapper">
+    <div className="desc-tab-wrapper">
       {/* Risk description */}
       {riskDescription && (
-        <Typography
+        <div
           className="desc-tab-risk"
-          component="div"
           dangerouslySetInnerHTML={createMarkup(riskDescription)}
         />
       )}
 
       {/* Vulnerability description (Ask Yourself, Examples, etc.) */}
       {vulnerabilityDescription && (
-        <Box
+        <div
           className="tab-content-wrapper"
           dangerouslySetInnerHTML={createMarkup(vulnerabilityDescription)}
         />
       )}
-    </Box>
+    </div>
   );
 };
 

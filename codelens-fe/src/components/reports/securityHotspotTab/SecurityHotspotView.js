@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Box, CircularProgress } from "@mui/material";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import HotspotList from "./HotspotList";
 import HotspotDetails from "./HotspotDetails/HotspotDetails.js";
 
@@ -10,8 +9,8 @@ const SecurityHotspotView = ({ loading, reportDetails }) => {
   const [expandedCategories, setExpandedCategories] = useState({});
 
   // Safe access
-  const hotspots = reportDetails?.hotspots?.items || [];
-  const hotspotDetails = reportDetails?.hotspots?.details || {};
+  const hotspots = useMemo(() => reportDetails?.hotspots?.items || [], [reportDetails]);
+  const hotspotDetails = useMemo(() => reportDetails?.hotspots?.details || {}, [reportDetails]);
 
   // 🔹 Normalizer: always return merged hotspot
   const normalizeHotspot = useCallback(
@@ -24,21 +23,26 @@ const SecurityHotspotView = ({ loading, reportDetails }) => {
   );
 
   // Filter by status
-  const filteredHotspots = hotspots.filter(
-    (h) => h.status === selectedTab
+  const filteredHotspots = useMemo(
+    () => hotspots.filter((h) => h.status === selectedTab),
+    [hotspots, selectedTab]
   );
 
   // Group by vulnerabilityProbability + category
-  const grouped = filteredHotspots.reduce((acc, h) => {
-    if (!acc[h.vulnerabilityProbability]) {
-      acc[h.vulnerabilityProbability] = {};
-    }
-    if (!acc[h.vulnerabilityProbability][h.securityCategory]) {
-      acc[h.vulnerabilityProbability][h.securityCategory] = [];
-    }
-    acc[h.vulnerabilityProbability][h.securityCategory].push(h);
-    return acc;
-  }, {});
+  const grouped = useMemo(
+    () =>
+      filteredHotspots.reduce((acc, h) => {
+        if (!acc[h.vulnerabilityProbability]) {
+          acc[h.vulnerabilityProbability] = {};
+        }
+        if (!acc[h.vulnerabilityProbability][h.securityCategory]) {
+          acc[h.vulnerabilityProbability][h.securityCategory] = [];
+        }
+        acc[h.vulnerabilityProbability][h.securityCategory].push(h);
+        return acc;
+      }, {}),
+    [filteredHotspots]
+  );
 
   // Auto-select first hotspot on tab change
   useEffect(() => {
@@ -54,7 +58,7 @@ const SecurityHotspotView = ({ loading, reportDetails }) => {
       setSelectedHotspotKey(null);
       setSelectedHotspot(null);
     }
-  }, [selectedTab, reportDetails, normalizeHotspot]);
+  }, [filteredHotspots, grouped, normalizeHotspot]);
 
   // Handle tab change (status filter)
   const handleTabChange = (_, value) => {
@@ -66,14 +70,14 @@ const SecurityHotspotView = ({ loading, reportDetails }) => {
 
   if (loading) {
     return (
-      <Box className="hotspot-container" display="flex" justifyContent="center" alignItems="center" minHeight="300px">
-        <CircularProgress />
-      </Box>
+      <div className="hotspot-container flex min-h-[300px] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
+      </div>
     );
   }
 
   return (
-    <Box className="hotspot-container">
+    <div className="hotspot-container">
       <HotspotList
         selectedTab={selectedTab}
         handleTabChange={handleTabChange}
@@ -96,7 +100,7 @@ const SecurityHotspotView = ({ loading, reportDetails }) => {
         selectedHotspot={selectedHotspot}
         hotspotSource={selectedHotspot?.component || {}}
       />
-    </Box>
+    </div>
   );
 };
 

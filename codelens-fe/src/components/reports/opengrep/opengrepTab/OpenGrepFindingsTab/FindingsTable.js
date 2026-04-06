@@ -1,6 +1,22 @@
 import React from "react";
-import { Box, Chip, Tooltip, Typography } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+
+const Box = ({ children, className = "" }) => (
+  <div className={className}>{children}</div>
+);
+
+const Chip = ({ label, className = "" }) => (
+  <span className={`inline-flex rounded-full border px-2 py-0.5 text-xs ${className}`.trim()}>
+    {label}
+  </span>
+);
+
+const Tooltip = ({ children, title }) => (
+  <span title={typeof title === "string" ? title : undefined}>{children}</span>
+);
+
+const Typography = ({ children, className = "" }) => (
+  <span className={className}>{children}</span>
+);
 
 const SeverityChip = ({ severity }) => (
   <Chip
@@ -10,76 +26,51 @@ const SeverityChip = ({ severity }) => (
   />
 );
 
-const columns = [
-  {
-    field: "rule_id",
-    headerName: "Rule",
-    flex: 1.8,
-    renderCell: ({ value }) => (
-      <Tooltip title={value}>
-        <Typography className="rule-cell" noWrap>
-          {value}
-        </Typography>
-      </Tooltip>
-    )
-  },
-  {
-    field: "severity",
-    headerName: "Severity",
-    width: 130,
-    align: "center",
-    headerAlign: "center",
-    renderCell: ({ value }) => <SeverityChip severity={value} />
-  },
-  {
-    field: "file_path",
-    headerName: "File",
-    flex: 1.2,
-    renderCell: ({ value }) => (
-      <Typography className="file-cell" noWrap>
-        {value}
-      </Typography>
-    )
-  },
-  {
-    field: "line_start",
-    headerName: "Line",
-    width: 90,
-    align: "center",
-    headerAlign: "center"
-  },
-  {
-    field: "category",
-    headerName: "Category",
-    width: 130
-  },
-  {
-    field: "cwe",
-    headerName: "CWE",
-    width: 120,
-    valueGetter: (v) => v || "-",
-    align: "center",
-    headerAlign: "center"
-  }
-];
-
 const FindingsTable = ({ rows, onRowClick }) => {
   return (
     <Box className={`findings-table ${rows.length === 0 ? "is-empty" : ""}`}>
-      <DataGrid
-        rows={rows}
-        getRowId={(row) => row.finding_id}
-        columns={columns}
-        pageSizeOptions={[10, 25, 50]}
-        initialState={{
-          pagination: { paginationModel: { pageSize: 10, page: 0 } }
-        }}
-        disableRowSelectionOnClick
-        disableColumnMenu
-        onRowClick={(params) => onRowClick(params.row)}
-        rowHeight={56}
-        localeText={{ noRowsLabel: "No findings detected 🎉" }}
-      />
+      {rows.length === 0 ? (
+        <div className="p-4 text-sm text-slate-500">No findings detected 🎉</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b bg-slate-50 text-left">
+                <th className="px-3 py-2">Rule</th>
+                <th className="px-3 py-2 text-center">Severity</th>
+                <th className="px-3 py-2">File</th>
+                <th className="px-3 py-2 text-center">Line</th>
+                <th className="px-3 py-2">Category</th>
+                <th className="px-3 py-2 text-center">CWE</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr
+                  key={row.finding_id}
+                  className="cursor-pointer border-b hover:bg-slate-50"
+                  onClick={() => onRowClick(row)}
+                >
+                  <td className="px-3 py-2">
+                    <Tooltip title={row.rule_id}>
+                      <Typography className="rule-cell">{row.rule_id}</Typography>
+                    </Tooltip>
+                  </td>
+                  <td className="px-3 py-2 text-center">
+                    <SeverityChip severity={row.severity} />
+                  </td>
+                  <td className="px-3 py-2">
+                    <Typography className="file-cell">{row.file_path}</Typography>
+                  </td>
+                  <td className="px-3 py-2 text-center">{row.line_start}</td>
+                  <td className="px-3 py-2">{row.category}</td>
+                  <td className="px-3 py-2 text-center">{row.cwe || "-"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </Box>
   );
 };

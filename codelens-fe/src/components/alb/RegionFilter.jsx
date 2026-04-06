@@ -1,14 +1,6 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  Autocomplete,
-  TextField,
-  Chip,
-} from '@mui/material';
+import { Card } from "../../components/ui/card";
+import { Badge } from "../../components/ui/badge";
 
 const RegionFilter = ({
   albs,
@@ -28,88 +20,62 @@ const RegionFilter = ({
   }, {});
 
   return (
-    <Box>
+    <div>
       {/* Region Summary Cards */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold mb-4">
           ALBs by Region ({albs.length} total)
-        </Typography>
-        <Grid container spacing={2}>
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {Object.entries(regionCounts).map(([region, count]) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={region}>
-              <Card 
-                sx={{ 
-                  cursor: 'pointer',
-                  border: filterRegion === region ? 2 : 1,
-                  borderColor: filterRegion === region ? 'primary.main' : 'grey.300',
-                  '&:hover': { boxShadow: 2 }
-                }}
-                onClick={() => onFilterChange(filterRegion === region ? 'all' : region)}
-              >
-                <CardContent sx={{ textAlign: 'center', py: 2 }}>
-                  <Typography variant="h4" color="primary">
-                    {count}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {region}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {count === 1 ? 'ALB' : 'ALBs'}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+            <Card 
+              key={region}
+              className={`cursor-pointer p-4 text-center transition-shadow hover:shadow-md ${
+                filterRegion === region 
+                  ? 'border-2 border-blue-500' 
+                  : 'border border-slate-200'
+              }`}
+              onClick={() => onFilterChange(filterRegion === region ? 'all' : region)}
+            >
+              <p className="text-2xl font-bold text-blue-600 mb-1">{count}</p>
+              <p className="text-sm text-slate-600">{region}</p>
+              <p className="text-xs text-slate-500">{count === 1 ? 'ALB' : 'ALBs'}</p>
+            </Card>
           ))}
-        </Grid>
-      </Box>
+        </div>
+      </div>
 
       {/* Region Search and Filter */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 2 }}>
-        <Typography variant="h6">
+      <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
+        <h3 className="text-lg font-semibold">
           Load Balancers ({filteredAlbs.length} of {albs.length})
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-          {/* Region Search */}
-          <Autocomplete
-            size="small"
-            options={availableRegions}
-            value={filterRegion}
-            onChange={(event, newValue) => {
-              onFilterChange(newValue || 'all');
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Search Region" size="small" sx={{ minWidth: 150 }} />
-            )}
-            sx={{ minWidth: 150 }}
-          />
-          
+        </h3>
+        <div className="flex gap-2 items-center flex-wrap">
           {/* Quick Region Filters */}
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            {Object.entries(regionCounts).slice(0, 3).map(([region, count]) => (
-              <Chip
-                key={region}
-                label={`${region} (${count})`}
-                clickable
-                color={filterRegion === region ? 'primary' : 'default'}
-                onClick={() => onFilterChange(filterRegion === region ? 'all' : region)}
-                size="small"
-                variant={filterRegion === region ? 'filled' : 'outlined'}
-              />
-            ))}
-            {availableRegions.length > 4 && (
-              <Chip
-                label="More..."
-                clickable
-                color={filterRegion !== 'all' ? 'secondary' : 'default'}
-                onClick={() => onFilterChange('all')}
-                size="small"
-                variant="outlined"
-              />
-            )}
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+          {Object.entries(regionCounts).slice(0, 3).map(([region, count]) => (
+            <Badge
+              key={region}
+              className={`cursor-pointer ${
+                filterRegion === region 
+                  ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' 
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+              onClick={() => onFilterChange(filterRegion === region ? 'all' : region)}
+            >
+              {region} ({count})
+            </Badge>
+          ))}
+          {availableRegions.length > 4 && (
+            <Badge
+              className="cursor-pointer bg-slate-100 text-slate-700 hover:bg-slate-200"
+              onClick={() => onFilterChange('all')}
+            >
+              More...
+            </Badge>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

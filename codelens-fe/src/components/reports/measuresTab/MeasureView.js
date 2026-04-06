@@ -1,18 +1,8 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  List,
-  ListItemButton,
-  ListItemText,
-  Select,
-  MenuItem
-} from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import FolderIcon from "@mui/icons-material/Folder";
+import { ChevronDown as ExpandMoreIcon, Folder as FolderIcon } from "lucide-react";
+
+const Box = ({ children, className = "" }) => <div className={className}>{children}</div>;
+const Typography = ({ children, className = "" }) => <p className={className}>{children}</p>;
 
 const measureData = [
   {
@@ -40,52 +30,53 @@ const MeasureView = () => {
       {/* Left Panel */}
       <Box className="measure-left-panel">
         {measureData.map((section, idx) => (
-          <Accordion key={idx} className="measure-accordion">
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="body2" className="measure-section-title">{section.title}</Typography>
-            </AccordionSummary>
+          <details key={idx} className="measure-accordion" open>
+            <summary className="flex cursor-pointer list-none items-center justify-between">
+              <Typography className="measure-section-title">{section.title}</Typography>
+              <ExpandMoreIcon className="h-4 w-4" />
+            </summary>
             {section.subItems.length > 0 && (
-              <AccordionDetails className="measure-subitems">
-                <List dense>
+              <div className="measure-subitems">
+                <div>
                   {section.subItems.map((sub, i) => (
-                    <ListItemButton
+                    <button
                       key={i}
+                      type="button"
                       className={`measure-subitem-btn ${
                         selectedSubItem === sub ? "selected" : ""
                       }`}
                       onClick={() => setSelectedSubItem(sub)}
                     >
-                      <ListItemText primary={sub} />
-                      <Typography variant="body2" color="textSecondary">
+                      <span>{sub}</span>
+                      <Typography>
                         0
                       </Typography>
-                    </ListItemButton>
+                    </button>
                   ))}
-                </List>
-              </AccordionDetails>
+                </div>
+              </div>
             )}
-          </Accordion>
+          </details>
         ))}
       </Box>
 
       {/* Right Panel */}
       <Box className="measure-right-panel">
         <Box className="measure-header">
-          <Typography variant="body1" className="measure-path">
+          <Typography className="measure-path">
             examples › framework-boilerplates
           </Typography>
           <Box className="measure-header-actions">
-            <Typography variant="body2">View as</Typography>
-            <Select
+            <Typography>View as</Typography>
+            <select
               value={viewMode}
               onChange={(e) => setViewMode(e.target.value)}
-              size="small"
-              className="measure-view-select"
+              className="measure-view-select h-9 rounded-md border border-input bg-background px-3 text-sm"
             >
-              <MenuItem value="Tree">Tree</MenuItem>
-              <MenuItem value="Chart">Chart</MenuItem>
-            </Select>
-            <Typography variant="body2" className="measure-file-count">
+              <option value="Tree">Tree</option>
+              <option value="Chart">Chart</option>
+            </select>
+            <Typography className="measure-file-count">
               47 files
             </Typography>
           </Box>
@@ -93,7 +84,7 @@ const MeasureView = () => {
 
         <Box className="measure-content">
           {viewMode === "Tree" ? (
-            <List>
+            <div>
               {[
                 "angular",
                 "astro",
@@ -104,16 +95,16 @@ const MeasureView = () => {
                 "ember",
                 "gatsby"
               ].map((folder, i) => (
-                <ListItemButton key={i} className="measure-folder-item">
+                <button type="button" key={i} className="measure-folder-item">
                   <FolderIcon className="measure-folder-icon" />
-                  <ListItemText primary={folder} />
-                  <Typography variant="body2">0</Typography>
-                </ListItemButton>
+                  <span>{folder}</span>
+                  <Typography>0</Typography>
+                </button>
               ))}
-            </List>
+            </div>
           ) : (
             <Box className="measure-chart-placeholder">
-              <Typography variant="body2">
+              <Typography>
                 Chart placeholder (e.g., Lines of Code vs Technical Debt)
               </Typography>
             </Box>

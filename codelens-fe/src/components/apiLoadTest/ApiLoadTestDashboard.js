@@ -1,10 +1,10 @@
 // src/components/apiLoadTest/ApiLoadTestDashboard.jsx
 import React, { useState } from "react";
-import { Box, CircularProgress } from "@mui/material";
-
 import ReportTabs from "../reports/ReportTabs";
 import ApiSummaryView from "./summaryTab/ApiSummaryView";
 import ApiPerformanceView from "./performanceTab/ApiPerformanceView";
+
+const Box = ({ children, className = "" }) => <div className={className}>{children}</div>;
 
 const API_TABS = [
   { label: "Summary" },
@@ -16,8 +16,8 @@ const ApiLoadTestDashboard = ({ report, loading }) => {
 
   if (loading || !report) {
     return (
-      <Box className="repo-list-loading">
-        <CircularProgress />
+      <Box className="repo-list-loading flex items-center justify-center py-8">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
       </Box>
     );
   }

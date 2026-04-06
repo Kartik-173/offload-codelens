@@ -1,7 +1,4 @@
-import PestControlOutlinedIcon from "@mui/icons-material/PestControlOutlined";
-import LockPersonOutlinedIcon from "@mui/icons-material/LockPersonOutlined";
-import GppMaybeOutlinedIcon from "@mui/icons-material/GppMaybeOutlined";
-import BuildCircleOutlinedIcon from "@mui/icons-material/BuildCircleOutlined";
+import { Bug, ShieldAlert, Wrench } from "lucide-react";
 
 export const reportInfoConfig = [
   { key: "organization", label: "Organization" },
@@ -21,7 +18,7 @@ export const reportMetricsConfig = [
     metricLabel: "Bugs",
     key: "bugs",
     barValuesKey: "reliabilityRating",
-    icon: <PestControlOutlinedIcon fontSize="large" />,
+    icon: <Bug className="h-6 w-6" />,
   },
   {
     title: "Security",
@@ -29,7 +26,7 @@ export const reportMetricsConfig = [
     metricLabel: "Vulnerabilities",
     key: "vulnerabilities",
     barValuesKey: "securityRating",
-    icon: <LockPersonOutlinedIcon fontSize="large" />,
+    icon: <ShieldAlert className="h-6 w-6" />,
   },
   {
     title: "Maintainability",
@@ -37,7 +34,7 @@ export const reportMetricsConfig = [
     metricLabel: "Code Smells",
     key: "codeSmells",
     barValuesKey: "maintainabilityRating",
-    icon: <BuildCircleOutlinedIcon fontSize="large" />,
+    icon: <Wrench className="h-6 w-6" />,
   },
 ];
 

@@ -1,23 +1,13 @@
 import React from "react";
 import {
-  Card,
-  CardContent,
-  Chip,
-  Grid,
-  Typography,
-  Divider,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-} from "@mui/material";
-
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import SecurityIcon from "@mui/icons-material/Security";
-import ShieldIcon from "@mui/icons-material/Shield";
-import SpeedIcon from "@mui/icons-material/Speed";
-import QueryStatsIcon from "@mui/icons-material/QueryStats";
-import BugReportIcon from "@mui/icons-material/BugReport";
-import HttpIcon from "@mui/icons-material/Http";
+  ChevronDown,
+  ShieldAlert,
+  Shield,
+  Gauge,
+  ChartNoAxesCombined,
+  Bug,
+  Globe,
+} from "lucide-react";
 
 const WafScanDashboard = ({ report }) => {
   if (!report) return null;
@@ -25,39 +15,39 @@ const WafScanDashboard = ({ report }) => {
   const d = report.data.data;
 
   const kpis = [
-    { label: "Protection", value: d.protectionLevel, icon: <ShieldIcon /> },
-    { label: "Rules Score", value: d.rulesProtectionScore, icon: <QueryStatsIcon /> },
-    { label: "Enabled", value: d.enabledRulesCount, icon: <BugReportIcon /> },
-    { label: "Disabled", value: d.disabledRulesCount, icon: <BugReportIcon /> },
-    { label: "Duration (s)", value: d.scanDurationSeconds, icon: <SpeedIcon /> },
-    { label: "Baseline RT", value: `${d.baselineResponseTimeMs} ms`, icon: <SpeedIcon /> },
+    { label: "Protection", value: d.protectionLevel, icon: <Shield className="h-4 w-4" /> },
+    { label: "Rules Score", value: d.rulesProtectionScore, icon: <ChartNoAxesCombined className="h-4 w-4" /> },
+    { label: "Enabled", value: d.enabledRulesCount, icon: <Bug className="h-4 w-4" /> },
+    { label: "Disabled", value: d.disabledRulesCount, icon: <Bug className="h-4 w-4" /> },
+    { label: "Duration (s)", value: d.scanDurationSeconds, icon: <Gauge className="h-4 w-4" /> },
+    { label: "Baseline RT", value: `${d.baselineResponseTimeMs} ms`, icon: <Gauge className="h-4 w-4" /> },
   ];
 
   return (
     <div className="waf-dashboard-container">
       <div className="waf-dashboard-header">
         <div className="waf-dashboard-header-left">
-          <SecurityIcon className="waf-dashboard-header-icon" />
+          <ShieldAlert className="waf-dashboard-header-icon" />
           <div>
-            <Typography className="waf-dashboard-title">
+            <p className="waf-dashboard-title text-xl font-semibold">
               WAF Scan Report
-            </Typography>
-            <Typography className="waf-dashboard-subtitle">
+            </p>
+            <p className="waf-dashboard-subtitle text-sm text-slate-600">
               {d.target}
-            </Typography>
+            </p>
           </div>
         </div>
 
         <div className="waf-dashboard-badges">
-          <Chip className="waf-dashboard-chip waf-dashboard-chip-success" label="WAF Detected" />
-          <Chip className="waf-dashboard-chip" label={`Confidence: ${d.confidenceLevel}`} />
-          <Chip className="waf-dashboard-chip" label={`Scan: ${d.scanType}`} />
+          <span className="waf-dashboard-chip waf-dashboard-chip-success rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs text-emerald-700">WAF Detected</span>
+          <span className="waf-dashboard-chip rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-700">Confidence: {d.confidenceLevel}</span>
+          <span className="waf-dashboard-chip rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-700">Scan: {d.scanType}</span>
         </div>
       </div>
 
       <div className="waf-dashboard-meta">
         <div className="waf-dashboard-meta-item">
-          <ShieldIcon />
+          <Shield className="h-4 w-4" />
           <div>
             <span className="meta-label">WAF Provider</span>
             <strong>{d.wafName}</strong>
@@ -65,7 +55,7 @@ const WafScanDashboard = ({ report }) => {
         </div>
 
         <div className="waf-dashboard-meta-item">
-          <QueryStatsIcon />
+          <ChartNoAxesCombined className="h-4 w-4" />
           <div>
             <span className="meta-label">Detection Methods</span>
             <strong>{d.detectionMethod}</strong>
@@ -73,7 +63,7 @@ const WafScanDashboard = ({ report }) => {
         </div>
 
         <div className="waf-dashboard-meta-item">
-          <SpeedIcon />
+          <Gauge className="h-4 w-4" />
           <div>
             <span className="meta-label">Scanned At</span>
             <strong>
@@ -84,28 +74,23 @@ const WafScanDashboard = ({ report }) => {
       </div>
 
 
-      <Grid container spacing={2} className="waf-dashboard-kpis">
+      <div className="waf-dashboard-kpis grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
         {kpis.map((kpi, i) => (
-          <Grid key={i} size={{ xs: 12, sm: 6, md: 4 }}>
-            <Card className="waf-dashboard-kpi">
-              <CardContent>
-                <div className="waf-dashboard-kpi-header">
-                  {kpi.icon}
-                  <span>{kpi.label}</span>
-                </div>
-                <strong>{kpi.value}</strong>
-              </CardContent>
-            </Card>
-          </Grid>
+          <div key={i} className="waf-dashboard-kpi rounded-md border bg-card p-4">
+            <div className="waf-dashboard-kpi-header flex items-center gap-2 text-sm text-slate-600">
+              {kpi.icon}
+              <span>{kpi.label}</span>
+            </div>
+            <strong className="text-lg">{kpi.value}</strong>
+          </div>
         ))}
-      </Grid>
+      </div>
 
-      <Card className="waf-dashboard-panel">
-        <CardContent>
-          <Typography className="waf-dashboard-panel-title">
+      <div className="waf-dashboard-panel mt-4 rounded-md border bg-card p-4">
+          <p className="waf-dashboard-panel-title text-base font-semibold">
             Category Summary
-          </Typography>
-          <Divider />
+          </p>
+          <div className="my-2 border-t" />
           <div className="waf-dashboard-category-grid">
             {Object.entries(d.categorySummary).map(([key, value]) => (
               <div
@@ -119,26 +104,24 @@ const WafScanDashboard = ({ report }) => {
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+      </div>
 
-      <Card className="waf-dashboard-panel">
-        <CardContent>
-          <Typography className="waf-dashboard-panel-title">Evidence</Typography>
-          <Divider />
+      <div className="waf-dashboard-panel mt-4 rounded-md border bg-card p-4">
+          <p className="waf-dashboard-panel-title text-base font-semibold">Evidence</p>
+          <div className="my-2 border-t" />
           <ul className="waf-dashboard-evidence">
             {d.evidence.map((e) => (
               <li key={e}>{e}</li>
             ))}
           </ul>
-        </CardContent>
-      </Card>
+      </div>
 
-      <Accordion className="waf-dashboard-accordion" defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography>Enabled Rules</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
+      <details className="waf-dashboard-accordion mt-4 rounded-md border bg-card" open>
+        <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium">
+          Enabled Rules
+          <ChevronDown className="h-4 w-4" />
+        </summary>
+        <div className="px-4 pb-4">
           <div className="waf-dashboard-table">
             {d.enabledRules.map((r) => (
               <div key={r.rule_id} className="waf-dashboard-row blocked">
@@ -150,14 +133,15 @@ const WafScanDashboard = ({ report }) => {
               </div>
             ))}
           </div>
-        </AccordionDetails>
-      </Accordion>
+        </div>
+      </details>
 
-      <Accordion className="waf-dashboard-accordion">
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography>Disabled Rules</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
+      <details className="waf-dashboard-accordion mt-4 rounded-md border bg-card">
+        <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium">
+          Disabled Rules
+          <ChevronDown className="h-4 w-4" />
+        </summary>
+        <div className="px-4 pb-4">
           <div className="waf-dashboard-table">
             {d.disabledRules.map((r) => (
               <div key={r.rule_id} className="waf-dashboard-row">
@@ -169,28 +153,24 @@ const WafScanDashboard = ({ report }) => {
               </div>
             ))}
           </div>
-        </AccordionDetails>
-      </Accordion>
+        </div>
+      </details>
 
-      <Card className="waf-dashboard-panel">
-        <CardContent>
-          <Typography className="waf-dashboard-panel-title">WAF Headers</Typography>
-          <Divider />
+      <div className="waf-dashboard-panel mt-4 rounded-md border bg-card p-4">
+          <p className="waf-dashboard-panel-title text-base font-semibold">WAF Headers</p>
+          <div className="my-2 border-t" />
           <div className="waf-dashboard-headers">
             {Object.entries(d.wafHeaders).map(([k, v]) => (
               <div key={k}>
-                <HttpIcon />
+                <Globe className="h-4 w-4" />
                 <span>{k}</span>
                 <strong>{v}</strong>
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+      </div>
 
-      <Card className="waf-dashboard-note">
-        <CardContent>{d.note}</CardContent>
-      </Card>
+      <div className="waf-dashboard-note mt-4 rounded-md border bg-card p-4">{d.note}</div>
     </div>
   );
 };

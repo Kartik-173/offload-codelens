@@ -1,6 +1,5 @@
 import React from "react";
-import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
-import ConstructionOutlinedIcon from "@mui/icons-material/ConstructionOutlined";
+import { MessageCircle, Wrench } from "lucide-react";
 
 const ChatEmptyState = ({ onStartChat, onStartTerraform }) => {
   return (
@@ -12,11 +11,11 @@ const ChatEmptyState = ({ onStartChat, onStartTerraform }) => {
       </p>
       <div className="chat-empty-actions">
         <button className="chat-empty-btn" onClick={onStartChat}>
-          <ChatBubbleOutlineOutlinedIcon className="btn-icon" fontSize="small" />
+          <MessageCircle className="btn-icon h-4 w-4" />
           Start Chat
         </button>
         <button className="chat-empty-btn secondary" onClick={onStartTerraform}>
-          <ConstructionOutlinedIcon className="btn-icon" fontSize="small" />
+          <Wrench className="btn-icon h-4 w-4" />
           Start Terraform
         </button>
       </div>

@@ -1,23 +1,13 @@
 import React, { useState } from 'react';
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { Badge } from "../../components/ui/badge";
 import {
-  Box,
-  Grid,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TextField,
-  Button,
-  Typography,
-  Chip,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
-import {
-  Search as SearchIcon,
-  Cancel as CancelIcon,
-  Language as LanguageIcon,
-} from '@mui/icons-material';
+  Search,
+  X,
+  Globe,
+  Check,
+} from 'lucide-react';
 import { AWS_REGIONS } from '../../utils/Helpers';
 
 const RegionSelector = ({
@@ -28,6 +18,7 @@ const RegionSelector = ({
   loading,
 }) => {
   const [regionSearchQuery, setRegionSearchQuery] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
 
   // Filter regions based on search query
   const filteredRegions = AWS_REGIONS.filter(region => 
@@ -60,152 +51,124 @@ const RegionSelector = ({
   };
 
   return (
-    <Grid container spacing={2} alignItems="center">
-      <Grid item xs={12} md={6}>
-        <FormControl size="small" sx={{ minWidth: 350 }}>
-          <InputLabel>Select AWS Regions</InputLabel>
-          <Select
-            multiple
-            value={selectedRegions}
-            label="Select AWS Regions"
-            onChange={(e) => {
-              const value = e.target.value;
-              onRegionsChange(typeof value === 'string' ? value.split(',') : value);
-            }}
-            onOpen={() => setRegionSearchQuery('')}
-            onClose={() => setRegionSearchQuery('')}
-            renderValue={(selected) => (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'center' }}>
-                {selected.map((value) => (
-                  <Chip
-                    key={value}
-                    label={AWS_REGIONS.find(r => r.value === value)?.label || value}
-                    size="small"
-                    onMouseDown={(e) => e.stopPropagation()}
-                    onClick={(e) => e.stopPropagation()}
-                    deleteIcon={<CancelIcon onMouseDown={(e) => e.stopPropagation()} />}
-                    onDelete={() => handleRemoveRegion(value)}
-                  />
-                ))}
-                {selected.length > 0 && (
-                  <Chip
-                    label={`${selected.length}/${AWS_REGIONS.length}`}
-                    size="small"
-                    variant="outlined"
-                    sx={{ 
-                      backgroundColor: '#e3f2fd', 
-                      color: '#1976d2',
-                      borderColor: '#1976d2',
-                      fontSize: '11px',
-                      height: '20px'
-                    }}
-                  />
-                )}
-              </Box>
-            )}
-            MenuProps={{
-              disableAutoFocusItem: true,
-              MenuListProps: {
-                autoFocusItem: false,
-              },
-              PaperProps: {
-                style: {
-                  maxHeight: 400,
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #ddd',
-                },
-              },
-              sx: {
-                '& .MuiMenuItem-root': {
-                  '&:hover': {
-                    backgroundColor: '#f8f9fa',
-                  },
-                  '&.Mui-selected': {
-                    backgroundColor: '#e3f2fd',
-                    color: '#1976d2',
-                  },
-                },
-              },
-            }}
-          >
-            {/* Search Input */}
-            <Box
-              sx={{
-                padding: 1,
-                borderBottom: '1px solid #eee',
-                backgroundColor: '#ffffff',
-              }}
-              onClick={(e) => e.stopPropagation()}
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+      <div className="md:col-span-6">
+        <div className="relative">
+          <label className="block text-sm font-medium mb-1">Select AWS Regions</label>
+          <div className="relative">
+            <button
+              type="button"
+              className="w-full p-2 border rounded text-left bg-white flex flex-wrap gap-1 items-center min-h-[38px]"
+              onClick={() => setIsOpen(!isOpen)}
             >
-              <TextField
-                size="small"
-                placeholder="Search regions..."
-                value={regionSearchQuery}
-                onChange={(e) => setRegionSearchQuery(e.target.value)}
-                onClick={(e) => e.stopPropagation()}
-                onKeyDown={(e) => e.stopPropagation()}
-                fullWidth
-                InputProps={{
-                  startAdornment: <SearchIcon fontSize="small" sx={{ mr: 1, color: '#666' }} />,
-                }}
-              />
-            </Box>
+              {selectedRegions.length === 0 ? (
+                <span className="text-slate-400">Select regions...</span>
+              ) : (
+                <>
+                  {selectedRegions.map((value) => (
+                    <Badge
+                      key={value}
+                      variant="secondary"
+                      className="flex items-center gap-1 px-2 py-0.5"
+                    >
+                      {AWS_REGIONS.find(r => r.value === value)?.label || value}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveRegion(value);
+                        }}
+                        className="ml-1 hover:text-red-500"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                  {selectedRegions.length > 0 && (
+                    <Badge variant="outline" className="text-xs">
+                      {selectedRegions.length}/{AWS_REGIONS.length}
+                    </Badge>
+                  )}
+                </>
+              )}
+            </button>
             
-            {/* Region Options */}
-            {filteredRegions.map((region) => (
-              <MenuItem key={region.value} value={region.value}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <LanguageIcon fontSize="small" />
-                  <Box>
-                    <Typography variant="body2">
-                      {region.label}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {region.value}
-                    </Typography>
-                  </Box>
-                </Box>
-              </MenuItem>
-            ))}
-            
-            {filteredRegions.length === 0 && (
-              <MenuItem disabled>
-                <Typography variant="body2" color="text.secondary">
-                  No regions found
-                </Typography>
-              </MenuItem>
+            {isOpen && (
+              <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-96 overflow-auto">
+                {/* Search Input */}
+                <div className="p-2 border-b sticky top-0 bg-white">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Input
+                      placeholder="Search regions..."
+                      value={regionSearchQuery}
+                      onChange={(e) => setRegionSearchQuery(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="pl-9"
+                    />
+                  </div>
+                </div>
+                
+                {/* Region Options */}
+                <div className="py-1">
+                  {filteredRegions.map((region) => (
+                    <button
+                      key={region.value}
+                      type="button"
+                      className="w-full px-4 py-2 text-left hover:bg-slate-100 flex items-center gap-3"
+                      onClick={() => {
+                        const newSelection = selectedRegions.includes(region.value)
+                          ? selectedRegions.filter(r => r !== region.value)
+                          : [...selectedRegions, region.value];
+                        onRegionsChange(newSelection);
+                      }}
+                    >
+                      <Globe className="h-4 w-4 text-slate-400" />
+                      <div>
+                        <p className="text-sm font-medium">{region.label}</p>
+                        <p className="text-xs text-slate-500">{region.value}</p>
+                      </div>
+                      {selectedRegions.includes(region.value) && (
+                        <Check className="h-4 w-4 text-blue-500 ml-auto" />
+                      )}
+                    </button>
+                  ))}
+                  
+                  {filteredRegions.length === 0 && (
+                    <div className="px-4 py-2 text-sm text-slate-500">
+                      No regions found
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
-          </Select>
-        </FormControl>
-      </Grid>
+          </div>
+        </div>
+      </div>
       
-      <Grid item xs={12} md={6}>
-        <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
-          <Tooltip title="Select all AWS regions">
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={onSelectAllRegions}
-              disabled={loading || selectedRegions.length === AWS_REGIONS.length}
-              sx={{ minWidth: 'auto' }}
-            >
-              Select All
-            </Button>
-          </Tooltip>
-          <Tooltip title="Deselect all regions">
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={onClearRegions}
-              disabled={loading || selectedRegions.length === 0}
-              sx={{ minWidth: 'auto' }}
-            >
-              Deselect All
-            </Button>
-          </Tooltip>
-        </Box>
-      </Grid>
-    </Grid>
+      <div className="md:col-span-6">
+        <div className="flex gap-2 mt-1 flex-wrap">
+          <button
+            type="button"
+            className="px-3 py-1.5 border rounded text-sm hover:bg-slate-50 disabled:opacity-50"
+            onClick={onSelectAllRegions}
+            disabled={loading || selectedRegions.length === AWS_REGIONS.length}
+            title="Select all AWS regions"
+          >
+            Select All
+          </button>
+          <button
+            type="button"
+            className="px-3 py-1.5 border rounded text-sm hover:bg-slate-50 disabled:opacity-50"
+            onClick={onClearRegions}
+            disabled={loading || selectedRegions.length === 0}
+            title="Deselect all regions"
+          >
+            Deselect All
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -1,8 +1,18 @@
 import React, { useMemo, useState } from "react";
-import { Box, Typography, TextField } from "@mui/material";
+
+const Box = ({ children, className = "", onClick }) => (
+  <div className={className} onClick={onClick}>{children}</div>
+);
+
+const Typography = ({ children, className = "" }) => (
+  <p className={className}>{children}</p>
+);
 
 const OpenGrepRulesTab = ({ details }) => {
-  const rules = details?.rules_statistics?.top_rules || [];
+  const rules = useMemo(
+    () => details?.rules_statistics?.top_rules || [],
+    [details]
+  );
   const totalRules = details?.rules_statistics?.total_rules_executed;
   const triggeredRules = details?.rules_statistics?.rules_triggered;
 
@@ -57,12 +67,12 @@ const OpenGrepRulesTab = ({ details }) => {
           </Typography>
         </Box>
 
-        <TextField
-          size="small"
+        <input
+          type="text"
           placeholder="Search by rule ID..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="opengrep-rules-search"
+          className="opengrep-rules-search h-9 rounded-md border border-input bg-background px-3 text-sm"
         />
       </Box>
 

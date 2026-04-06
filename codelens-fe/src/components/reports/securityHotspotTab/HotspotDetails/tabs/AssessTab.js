@@ -1,23 +1,19 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
 
 const AssessTab = ({ hotspot }) => {
   if (!hotspot?.rule?.vulnerabilityDescription) {
     return (
-      <Box className="assess-tab-empty" sx={{ p: 2 }}>
-        <Typography variant="body1" color="textSecondary">
-          No assessment details available.
-        </Typography>
-      </Box>
+      <div className="assess-tab-empty p-2 text-sm text-slate-500">
+        No assessment details available.
+      </div>
     );
   }
 
   const createMarkup = (html) => ({ __html: html });
 
   return (
-    <Box
+    <div
       className="tab-content-wrapper"
-      component="div"
       dangerouslySetInnerHTML={createMarkup(
         hotspot.rule.vulnerabilityDescription
       )}

@@ -1,9 +1,11 @@
 import React, { useState, useMemo } from "react";
-import { Box } from "@mui/material";
-
 import FindingsFilters from "./FindingsFilters";
 import FindingsTable from "./FindingsTable";
 import FindingDetails from "./FindingDetails";
+
+const Box = ({ children, className = "" }) => (
+  <div className={className}>{children}</div>
+);
 
 const OpenGrepFindingsTab = ({ findings }) => {
   const [filters, setFilters] = useState({

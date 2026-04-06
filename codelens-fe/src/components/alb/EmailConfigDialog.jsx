@@ -1,29 +1,23 @@
 import React from 'react';
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Switch,
-  FormControlLabel,
-  Box,
-  Typography,
-  Chip,
-  IconButton,
-  CircularProgress,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-} from '@mui/material';
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "../../components/ui/dialog";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Switch } from "../../components/ui/switch";
+import { Badge } from "../../components/ui/badge";
 import {
-  Close as CloseIcon,
-  Add as AddIcon,
-  Delete as DeleteIcon,
-  Email as EmailIcon,
-} from '@mui/icons-material';
+  X,
+  Plus,
+  Trash2,
+  Mail,
+  Loader2,
+} from 'lucide-react';
 
 const EmailConfigDialog = ({
   open,
@@ -46,114 +40,104 @@ const EmailConfigDialog = ({
     ...emailConfig
   };
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth="md"
-      fullWidth
-    >
-      <DialogTitle>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <EmailIcon />
-            <Typography variant="h6">Email Configuration</Typography>
-          </Box>
-          <IconButton onClick={onClose} disabled={loading}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
-      </DialogTitle>
-      
-      <DialogContent>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          Configure email notifications for ALB health monitoring. Emails will be sent when unhealthy targets are detected.
-        </Typography>
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Mail className="h-5 w-5" />
+            Email Configuration
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4 py-4">
+          <p className="text-sm text-slate-600">
+            Configure email notifications for ALB health monitoring. Emails will be sent when unhealthy targets are detected.
+          </p>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           {/* To Emails */}
-          <Box>
-            <Typography variant="subtitle2" gutterBottom>
-              Recipient Emails
-            </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <div className="space-y-2">
+            <Label>Recipient Emails</Label>
+            <div className="flex flex-wrap gap-2 mb-2">
               {safeEmailConfig.toEmails?.map((email, index) => (
-                <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Chip
-                    label={email}
-                    onDelete={() => onRemoveEmail(email)}
-                    deleteIcon={<DeleteIcon />}
-                    color="primary"
-                    variant="outlined"
-                  />
-                </Box>
+                <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                  {email}
+                  <button
+                    onClick={() => onRemoveEmail(email)}
+                    disabled={loading}
+                    className="ml-1 hover:text-red-500"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
               ))}
-              
-              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                <TextField
-                  size="small"
-                  placeholder="Add email address"
-                  value={newEmail}
-                  onChange={onNewEmailChange}
-                  disabled={loading}
-                  sx={{ flexGrow: 1 }}
-                />
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={onAddEmail}
-                  disabled={!newEmail || loading}
-                  startIcon={<AddIcon />}
-                >
-                  Add
-                </Button>
-              </Box>
-            </Box>
-          </Box>
-
-          {/* Email Notifications Toggle */}
-          <FormControlLabel
-            control={
-              <Switch
-                checked={safeEmailConfig.emailsEnabled}
-                onChange={(e) => onConfigChange('emailsEnabled', e.target.checked)}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Add email address"
+                value={newEmail}
+                onChange={onNewEmailChange}
                 disabled={loading}
               />
-            }
-            label="Enable Email Notifications"
-          />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onAddEmail}
+                disabled={!newEmail || loading}
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add
+              </Button>
+            </div>
+          </div>
+
+          {/* Email Notifications Toggle */}
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={safeEmailConfig.emailsEnabled}
+              onCheckedChange={(checked) => onConfigChange('emailsEnabled', checked)}
+              disabled={loading}
+            />
+            <Label>Enable Email Notifications</Label>
+          </div>
 
           {/* Check Interval */}
-          <FormControl fullWidth>
-            <InputLabel>Check Interval</InputLabel>
-            <Select
+          <div className="space-y-2">
+            <Label>Check Interval</Label>
+            <select
+              className="w-full p-2 border rounded"
               value={safeEmailConfig.interval}
               onChange={(e) => onConfigChange('interval', e.target.value)}
               disabled={loading}
             >
-              <MenuItem value="1">Every 1 minute</MenuItem>
-              <MenuItem value="5">Every 5 minutes</MenuItem>
-              <MenuItem value="10">Every 10 minutes</MenuItem>
-              <MenuItem value="15">Every 15 minutes</MenuItem>
-              <MenuItem value="30">Every 30 minutes</MenuItem>
-              <MenuItem value="60">Every 1 hour</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
-      </DialogContent>
+              <option value="1">Every 1 minute</option>
+              <option value="5">Every 5 minutes</option>
+              <option value="10">Every 10 minutes</option>
+              <option value="15">Every 15 minutes</option>
+              <option value="30">Every 30 minutes</option>
+              <option value="60">Every 1 hour</option>
+            </select>
+          </div>
+        </div>
 
-      <DialogActions>
-        <Button onClick={onClose} disabled={loading}>
-          Cancel
-        </Button>
-        <Button
-          onClick={onSave}
-          variant="contained"
-          disabled={loading || !safeEmailConfig.toEmails || safeEmailConfig.toEmails.length === 0}
-          startIcon={loading ? <CircularProgress size={16} /> : null}
-        >
-          {loading ? 'Saving...' : 'Save Configuration'}
-        </Button>
-      </DialogActions>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose} disabled={loading}>
+            Cancel
+          </Button>
+          <Button
+            onClick={onSave}
+            disabled={loading || !safeEmailConfig.toEmails || safeEmailConfig.toEmails.length === 0}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Saving...
+              </>
+            ) : (
+              'Save Configuration'
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 };

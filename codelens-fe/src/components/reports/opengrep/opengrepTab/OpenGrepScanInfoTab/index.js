@@ -1,5 +1,12 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+
+const Box = ({ children, className = "" }) => (
+  <div className={className}>{children}</div>
+);
+
+const Typography = ({ children, className = "" }) => (
+  <p className={className}>{children}</p>
+);
 
 const InfoItem = ({ icon, label, value, isLink }) => (
   <Box className="scan-info-item">

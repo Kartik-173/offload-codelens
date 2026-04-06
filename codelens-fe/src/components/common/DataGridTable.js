@@ -1,50 +1,10 @@
 import React from 'react';
-import Paper from '@mui/material/Paper';
-import {
-  DataGrid,
-  GridFooterContainer,
-  GridPagination,
-  GridToolbar,
-} from '@mui/x-data-grid';
-import { Box, styled, Typography } from '@mui/material';
 
-// Simplified DataGridTable adapted from finops_frontend for terraform-f
+// Simplified DataGridTable using native HTML table instead of MUI DataGrid
 const DataGridTable = (props) => {
   const columns = props.columns ?? [];
   const rows = props.rows ?? [];
-  const headerBgColor = props.headerBgColor ?? '#203B5A';
-  const evenRowBgColor = props.evenRowBgColor ?? '#E6EAED';
-  const oddRowColor = props.oddRowColor ?? '#000';
-  const evenRowColor = props.evenRowColor ?? '#000';
-  const iconColor = props.actionIconColor ?? '#2793F2';
   const hideExport = props.hideExport ?? false;
-
-  const StyledDataGrid = styled(DataGrid)(() => ({
-    '&.MuiDataGrid-root': {
-      backgroundColor: props.bgColor ?? '#F6FBFF',
-    },
-    '& .MuiDataGrid-row:nth-of-type(odd)': {
-      color: oddRowColor,
-    },
-    '& .MuiDataGrid-row:nth-of-type(even)': {
-      backgroundColor: evenRowBgColor,
-      color: evenRowColor,
-    },
-    '& .MuiButton-text': {
-      color: '#000',
-    },
-    '& .MuiButton-text .MuiSvgIcon-root': {
-      color: iconColor,
-    },
-    '& .MuiDataGrid-toolbarContainer': {
-      alignSelf: 'end',
-    },
-    '& .MuiDataGrid-columnHeader': {
-      backgroundColor: headerBgColor,
-      color: '#fff',
-      fontWeight: 600,
-    },
-  }));
 
   const generateExportFileName = () => {
     const path = window.location.pathname;
@@ -52,59 +12,78 @@ const DataGridTable = (props) => {
     return `CodeLens_AwsScan_${splitPath[splitPath.length - 1]?.toUpperCase()}`;
   };
 
-  const CustomFooterComponent = (footerProps) => (
-    <GridFooterContainer>
-      <div>{footerProps.customFooterEl}</div>
-      <GridPagination />
-    </GridFooterContainer>
-  );
-
-  const NoRowsOverlay = () => (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100%',
-        width: '100%',
-      }}
-    >
-      <Typography variant="h6" color="textSecondary">
-        No Data Found
-      </Typography>
-    </Box>
-  );
+  const exportCSV = () => {
+    const headers = columns.map(col => col.headerName || col.field).join(',');
+    const rowsData = rows.map(row => 
+      columns.map(col => {
+        const val = row[col.field];
+        return typeof val === 'string' && val.includes(',') ? `"${val}"` : val;
+      }).join(',')
+    ).join('\n');
+    
+    const csv = [headers, rowsData].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${generateExportFileName()}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
 
   return (
-    <Paper sx={{ width: '100%' }}>
-      <div style={{ minWidth: 'auto' }}>
-        <StyledDataGrid
-          slots={{
-            toolbar: GridToolbar,
-            noRowsOverlay: props.subscribeOverlayComponent ?? NoRowsOverlay,
-            footer: CustomFooterComponent,
-          }}
-          className="optimization-data-grid"
-          columns={columns}
-          rows={rows}
-          slotProps={{
-            toolbar: {
-              csvOptions: {
-                fileName: generateExportFileName(),
-                disableToolbarButton: hideExport,
-              },
-              printOptions: { disableToolbarButton: hideExport },
-            },
-            footer: { customFooterEl: props.customFooterEl },
-          }}
-          initialState={{
-            columns: {
-              columnVisibilityModel: props.columnVisibilityModel,
-            },
-          }}
-        />
+    <div className="w-full rounded-lg border bg-white shadow-sm">
+      {!hideExport && (
+        <div className="flex justify-end border-b p-2">
+          <button
+            onClick={exportCSV}
+            className="rounded border px-3 py-1 text-sm hover:bg-slate-50"
+          >
+            Export CSV
+          </button>
+        </div>
+      )}
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-slate-800 text-white">
+              {columns.map((col) => (
+                <th key={col.field} className="px-4 py-2 text-left font-semibold">
+                  {col.headerName || col.field}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length} className="px-4 py-8 text-center text-slate-500">
+                  No Data Found
+                </td>
+              </tr>
+            ) : (
+              rows.map((row, idx) => (
+                <tr key={row.id || idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+                  {columns.map((col) => (
+                    <td key={col.field} className="px-4 py-2">
+                      {col.renderCell 
+                        ? col.renderCell({ value: row[col.field], row })
+                        : row[col.field]
+                      }
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
-    </Paper>
+      {rows.length > 0 && (
+        <div className="border-t p-2 text-xs text-slate-500">
+          {rows.length} rows
+        </div>
+      )}
+    </div>
   );
 };
 

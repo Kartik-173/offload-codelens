@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Box, Paper, Tabs, Tab } from "@mui/material";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/ui/tabs";
+import { Card } from "../components/ui/card";
 
 import AwsAccountsManager from "../components/credentials/AwsAccountsManager";
 import AzureAccountsManager from "../components/credentials/AzureAccountsManager.js";
@@ -12,26 +13,30 @@ const Credentials = () => {
   });
 
   return (
-    <Box className="credentials-page">
-      <Paper className="credentials-card" elevation={3}>
-        <Box className="credentials-tabs">
+    <div className="credentials-page p-6">
+      <Card className="credentials-card p-6 shadow-lg">
+        <div className="credentials-tabs mb-6">
           <Tabs
             value={tab}
-            onChange={(_, v) => {
-              setTab(v);
-              const url = new URL(window.location.href);
-              url.searchParams.set("tab", v);
-              window.history.replaceState({}, "", url);
-            }}
+            onValueChange={setTab}
+            className="credentials-tabs-wrapper"
           >
-            <Tab label="AWS" value="aws" />
-            <Tab label="Azure" value="azure" />
-          </Tabs>
-        </Box>
+            <TabsList>
+              <TabsTrigger value="aws">☁️ AWS</TabsTrigger>
+              <TabsTrigger value="azure">🔷 Azure</TabsTrigger>
+            </TabsList>
 
-        {tab === "aws" ? <AwsAccountsManager /> : <AzureAccountsManager />}
-      </Paper>
-    </Box>
+            <TabsContent value="aws">
+              <AwsAccountsManager />
+            </TabsContent>
+
+            <TabsContent value="azure">
+              <AzureAccountsManager />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </Card>
+    </div>
   );
 };
 

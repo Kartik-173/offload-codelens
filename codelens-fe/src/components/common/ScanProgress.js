@@ -1,21 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  LinearProgress,
-  Stepper,
-  Step,
-  StepLabel,
-  Alert,
-  Paper,
-  Chip,
-  CircularProgress
-} from '@mui/material';
-import {
-  CheckCircle as CheckCircleIcon,
-  Error as ErrorIcon,
-  Schedule as ScheduleIcon
-} from '@mui/icons-material';
+import { CheckCircle, CircleX, Clock3, Loader2 } from 'lucide-react';
 
 const SCAN_PHASES = [
   { key: 'initializing', label: 'Initialize', weight: 0 },
@@ -61,89 +45,101 @@ const ScanProgress = ({ status }) => {
 
   const activeStep = getActiveStep();
   const elapsed = getElapsedTime();
+  const visibleSteps = SCAN_PHASES.filter(
+    (p) => p.key !== 'initializing' && p.key !== 'extract'
+  );
 
   return (
-    <Paper className="scan-progress-container" elevation={0}>
-      <Box className="scan-progress-header">
-        <Box className="scan-progress-title-row">
-          <Typography variant="h6" className="scan-progress-title">
+    <div className="scan-progress-container rounded-md border bg-card p-4">
+      <div className="scan-progress-header">
+        <div className="scan-progress-title-row flex items-center justify-between gap-3">
+          <p className="scan-progress-title text-lg font-semibold">
             {isCompleted ? 'Scan Completed' : isFailed ? 'Scan Failed' : 'Scan in Progress'}
-          </Typography>
+          </p>
           {isRunning && (
-            <Chip 
-              icon={<CircularProgress size={16} />} 
-              label="Running" 
-              size="small" 
-              className="scan-status-chip scan-status-running"
-            />
+            <span className="scan-status-chip scan-status-running inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs text-blue-700">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              Running
+            </span>
           )}
           {isCompleted && (
-            <Chip 
-              icon={<CheckCircleIcon />} 
-              label="Completed" 
-              size="small" 
-              className="scan-status-chip scan-status-completed"
-            />
+            <span className="scan-status-chip scan-status-completed inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700">
+              <CheckCircle className="h-3.5 w-3.5" />
+              Completed
+            </span>
           )}
           {isFailed && (
-            <Chip 
-              icon={<ErrorIcon />} 
-              label="Failed" 
-              size="small" 
-              className="scan-status-chip scan-status-failed"
-            />
+            <span className="scan-status-chip scan-status-failed inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-xs text-red-700">
+              <CircleX className="h-3.5 w-3.5" />
+              Failed
+            </span>
           )}
-        </Box>
+        </div>
         
         {elapsed && (
-          <Box className="scan-progress-meta">
-            <ScheduleIcon fontSize="small" className="scan-progress-icon" />
-            <Typography variant="body2" className="scan-progress-elapsed">
+          <div className="scan-progress-meta mt-2 inline-flex items-center gap-1 text-sm text-slate-600">
+            <Clock3 className="scan-progress-icon h-4 w-4" />
+            <p className="scan-progress-elapsed">
               Elapsed: {elapsed}
-            </Typography>
-          </Box>
+            </p>
+          </div>
         )}
-      </Box>
+      </div>
 
       {isFailed && error && (
-        <Alert severity="error" className="scan-progress-error">
+        <div className="scan-progress-error mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
           {error}
-        </Alert>
+        </div>
       )}
 
       {isRunning && (
         <>
-          <Box className="scan-progress-bar-section">
-            <LinearProgress 
-              variant="determinate" 
-              value={progress || 0} 
-              className="scan-progress-bar"
-            />
-            <Typography variant="body2" className="scan-progress-percent">
+          <div className="scan-progress-bar-section mt-3">
+            <div className="scan-progress-bar h-2 w-full overflow-hidden rounded bg-slate-200">
+              <div
+                className="h-full bg-blue-600 transition-all"
+                style={{ width: `${progress || 0}%` }}
+              />
+            </div>
+            <p className="scan-progress-percent mt-1 text-xs text-slate-600">
               {progress || 0}%
-            </Typography>
-          </Box>
+            </p>
+          </div>
 
-          <Typography variant="body2" className="scan-progress-message">
+          <p className="scan-progress-message mt-2 text-sm text-slate-700">
             {message || 'Processing...'}
-          </Typography>
+          </p>
 
-          <Stepper activeStep={activeStep} className="scan-progress-stepper" alternativeLabel>
-            {SCAN_PHASES.filter(p => p.key !== 'initializing' && p.key !== 'extract').map((phaseItem) => (
-              <Step key={phaseItem.key}>
-                <StepLabel>{phaseItem.label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
+          <div className="scan-progress-stepper mt-4 grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-5">
+            {visibleSteps.map((phaseItem, index) => {
+              const done = index < activeStep;
+              const current = index === activeStep;
+
+              return (
+                <div
+                  key={phaseItem.key}
+                  className={`rounded-md border px-2 py-1 text-xs ${
+                    current
+                      ? 'border-blue-300 bg-blue-50 text-blue-700'
+                      : done
+                        ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
+                        : 'border-slate-200 bg-slate-50 text-slate-500'
+                  }`}
+                >
+                  {phaseItem.label}
+                </div>
+              );
+            })}
+          </div>
         </>
       )}
 
       {isCompleted && (
-        <Alert severity="success" className="scan-progress-success">
+        <div className="scan-progress-success mt-3 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
           Scan completed successfully. Results are now available below.
-        </Alert>
+        </div>
       )}
-    </Paper>
+    </div>
   );
 };
 

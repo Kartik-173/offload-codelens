@@ -1,33 +1,76 @@
 import React, { useState } from 'react';
 import {
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Chip,
-  IconButton,
-  Collapse,
-  Typography,
-  Card,
-  CardContent,
-  Divider,
-  Tooltip,
-  Button,
-} from '@mui/material';
-import {
-  KeyboardArrowDown,
-  KeyboardArrowUp,
-  RemoveCircle,
-  Delete as DeleteIcon,
-  BugReport as BugReportIcon,
-  Warning as UnusedIcon,
-  CheckCircle as InUseIcon,
-} from '@mui/icons-material';
+  ChevronDown,
+  ChevronUp,
+  CircleMinus,
+  Check,
+} from 'lucide-react';
 import TargetGroupCard from './TargetGroupCard';
+
+const TableContainer = ({ children, className = '' }) => (
+  <div className={className}>{children}</div>
+);
+
+const Paper = ({ children }) => <>{children}</>;
+
+const Table = ({ children }) => <table className="w-full text-sm">{children}</table>;
+const TableHead = ({ children }) => <thead>{children}</thead>;
+const TableBody = ({ children }) => <tbody>{children}</tbody>;
+const TableRow = ({ children }) => <tr className="border-b align-top">{children}</tr>;
+const TableCell = ({ children, colSpan, style }) => (
+  <td className="p-2" colSpan={colSpan} style={style}>
+    {children}
+  </td>
+);
+
+const IconButton = ({ children, onClick, disabled = false, ...props }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted disabled:opacity-50"
+    {...props}
+  >
+    {children}
+  </button>
+);
+
+const Tooltip = ({ children, title }) => (
+  <span title={typeof title === 'string' ? title : undefined}>{children}</span>
+);
+
+const Chip = ({ label, color = 'default', variant = 'outlined', icon }) => {
+  const colorClasses = {
+    default: 'border-slate-300 text-slate-700',
+    warning: 'border-amber-300 text-amber-700',
+    primary: 'border-blue-300 text-blue-700',
+    success: 'border-emerald-300 text-emerald-700',
+    error: 'border-rose-300 text-rose-700',
+  };
+
+  const baseColor = colorClasses[color] || colorClasses.default;
+  const variantClass = variant === 'filled' ? 'bg-slate-100' : 'bg-transparent';
+
+  return (
+    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${baseColor} ${variantClass}`}>
+      {icon}
+      {label}
+    </span>
+  );
+};
+
+const Collapse = ({ in: open, children }) => (open ? <div>{children}</div> : null);
+
+const Box = ({ children }) => <div className="p-2">{children}</div>;
+
+const Typography = ({ children, className = '' }) => (
+  <p className={`text-sm ${className}`.trim()}>{children}</p>
+);
+
+const KeyboardArrowUp = () => <ChevronUp className="h-4 w-4" />;
+const KeyboardArrowDown = () => <ChevronDown className="h-4 w-4" />;
+const UnusedIcon = () => <CircleMinus className="h-3 w-3" />;
+const InUseIcon = () => <Check className="h-3 w-3" />;
 
 const AlbTable = ({
   albs,

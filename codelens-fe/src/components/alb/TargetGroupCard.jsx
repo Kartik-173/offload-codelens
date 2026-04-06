@@ -1,31 +1,25 @@
 import React from 'react';
+import { Card } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Badge } from "../../components/ui/badge";
+import { Checkbox } from "../../components/ui/checkbox";
+import { Switch } from "../../components/ui/switch";
+import { Label } from "../../components/ui/label";
 import {
-  Card,
-  CardContent,
-  Typography,
-  Box,
   Table,
-  TableHead,
   TableBody,
-  TableRow,
   TableCell,
-  Button,
-  Chip,
-  Tooltip,
-  Divider,
-  Checkbox,
-  IconButton,
-  Switch,
-  FormControlLabel,
-  Alert,
-} from '@mui/material';
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../components/ui/table";
 import {
   RemoveCircle,
-  Delete as DeleteIcon,
-  BugReport as BugReportIcon,
-  Shield as ShieldIcon,
-  ShieldOutlined as ShieldOutlinedIcon,
-} from '@mui/icons-material';
+  Trash2,
+  Bug,
+  Shield,
+  ShieldOff,
+} from 'lucide-react';
 
 const TargetGroupCard = ({
   targetGroup,
@@ -53,60 +47,55 @@ const TargetGroupCard = ({
   
   const renderHealthStatusIcon = (health) => {
     const colorMap = {
-      healthy: 'success',
-      unhealthy: 'error',
-      unused: 'warning',
-      unknown: 'default'
+      healthy: 'bg-green-100 text-green-800',
+      unhealthy: 'bg-red-100 text-red-800',
+      unused: 'bg-amber-100 text-amber-800',
+      unknown: 'bg-gray-100 text-gray-800'
     };
     
-    const color = colorMap[health] || 'default';
+    const colorClass = colorMap[health] || 'bg-gray-100 text-gray-800';
     return (
-      <Chip
-        size="small"
-        label={health}
-        color={color}
-        variant={health === 'unhealthy' ? 'filled' : 'outlined'}
-      />
+      <Badge className={colorClass}>
+        {health}
+      </Badge>
     );
   };
 
   return (
-    <Card sx={{ mb: 2, border: '1px solid', borderColor: 'divider' }}>
-      <CardContent sx={{ py: 1.5 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-            {tgName}
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
-            <Chip size="small" label={`${healthy} healthy`} color="success" variant="outlined" />
-            <Chip size="small" label={`${unhealthy} unhealthy`} color={unhealthy > 0 ? 'error' : 'default'} variant={unhealthy > 0 ? 'filled' : 'outlined'} />
+    <Card className="mb-4 border border-slate-200">
+      <div className="p-4">
+        <div className="flex flex-wrap justify-between items-center gap-3 mb-3">
+          <h3 className="font-semibold">{tgName}</h3>
+          <div className="flex gap-2 items-center flex-wrap">
+            <Badge variant="outline" className="bg-green-50 text-green-700">{healthy} healthy</Badge>
+            <Badge variant={unhealthy > 0 ? "destructive" : "outline"} className={unhealthy > 0 ? "" : "bg-gray-50 text-gray-700"}>
+              {unhealthy} unhealthy
+            </Badge>
             {unhealthy > 0 && (
               <Button
-                variant="outlined"
-                color="error"
-                size="small"
-                startIcon={<BugReportIcon />}
+                variant="outline"
+                size="sm"
+                className="text-red-600 border-red-300 hover:bg-red-50"
                 onClick={() => onShowUnhealthyDetails(tgArn, tgName, alb.region)}
               >
+                <Bug className="h-4 w-4 mr-1" />
                 View Issues
               </Button>
             )}
-          </Box>
-        </Box>
+          </div>
+        </div>
 
-        <Divider sx={{ my: 1.5 }} />
+        <div className="border-t border-slate-200 my-3" />
 
         {/* Enhanced Bulk Actions */}
         {targets.length > 0 && (
-          <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-            <Typography variant="body2" color="text.secondary">
-              Selection Actions:
-            </Typography>
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <span className="text-sm text-slate-600">Selection Actions:</span>
             
             {/* Select All/Deselect All */}
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              size="sm"
               onClick={() => {
                 const allSelected = targets.every(t => 
                   isTargetSelected(t.targetId || t.id, t.port, tgArn)
@@ -124,9 +113,9 @@ const TargetGroupCard = ({
             {/* Select All Unhealthy */}
             {unhealthy > 0 && (
               <Button
-                variant="outlined"
-                color="warning"
-                size="small"
+                variant="outline"
+                size="sm"
+                className="text-amber-600 border-amber-300 hover:bg-amber-50"
                 onClick={() => {
                   const unhealthyTargets = targets.filter(t => t.health === 'unhealthy');
                   onSelectAllInGroup(unhealthyTargets, tgArn, tgName);
@@ -135,75 +124,58 @@ const TargetGroupCard = ({
                 Select Unhealthy ({unhealthy})
               </Button>
             )}
-          </Box>
+          </div>
         )}
 
         {/* Excluded Targets Alert */}
         {excludedTargets.some(t => t.targetGroupArn === tgArn) && (
-          <Alert 
-            severity="success" 
-            sx={{ mb: 2 }}
-            action={
-              <Button
-                size="small"
-                color="inherit"
-                onClick={() => {
-                  const groupExcludedTargets = excludedTargets.filter(t => t.targetGroupArn === tgArn);
-                  groupExcludedTargets.forEach(target => {
-                    onRemoveExclusion(target.targetId, target.port);
-                  });
-                }}
-              >
-                Clear All
-              </Button>
-            }
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <ShieldIcon sx={{ fontSize: 16 }} />
-              <Typography variant="body2">
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md flex items-start gap-2">
+            <Shield className="h-4 w-4 text-green-600 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm text-green-800">
                 <strong>{excludedTargets.filter(t => t.targetGroupArn === tgArn).length}</strong> target(s) in this group are protected from auto-deletion
-              </Typography>
-            </Box>
-          </Alert>
+              </p>
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                const groupExcludedTargets = excludedTargets.filter(t => t.targetGroupArn === tgArn);
+                groupExcludedTargets.forEach(target => {
+                  onRemoveExclusion(target.targetId, target.port);
+                });
+              }}
+            >
+              Clear All
+            </Button>
+          </div>
         )}
 
         {targets.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
-            No targets registered.
-          </Typography>
+          <p className="text-sm text-slate-500">No targets registered.</p>
         ) : (
-          <Table size="small">
-            <TableHead>
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell padding="checkbox">
+                <TableHead className="w-12">
                   <Checkbox
-                    indeterminate={
-                      (() => {
-                        const selectedInGroup = targets.filter(t => 
-                          isTargetSelected(t.targetId || t.id, t.port, tgArn)
-                        ).length;
-                        return selectedInGroup > 0 && selectedInGroup < targets.length;
-                      })()
-                    }
-                    checked={targets.every(t => 
-                      isTargetSelected(t.targetId || t.id, t.port, tgArn)
-                    )}
-                    onChange={(e) => {
-                      if (e.target.checked) {
+                    checked={targets.every(t => isTargetSelected(t.targetId || t.id, t.port, tgArn))}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
                         onSelectAllInGroup(targets, tgArn, tgName);
                       } else {
                         onDeselectAllInGroup(tgArn);
                       }
                     }}
                   />
-                </TableCell>
-                <TableCell>Target Instance (Name/ID)</TableCell>
-                <TableCell>Port</TableCell>
-                <TableCell>Health</TableCell>
-                <TableCell>Protection Status</TableCell>
-                <TableCell align="right">Actions</TableCell>
+                </TableHead>
+                <TableHead>Target Instance (Name/ID)</TableHead>
+                <TableHead>Port</TableHead>
+                <TableHead>Health</TableHead>
+                <TableHead>Protection Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            </TableHead>
+            </TableHeader>
             <TableBody>
               {targets.map((t, ti) => {
                 const targetId = t?.targetId || t?.id;
@@ -214,11 +186,11 @@ const TargetGroupCard = ({
                 const isProtected = isSelected || isExcluded;
                 
                 return (
-                  <TableRow key={`${targetId}-${port}-${ti}`} hover>
-                    <TableCell padding="checkbox">
+                  <TableRow key={`${targetId}-${port}-${ti}`}>
+                    <TableCell>
                       <Checkbox
                         checked={isSelected}
-                        onChange={() => onToggleTargetSelection({
+                        onCheckedChange={() => onToggleTargetSelection({
                           ...t,
                           targetId,
                           port,
@@ -230,69 +202,49 @@ const TargetGroupCard = ({
                       />
                     </TableCell>
                     <TableCell>
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                          {t?.targetName || targetId}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {targetId}
-                        </Typography>
-                      </Box>
+                      <div>
+                        <p className="font-medium">{t?.targetName || targetId}</p>
+                        <p className="text-xs text-slate-500">{targetId}</p>
+                      </div>
                     </TableCell>
                     <TableCell>{port}</TableCell>
                     <TableCell>
                       {renderHealthStatusIcon(healthState)}
                     </TableCell>
                     <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <div className="flex items-center gap-1">
                         {isProtected ? (
                           <>
-                            <ShieldIcon color="success" sx={{ fontSize: 16 }} />
-                            <Typography variant="body2" color="success.main" sx={{ fontSize: 12 }}>
-                              Protected
-                            </Typography>
+                            <Shield className="h-4 w-4 text-green-600" />
+                            <span className="text-sm text-green-700">Protected</span>
                           </>
                         ) : (
-                          <Typography variant="body2" color="text.secondary" sx={{ fontSize: 12 }}>
-                            Not Protected
-                          </Typography>
+                          <span className="text-sm text-slate-500">Not Protected</span>
                         )}
-                      </Box>
+                      </div>
                     </TableCell>
 
-                    <TableCell align="right">
+                    <TableCell className="text-right">
                       {!autoDeregisterEnabled && healthState === 'unhealthy' ? (
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                          <Tooltip
-                            title={
-                              isProtected
-                                ? 'Protected targets cannot be deregistered'
-                                : 'Deregister this target from the target group'
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            disabled={isProtected}
+                            onClick={() =>
+                              onDeregisterSingleTarget?.({
+                                targetGroupArn: tgArn,
+                                targetId,
+                                port,
+                                isProtected,
+                              })
                             }
+                            title={isProtected ? 'Protected targets cannot be deregistered' : 'Deregister this target'}
                           >
-                            <span>
-                              <Button
-                                size="small"
-                                variant="contained"
-                                color="warning"
-                                disabled={isProtected}
-                                onClick={() =>
-                                  onDeregisterSingleTarget?.({
-                                    targetGroupArn: tgArn,
-                                    targetId,
-                                    port,
-                                    isProtected,
-                                  })
-                                }
-                              >
-                                Deregister
-                              </Button>
-                            </span>
-                          </Tooltip>
-                        </Box>
-                      ) : (
-                        <Box />
-                      )}
+                            Deregister
+                          </Button>
+                        </div>
+                      ) : null}
                     </TableCell>
                   </TableRow>
                 );
@@ -300,7 +252,7 @@ const TargetGroupCard = ({
             </TableBody>
           </Table>
         )}
-      </CardContent>
+      </div>
     </Card>
   );
 };

@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  CircularProgress,
-  Tabs,
-  Tab,
-} from "@mui/material";
+import { Loader2 } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/ui/tabs";
 
 import SnackbarNotification, {
   SNACKBAR_THEME,
@@ -70,45 +66,64 @@ const ReportList = () => {
       <div className="repo-select-section">
         <Tabs
           value={activeDashboard}
-          onChange={(_, v) => setActiveDashboard(v)}
+          onValueChange={setActiveDashboard}
           className="report-tabs-wrapper"
         >
-          <Tab value="sonar" label="Sonar Dashboard" />
-          <Tab value="opengrep" label="OpenGrep Dashboard" />
+          <TabsList>
+            <TabsTrigger value="sonar">Sonar Dashboard</TabsTrigger>
+            <TabsTrigger value="opengrep">OpenGrep Dashboard</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="sonar">
+            <ActiveScanBanner
+              status={scanStatus}
+              onDismiss={clearActiveScan}
+            />
+
+            {loadingReports ? (
+              <div className="repo-list-loading flex items-center justify-center p-8">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+              </div>
+            ) : (
+              <ReportSelector
+                reports={reportList}
+                selected={selectedReport}
+                onChange={setSelectedReport}
+              />
+            )}
+
+            <SonarDashboard
+              reportKey={selectedReport}
+              userId={userId}
+              onError={showError}
+            />
+          </TabsContent>
+
+          <TabsContent value="opengrep">
+            <ActiveScanBanner
+              status={scanStatus}
+              onDismiss={clearActiveScan}
+            />
+
+            {loadingReports ? (
+              <div className="repo-list-loading flex items-center justify-center p-8">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+              </div>
+            ) : (
+              <ReportSelector
+                reports={reportList}
+                selected={selectedReport}
+                onChange={setSelectedReport}
+              />
+            )}
+
+            <OpenGrepDashboard
+              projectKey={selectedReport}
+              userId={userId}
+              onError={showError}
+            />
+          </TabsContent>
         </Tabs>
-
-        <ActiveScanBanner
-          status={scanStatus}
-          onDismiss={clearActiveScan}
-        />
-
-        {loadingReports ? (
-          <Box className="repo-list-loading">
-            <CircularProgress />
-          </Box>
-        ) : (
-          <ReportSelector
-            reports={reportList}
-            selected={selectedReport}
-            onChange={setSelectedReport}
-          />
-        )}
-
-        {activeDashboard === "sonar" && (
-          <SonarDashboard
-            reportKey={selectedReport}
-            userId={userId}
-            onError={showError}
-          />
-        )}
-
-        {activeDashboard === "opengrep" && (
-          <OpenGrepDashboard
-            projectKey={selectedReport}
-            userId={userId}
-            onError={showError}
-          />
-        )}
       </div>
 
       {snackbar && (

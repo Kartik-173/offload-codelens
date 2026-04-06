@@ -1,27 +1,13 @@
 import React, { useEffect, useState, useCallback } from "react";
-import {
-  Box,
-  Button,
-  Typography,
-  TextField,
-  Divider,
-  CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
-  Tooltip,
-} from "@mui/material";
-
-import CloudQueueIcon from "@mui/icons-material/CloudQueue";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-
+import { Cloud, Trash2 } from "lucide-react";
 import SnackbarNotification, {
   SNACKBAR_THEME,
 } from "../common/SnackbarNotification";
-
 import CredentialsApiService from "../../services/CredentialsApiService";
+
+const Box = ({ children, className = "" }) => <div className={className}>{children}</div>;
+const Typography = ({ children, className = "" }) => <p className={className}>{children}</p>;
+const Divider = () => <hr className="my-4 border-slate-200" />;
 
 const EMPTY_FORM = {
   tenantId: "",
@@ -215,7 +201,7 @@ const AzureAccountsManager = () => {
   if (loading) {
     return (
       <Box className="credentials-loader">
-        <CircularProgress size={28} />
+        <div className="h-7 w-7 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
         <Typography>Loading Azure tenants…</Typography>
       </Box>
     );
@@ -225,15 +211,15 @@ const AzureAccountsManager = () => {
     <Box className="azure-manager">
       <Box className="azure-header">
         <Box className="credentials-logo-circle">
-          <CloudQueueIcon className="credentials-logo-icon" />
+          <Cloud className="credentials-logo-icon" size={24} />
         </Box>
 
         <Box>
-          <Typography variant="h5" className="credentials-title">
+          <Typography className="credentials-title">
             Azure Tenants
           </Typography>
 
-          <Typography variant="body2" className="credentials-subtext">
+          <Typography className="credentials-subtext">
             Manage multiple Azure tenants securely
           </Typography>
         </Box>
@@ -263,7 +249,7 @@ const AzureAccountsManager = () => {
           </Box>
 
           {tenants.length === 0 && (
-            <Typography color="text.secondary" sx={{ mb: 2 }}>
+            <Typography className="text-slate-500 mb-2">
               No tenants added yet
             </Typography>
           )}
@@ -278,32 +264,29 @@ const AzureAccountsManager = () => {
             >
               <Typography>{t?.name ? `${t.id}-${t.name}` : t.id}</Typography>
 
-              <Tooltip
-                title="Delete"
-                placement="left"
-              >
-                <IconButton
-                  size="small"
+              <div className="group relative">
+                <button
+                  type="button"
                   className="credentials-info-btn"
                   onClick={(e) => {
                     e.stopPropagation();
                     openDeleteDialogFor(t);
                   }}
+                  title="Delete"
                 >
-                  <DeleteOutlineIcon fontSize="inherit" />
-                </IconButton>
-              </Tooltip>
+                  <Trash2 size={16} />
+                </button>
+              </div>
             </Box>
           ))}
 
-          <Button
-            variant="outlined"
-            fullWidth
+          <button
+            type="button"
             className="azure-add-btn"
             onClick={resetForm}
           >
             + Add Tenant
-          </Button>
+          </button>
         </Box>
 
         <Box className="azure-editor">
@@ -332,62 +315,60 @@ const AzureAccountsManager = () => {
               style={{ display: "none" }}
             />
 
-            <TextField
-              label="Tenant ID"
-              fullWidth
-              required
-              margin="normal"
+            <input
+              type="text"
+              className="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              placeholder="Tenant ID"
               value={form.tenantId}
               autoComplete="off"
               onChange={(e) =>
                 setForm({ ...form, tenantId: e.target.value })
               }
+              required
             />
 
-            <TextField
-              label="Tenant Name"
-              fullWidth
-              required
-              margin="normal"
+            <input
+              type="text"
+              className="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              placeholder="Tenant Name"
               value={form.name}
               autoComplete="off"
               onChange={(e) =>
                 setForm({ ...form, name: e.target.value })
               }
+              required
             />
 
-            <TextField
-              label="Client ID"
-              fullWidth
-              required
-              margin="normal"
+            <input
+              type="text"
+              className="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              placeholder="Client ID"
               value={form.clientId}
               autoComplete="new-password"
               name="azure-client-id"
               onChange={(e) =>
                 setForm({ ...form, clientId: e.target.value })
               }
+              required
             />
 
-            <TextField
-              label="Client Secret"
+            <input
               type="password"
-              fullWidth
-              required
-              margin="normal"
+              className="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              placeholder="Client Secret"
               value={form.clientSecret}
               autoComplete="new-password"
               name="azure-client-secret"
               onChange={(e) =>
                 setForm({ ...form, clientSecret: e.target.value })
               }
+              required
             />
 
-            <TextField
-              label="Subscription ID"
-              fullWidth
-              required
-              margin="normal"
+            <input
+              type="text"
+              className="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              placeholder="Subscription ID"
               value={form.subscriptionId}
               autoComplete="off"
               onChange={(e) =>
@@ -396,26 +377,26 @@ const AzureAccountsManager = () => {
                   subscriptionId: e.target.value,
                 })
               }
+              required
             />
 
             <Box className="azure-editor-actions">
-              <Button
+              <button
                 type="submit"
-                variant="contained"
+                className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
                 disabled={saving}
               >
                 {saving ? "Saving…" : "Save"}
-              </Button>
+              </button>
 
-              <Button
+              <button
                 type="button"
-                variant="outlined"
-                color="error"
+                className="rounded border border-red-300 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
                 disabled={saving || !selected}
                 onClick={openDeleteDialog}
               >
                 Delete
-              </Button>
+              </button>
             </Box>
           </form>
         </Box>
@@ -435,23 +416,32 @@ const AzureAccountsManager = () => {
         />
       )}
 
-      <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog} maxWidth="xs" fullWidth>
-        <DialogTitle>Delete Azure Tenant</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete credentials for{' '}
-            <strong>{deleteTarget?.id}</strong>?
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button variant="outlined" onClick={closeDeleteDialog} disabled={saving}>
-            Cancel
-          </Button>
-          <Button variant="contained" color="error" onClick={deleteTenant} disabled={saving}>
-            {saving ? "Deleting…" : "Delete"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {deleteDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+            <h3 className="mb-4 text-lg font-semibold">Delete Azure Tenant</h3>
+            <p className="mb-6 text-slate-600">
+              Are you sure you want to delete credentials for <strong>{deleteTarget?.id}</strong>?
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                className="rounded border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                onClick={closeDeleteDialog}
+                disabled={saving}
+              >
+                Cancel
+              </button>
+              <button
+                className="rounded bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                onClick={deleteTenant}
+                disabled={saving}
+              >
+                {saving ? "Deleting…" : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Box>
   );
 };

@@ -1,38 +1,38 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Typography,
-  Button,
-  TablePagination,
-  IconButton,
-  Paper,
-  Tooltip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Menu,
-  Checkbox,
-  TextField,
-  ListItemText,
-  Divider,
-  Skeleton,
-} from '@mui/material';
 import AzureScanApiService from '../services/AzureScanApiService';
 import CredentialsApiService from '../services/CredentialsApiService';
 import SnackbarNotification, { SNACKBAR_THEME } from '../components/common/SnackbarNotification';
-import ViewColumnIcon from '@mui/icons-material/ViewColumn';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import DensityMediumIcon from '@mui/icons-material/DensityMedium';
-import GetAppIcon from '@mui/icons-material/GetApp';
-import Grid from '@mui/material/Grid';
-import CloseIcon from '@mui/icons-material/Close';
+import { Button } from "../components/ui/button";
+import { Card } from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Checkbox } from "../components/ui/checkbox";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
+import {
+  Columns,
+  Filter,
+  Menu as MenuIcon,
+  Download,
+  X,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+} from 'lucide-react';
 
 const AzureScan = () => {
   const [isTriggerLoading, setIsTriggerLoading] = useState(false);
@@ -475,408 +475,120 @@ const AzureScan = () => {
   };
 
   return (
-    <Grid container spacing={2} className="aws-scan-page">
+    <div className="aws-scan-page p-4">
       {/* ---------- Top bar ---------- */}
-      <Grid size={{ xs: 12 }} className="aws-scan-topbar">
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', lg: 'row' },
-            gap: 2,
-            alignItems: { xs: 'stretch', lg: 'center' },
-          }}
-        >
+      <div className="aws-scan-topbar mb-4">
+        <div className="flex flex-col lg:flex-row gap-4 lg:items-center">
           {/* Azure Tenant Dropdown */}
-          <FormControl
-            size="small"
-            className="azure-scan-select-control"
-            disabled={tenantIdsLoading || isTriggerLoading}
-            sx={{ minWidth: { xs: '100%', lg: 220 }, flex: { lg: '0 0 auto' } }}
-          >
-            <InputLabel id="azure-scan-tenant-select-label">Azure Tenant</InputLabel>
-            <Select
-              labelId="azure-scan-tenant-select-label"
+          <div className="azure-scan-select-control">
+            <label className="block text-sm font-medium mb-1">Azure Tenant</label>
+            <select
+              className="w-full lg:w-56 p-2 border rounded"
               value={tenantOptions.some(opt => opt.tenantId === selectedTenantId) ? selectedTenantId : ''}
-              label="Azure Tenant"
               onChange={(e) => setSelectedTenantId(e.target.value)}
+              disabled={tenantIdsLoading || isTriggerLoading}
             >
               {tenantIdsLoading ? (
-                <MenuItem value="" disabled>
-                  Loading tenants…
-                </MenuItem>
+                <option value="" disabled>Loading tenants…</option>
               ) : tenantIds.length === 0 ? (
-                <MenuItem value="" disabled>
-                  No Azure tenants found
-                </MenuItem>
+                <option value="" disabled>No Azure tenants found</option>
               ) : (
                 (tenantOptions.length ? tenantOptions : tenantIds.map((tenantId) => ({ tenantId, name: '' }))).map((opt) => (
-                  <MenuItem key={opt.tenantId} value={opt.tenantId}>
+                  <option key={opt.tenantId} value={opt.tenantId}>
                     {opt?.name ? `${opt.tenantId}-${opt.name}` : opt.tenantId}
-                  </MenuItem>
+                  </option>
                 ))
               )}
-            </Select>
-          </FormControl>
+            </select>
+          </div>
 
           {/* Scan Button */}
-          <Button
-            variant="contained"
-            className="scan-btn"
+          <button
+            className="scan-btn bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
             onClick={handleTriggerScan}
             disabled={isTriggerLoading || isWithinCooldown || !selectedTenantId}
-            sx={{ minWidth: { xs: '100%', lg: 'auto' }, flex: { lg: '0 0 auto' } }}
-            endIcon={
-              <img
-                src="/scan-icon.svg"
-                alt="Scan"
-                className="scan-btn-icon"
-              />
-            }
           >
             {isTriggerLoading ? 'Scanning…' : isWithinCooldown ? 'Cooldown (24h)' : 'Click to Scan'}
-          </Button>
+            <img src="/scan-icon.svg" alt="Scan" className="inline-block ml-2 h-4 w-4" />
+          </button>
 
           {/* Report Selection Dropdown */}
-          <FormControl
-            fullWidth
-            size="small"
-            className="aws-scan-select-control"
-            sx={{ minWidth: { xs: '100%', lg: 300 }, flex: { lg: '1 1 auto' } }}
-          >
-            <InputLabel id="azure-scan-report-select-label">
-              Select Report
-            </InputLabel>
-            <Select
-              labelId="azure-scan-report-select-label"
+          <div className="aws-scan-select-control flex-1">
+            <label className="block text-sm font-medium mb-1">Select Report</label>
+            <select
+              className="w-full lg:w-72 p-2 border rounded"
               value={isReportListLoading ? '' : selectedOpenSearchId}
-              label="Select Report"
               onChange={handleSelectChange}
               disabled={isReportLoading}
             >
               {isReportListLoading ? (
-                <MenuItem value="" disabled>
-                  Loading reports list…
-                </MenuItem>
+                <option value="" disabled>Loading reports list…</option>
               ) : reportList.length === 0 ? (
-                <MenuItem value="">No Report Available</MenuItem>
+                <option value="">No Report Available</option>
               ) : (
                 reportList.map((item) => {
                   const id = item.id || item.openSearchId || item.open_search_id;
                   return (
-                    <MenuItem key={id} value={id}>
-                      {id}
-                    </MenuItem>
+                    <option key={id} value={id}>{id}</option>
                   );
                 })
               )}
-            </Select>
-          </FormControl>
+            </select>
+          </div>
 
           {/* Download Button */}
-          <Tooltip title="Download JSON">
-            <span>
-              <Button
-                variant="contained"
-                className="scan-download-btn"
-                onClick={() => {
-                  if (!rawReport) return;
-                  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(findings, null, 2));
-                  const dlAnchorElem = document.createElement('a');
-                  dlAnchorElem.setAttribute('href', dataStr);
-                  dlAnchorElem.setAttribute('download', `azure_scan_${selectedOpenSearchId || 'report'}.json`);
-                  dlAnchorElem.click();
-                }}
-                disabled={isReportListLoading || !findings.length}
-                sx={{ flex: { lg: '0 0 auto' } }}
-              >
-                <GetAppIcon className="scan-download-icon" />
-              </Button>
-            </span>
-          </Tooltip>
-        </Box>
-
-        {/* Helper Text */}
-        {tenantIds.length === 0 && !tenantIdsLoading && (
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-            Add Azure credentials from the Credentials page to enable scanning.
-          </Typography>
-        )}
-      </Grid>
-
-      {/* ---------- Summary 4 blocks ---------- */}
-      {summaryCards.map((card) => (
-        <Grid key={card.key} size={{ xs: 12, sm: 6, md: 3 }} className="aws-scan-summary-col">
-          <div className={`aws-scan-summary-card ${card.bg}`}>
-            <div className="aws-scan-summary-main">
-              <div className="aws-scan-summary-icon-wrapper">
-                <img src={card.icon} alt={card.label} className="aws-scan-summary-icon" />
-              </div>
-              <div className="aws-scan-summary-text">
-                <span className="aws-scan-summary-label">{card.label}</span>
-                <span className="aws-scan-summary-value">{isReportListLoading || isReportLoading ? '' : card.value}</span>
-              </div>
-            </div>
-          </div>
-        </Grid>
-      ))}
-
-      {/* Table card, actions and table */}
-      <Grid size={12} className="aws-scan-table-section">
-        <div className="aws-scan-table-card">
-          {/* actions row */}
-          <div className="aws-scan-table-actions">
-            <div className="aws-scan-table-actions-right">
-              <div className="aws-scan-table-action">
-                <IconButton size="small" className="aws-scan-table-action-iconbtn" onClick={(e) => setColumnsAnchorEl(e.currentTarget)}>
-                  <ViewColumnIcon />
-                </IconButton>
-                <span className="aws-scan-table-action-label aws-scan-table-action-label-clickable" style={{ cursor: 'pointer' }} onClick={(e) => setColumnsAnchorEl(e.currentTarget)}>
-                  Columns
-                </span>
-                <Menu
-                  anchorEl={columnsAnchorEl}
-                  open={Boolean(columnsAnchorEl)}
-                  onClose={() => setColumnsAnchorEl(null)}
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                  transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                  className="aws-scan-columns-menu"
-                >
-                  {Object.keys(visibleColumns).map((key) => (
-                    <MenuItem key={key} onClick={() => setVisibleColumns((prev) => ({ ...prev, [key]: !prev[key] }))} className="aws-scan-columns-menu-item">
-                      <Checkbox size="small" checked={visibleColumns[key]} />
-                      <ListItemText primary={key} />
-                    </MenuItem>
-                  ))}
-                </Menu>
-              </div>
-
-              <div className="aws-scan-table-action">
-                <IconButton size="small" className="aws-scan-table-action-iconbtn" onClick={() => setIsFilterBarOpen((v) => !v)}>
-                  <FilterListIcon />
-                </IconButton>
-                <span className="aws-scan-table-action-label aws-scan-table-action-label-clickable" style={{ cursor: 'pointer' }} onClick={() => setIsFilterBarOpen((v) => !v)}>
-                  Filters
-                </span>
-              </div>
-
-              <div className="aws-scan-table-action">
-                <IconButton size="small" className="aws-scan-table-action-iconbtn" onClick={(e) => setDensityAnchorEl(e.currentTarget)}>
-                  <DensityMediumIcon />
-                </IconButton>
-                <span className="aws-scan-table-action-label aws-scan-table-action-label-clickable" style={{ cursor: 'pointer' }} onClick={(e) => setDensityAnchorEl(e.currentTarget)}>
-                  Density
-                </span>
-                <Menu
-                  anchorEl={densityAnchorEl}
-                  open={Boolean(densityAnchorEl)}
-                  onClose={() => setDensityAnchorEl(null)}
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                  transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                  className="aws-scan-density-menu"
-                >
-                  {['compact', 'standard', 'comfortable'].map((opt) => (
-                    <MenuItem key={opt} onClick={() => setTableDensity(opt)} className="aws-scan-density-menu-item">
-                      <DensityMediumIcon fontSize="small" className="aws-scan-density-menu-icon" />
-                      <ListItemText primary={opt.charAt(0).toUpperCase() + opt.slice(1)} />
-                    </MenuItem>
-                  ))}
-                </Menu>
-              </div>
-
-              <div className="aws-scan-table-action">
-                <IconButton
-                  size="small"
-                  className="aws-scan-table-action-iconbtn"
-                  onClick={(e) => setExportAnchorEl(e.currentTarget)}
-                  disabled={!findings.length}
-                >
-                  <GetAppIcon />
-                </IconButton>
-                <span
-                  className="aws-scan-table-action-label aws-scan-table-action-label-clickable"
-                  style={{ cursor: 'pointer' }}
-                  onClick={(e) => setExportAnchorEl(e.currentTarget)}
-                >
-                  Export
-                </span>
-                <Menu
-                  anchorEl={exportAnchorEl}
-                  open={Boolean(exportAnchorEl)}
-                  onClose={() => setExportAnchorEl(null)}
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                  transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                  className="aws-scan-export-menu"
-                >
-                  <MenuItem
-                    onClick={() => {
-                      handleDownloadCsv();
-                      setExportAnchorEl(null);
-                    }}
-                    className="aws-scan-export-menu-item"
-                  >
-                    <ListItemText primary="Download as CSV" />
-                  </MenuItem>
-                  <MenuItem onClick={() => { handlePrint(); setExportAnchorEl(null); }} className="aws-scan-export-menu-item">
-                    <ListItemText primary="Print" />
-                  </MenuItem>
-                </Menu>
-              </div>
-            </div>
-          </div>
-
-          {/* optional filters bar (styled like AWS) */}
-          {isFilterBarOpen && (
-            <div className="aws-scan-filter-bar">
-              <IconButton size="small" className="aws-scan-filter-close-btn" onClick={() => setIsFilterBarOpen(false)}>
-                <CloseIcon fontSize="small" />
-              </IconButton>
-              <div className="aws-scan-filter-main">
-                <div className="aws-scan-filter-field aws-scan-filter-column">
-                  <Typography variant="caption" className="aws-scan-filter-label">Columns</Typography>
-                  <FormControl size="small" fullWidth>
-                    <Select value={filterColumn} onChange={(e) => { setFilterColumn(e.target.value); setPage(0); }}>
-                      <MenuItem value="status">Status</MenuItem>
-                      <MenuItem value="severity">Severity</MenuItem>
-                      <MenuItem value="serviceName">Service</MenuItem>
-                      <MenuItem value="region">Region</MenuItem>
-                      <MenuItem value="checkId">Check ID</MenuItem>
-                      <MenuItem value="checkTitle">Title</MenuItem>
-                      <MenuItem value="resourceId">Resource ID</MenuItem>
-                      <MenuItem value="resourceTags">Tags</MenuItem>
-                      <MenuItem value="statusExtended">Status Extended</MenuItem>
-                      <MenuItem value="risk">Risk</MenuItem>
-                      <MenuItem value="recommendation">Recommendation</MenuItem>
-                      <MenuItem value="compliance">Compliance</MenuItem>
-                    </Select>
-                  </FormControl>
-                </div>
-                <div className="aws-scan-filter-field aws-scan-filter-operator">
-                  <Typography variant="caption" className="aws-scan-filter-label">Operator</Typography>
-                  <FormControl size="small" fullWidth>
-                    <Select value={filterOperator} onChange={(e) => { setFilterOperator(e.target.value); setPage(0); }}>
-                      <MenuItem value="contains">contains</MenuItem>
-                      <MenuItem value="equals">equals</MenuItem>
-                      <MenuItem value="startsWith">starts with</MenuItem>
-                      <MenuItem value="endsWith">ends with</MenuItem>
-                    </Select>
-                  </FormControl>
-                </div>
-                <div className="aws-scan-filter-field aws-scan-filter-value">
-                  <Typography variant="caption" className="aws-scan-filter-label aws-scan-filter-label-value">Value</Typography>
-                  <TextField size="small" placeholder="Filter value" fullWidth value={filterValue} onChange={(e) => { setFilterValue(e.target.value); setPage(0); }} />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* table section matching AWS behaviors */}
-          {isReportListLoading || isReportLoading ? (
-            <div className="aws-scan-table-skeleton">
-              <Skeleton variant="rectangular" height={32} className="aws-scan-table-skeleton-header" />
-              <Box className="aws-scan-table-skeleton-rows">
-                <Skeleton variant="rectangular" height={40} sx={{ mb: 1 }} />
-                <Skeleton variant="rectangular" height={40} sx={{ mb: 1 }} />
-                <Skeleton variant="rectangular" height={40} sx={{ mb: 1 }} />
-                <Skeleton variant="rectangular" height={40} />
-              </Box>
-            </div>
-          ) : !findings.length ? (
-            <div className="aws-scan-table-state">
-              <Typography variant="body2">No findings available for the selected report.</Typography>
-            </div>
-          ) : (
-            <TableContainer className="aws-scan-table-container">
-              <Table stickyHeader className={`aws-scan-table aws-scan-table-density-${tableDensity}`}>
-                <TableHead>
-                  <TableRow>
-                    {visibleColumns.status && <TableCell sx={densityCellSx}>Status</TableCell>}
-                    {visibleColumns.severity && <TableCell sx={densityCellSx}>Severity</TableCell>}
-                    {visibleColumns.serviceName && <TableCell sx={densityCellSx}>Service Name</TableCell>}
-                    {visibleColumns.region && <TableCell sx={densityCellSx}>Region</TableCell>}
-                    {visibleColumns.checkId && <TableCell sx={densityCellSx}>Check ID</TableCell>}
-                    {visibleColumns.checkTitle && <TableCell sx={densityCellSx}>Check Title</TableCell>}
-                    {visibleColumns.resourceId && <TableCell sx={densityCellSx}>Resource Id</TableCell>}
-                    {visibleColumns.resourceTags && <TableCell sx={densityCellSx}>Resource Tags</TableCell>}
-                    {visibleColumns.statusExtended && <TableCell sx={densityCellSx}>Status Extended</TableCell>}
-                    {visibleColumns.risk && <TableCell sx={densityCellSx}>Risk</TableCell>}
-                    {visibleColumns.recommendation && <TableCell sx={densityCellSx}>Recommendation</TableCell>}
-                    {visibleColumns.compliance && <TableCell sx={densityCellSx}>Compliance</TableCell>}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {pagedFindings.map((item, idx) => {
-                    const resource = Array.isArray(item.Resources) && item.Resources.length > 0 ? item.Resources[0] : {};
-                    const tags = resource?.Tags || null;
-                    const compliance = Array.isArray(item.Compliance?.RelatedRequirements)
-                      ? item.Compliance.RelatedRequirements.join(', ')
-                      : '';
-                    return (
-                      <TableRow key={idx} className="aws-scan-table-row">
-                        {visibleColumns.status && <TableCell sx={densityCellSx}>{item.Compliance?.Status || 'N/A'}</TableCell>}
-                        {visibleColumns.severity && <TableCell sx={densityCellSx}>{item.Severity?.Label || 'N/A'}</TableCell>}
-                        {visibleColumns.serviceName && (
-                          <TableCell sx={densityCellSx}>{(item.GeneratorId || '').replace(/^prowler-/, '') || 'N/A'}</TableCell>
-                        )}
-                        {visibleColumns.region && <TableCell sx={densityCellSx}>{resource?.Region || 'N/A'}</TableCell>}
-                        {visibleColumns.checkId && (
-                          <TableCell sx={densityCellSx}>{(item.Id || '').replace(/^prowler-/, '') || 'N/A'}</TableCell>
-                        )}
-                        {visibleColumns.checkTitle && (
-                          <TableCell sx={densityCellSx} className="aws-scan-cell-title">{item.Title || 'N/A'}</TableCell>
-                        )}
-                        {visibleColumns.resourceId && <TableCell sx={densityCellSx}>{resource?.Id || 'N/A'}</TableCell>}
-                        {visibleColumns.resourceTags && (
-                          <TableCell sx={densityCellSx} className="aws-scan-cell-tags">{tags ? JSON.stringify(tags) : 'N/A'}</TableCell>
-                        )}
-                        {visibleColumns.statusExtended && (
-                          <TableCell sx={densityCellSx} className="aws-scan-cell-desc">{item.Description || 'N/A'}</TableCell>
-                        )}
-                        {visibleColumns.risk && <TableCell sx={densityCellSx}>{(item.Types || []).join(', ') || 'N/A'}</TableCell>}
-                        {visibleColumns.recommendation && (
-                          <TableCell sx={densityCellSx} className="aws-scan-cell-rec">{item.Remediation?.Recommendation?.Text || 'N/A'}</TableCell>
-                        )}
-                        {visibleColumns.compliance && (
-                          <TableCell sx={densityCellSx} className="aws-scan-cell-comp">{compliance || 'N/A'}</TableCell>
-                        )}
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-
-          {/* pagination */}
-          {findings.length > 0 && (
-            <div className="aws-scan-pagination-row">
-              <TablePagination
-                component="div"
-                count={filteredFindings.length}
-                page={page}
-                onPageChange={handleChangePage}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                rowsPerPageOptions={[25, 50, 100]}
-              />
-            </div>
-          )}
+          <button
+            className="scan-download-btn bg-slate-600 text-white p-2 rounded hover:bg-slate-700 disabled:opacity-50"
+            title="Download JSON"
+            onClick={() => {
+              if (!rawReport) return;
+              const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(findings, null, 2));
+              const dlAnchorElem = document.createElement('a');
+              dlAnchorElem.setAttribute('href', dataStr);
+              dlAnchorElem.setAttribute('download', `azure_scan_${selectedOpenSearchId || 'report'}.json`);
+              dlAnchorElem.click();
+            }}
+            disabled={isReportListLoading || !findings.length}
+          >
+            <Download className="h-5 w-5" />
+          </button>
         </div>
-      </Grid>
 
-      {snackbarType && (
-        <Grid size={12} className="aws-scan-snackbar-row">
-          <SnackbarNotification
-            initialOpen
-            duration={5000}
-            message={snackbarMessage}
-            actionButtonName="Ok"
-            theme={snackbarType === 'success' ? SNACKBAR_THEME.GREEN : SNACKBAR_THEME.RED}
-            yPosition="top"
-            xPosition="center"
-          />
-        </Grid>
-      )}
-    </Grid>
+        <div className="aws-scan-table-actions mt-4">
+          <div className="aws-scan-table-action">
+            <button
+              className="p-2 hover:bg-slate-100 rounded"
+              onClick={(e) => setExportAnchorEl(e.currentTarget)}
+              disabled={!findings.length}
+            >
+              <Download className="h-5 w-5" />
+            </button>
+            <span
+              className="cursor-pointer"
+              onClick={(e) => setExportAnchorEl(e.currentTarget)}
+            >
+              Export
+            </span>
+            {exportAnchorEl && (
+              <div className="absolute bg-white shadow-lg rounded border mt-1 py-1 z-50">
+                <button
+                  className="block w-full text-left px-4 py-2 hover:bg-slate-100"
+                  onClick={() => { handleDownloadCsv(); setExportAnchorEl(null); }}
+                >
+                  Download as CSV
+                </button>
+                <button
+                  className="block w-full text-left px-4 py-2 hover:bg-slate-100"
+                  onClick={() => { handlePrint(); setExportAnchorEl(null); }}
+                >
+                  Print
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

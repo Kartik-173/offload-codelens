@@ -1,6 +1,5 @@
-import { Button, IconButton, Snackbar, SnackbarContent } from "@mui/material";
 import { useEffect, useState } from "react";
-import CloseIcon from "@mui/icons-material/Close";
+import { X } from "lucide-react";
 
 const defaultOptions = {
   initialOpen: false,
@@ -87,48 +86,48 @@ const SnackbarNotification = (props) => {
     setOpen(false);
   };
 
-  const action = (
-    <>
-      <Button
-        size="small"
-        onClick={handleClose}
-        variant="contained"
-        style={{
-          backgroundColor: theme["BTN_BACKGROUND"],
-        }}
-      >
-        {actionBtn}
-      </Button>
-      <IconButton
-        size="small"
-        aria-label="close"
-        color="inherit"
-        onClick={handleClose}
-      >
-        <CloseIcon fontSize="small" />
-      </IconButton>
-    </>
-  );
+  if (!open) return null;
+
+  const positionClasses = {
+    top: "top-4",
+    bottom: "bottom-4",
+    center: "top-1/2 -translate-y-1/2",
+  };
+
+  const horizontalClasses = {
+    left: "left-4",
+    right: "right-4",
+    center: "left-1/2 -translate-x-1/2",
+  };
 
   return (
-    <Snackbar
-      className="snackbar-container"
-      anchorOrigin={{ vertical, horizontal }}
-      open={open}
-      autoHideDuration={duration}
-      onClose={handleClose}
-      message={message}
-      action={action}
+    <div
+      className={`snackbar-container fixed z-50 ${positionClasses[vertical] || positionClasses.center} ${horizontalClasses[horizontal] || horizontalClasses.center}`}
     >
-      <SnackbarContent
+      <div
+        className="flex items-center gap-3 rounded-lg px-4 py-3 shadow-lg"
         style={{
           color: theme["TEXT"],
           backgroundColor: theme["BAR_BACKGROUND"],
         }}
-        message={message}
-        action={action}
-      />
-    </Snackbar>
+      >
+        <span className="text-sm">{message}</span>
+        <button
+          className="rounded px-3 py-1 text-sm font-medium text-white"
+          style={{ backgroundColor: theme["BTN_BACKGROUND"] }}
+          onClick={handleClose}
+        >
+          {actionBtn}
+        </button>
+        <button
+          className="rounded p-1 hover:bg-black/10"
+          aria-label="close"
+          onClick={handleClose}
+        >
+          <X size={16} />
+        </button>
+      </div>
+    </div>
   );
 };
 

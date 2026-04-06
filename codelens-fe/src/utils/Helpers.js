@@ -1,28 +1,28 @@
 import { ENV } from '../config/env';
-
-// Helper functions for various operations
-import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import {
+  MessageSquare,
+  FolderOpen,
+  FileText,
+  Shield,
+  Lock,
+  FolderGit,
+  ChevronsUp,
+  ChevronUp,
+  ChevronDown,
+  MessageCircle,
+  Folder,
+  Waypoints,
+  Archive,
+  ClipboardList,
+  Gauge,
+  ShieldCheck,
+  Cloud,
+  UserCog,
+  ShieldAlert,
+  Router,
+  Globe,
+} from 'lucide-react';
 import RepositoryService from '../services/RepositoryService';
-
-import ChatIcon from "@mui/icons-material/Chat";
-import ShieldIcon from "@mui/icons-material/Shield";
-import FolderIcon from "@mui/icons-material/Folder";
-import SourceIcon from "@mui/icons-material/Source";
-import DescriptionIcon from "@mui/icons-material/Description";
-import SecurityIcon from "@mui/icons-material/Security";
-
-import GitHubIcon from "@mui/icons-material/GitHub";
-import AddCommentIcon from "@mui/icons-material/AddComment";
-import ArchiveIcon from "@mui/icons-material/Archive";
-import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
-import AssessmentIcon from "@mui/icons-material/Assessment";
-import SpeedIcon from "@mui/icons-material/Speed";
-import PolicyIcon from "@mui/icons-material/Policy";
-import CloudOutlinedIcon from "@mui/icons-material/CloudOutlined";
-import LanguageIcon from "@mui/icons-material/Language";
-import LoadBalancerIcon from "@mui/icons-material/Router";
 
 /**
  * Fetch repositories from GitHub or Bitbucket
@@ -89,7 +89,6 @@ export const computeSizeRating = (ncloc) => {
 
 export const computeIssuesBySeverity = (issues) => {
   const severities = ["BLOCKER", "CRITICAL", "MAJOR", "MINOR", "INFO"];
-  const types = ["BUG", "VULNERABILITY", "CODE_SMELL"]; // match SonarQube naming
 
   // Initialize matrix: severity → [bugs, vulnerabilities, maintainability]
   const counts = severities.reduce((acc, sev) => {
@@ -193,11 +192,11 @@ export function buildTree(components) {
 export const getPriorityIcon = (priority) => {
   switch (priority.toLowerCase()) {
     case "high":
-      return <KeyboardDoubleArrowUpIcon className="priority-icon priority-high-icon" />;
+      return <ChevronsUp className="priority-icon priority-high-icon" />;
     case "medium":
-      return <KeyboardArrowUpIcon className="priority-icon priority-medium-icon" />;
+      return <ChevronUp className="priority-icon priority-medium-icon" />;
     case "low":
-      return <KeyboardArrowDownIcon className="priority-icon priority-low-icon" />;
+      return <ChevronDown className="priority-icon priority-low-icon" />;
     default:
       return null;
   }
@@ -218,69 +217,69 @@ export const CWE_LABELS = {
 export const SidebarMenu = (navigate) => [
   {
     label: "New Chat",
-    icon: <AddCommentIcon />,
+    icon: <MessageCircle />,
     action: "newChat",
   },
   {
     label: "GitHub",
-    icon: <GitHubIcon />,
+    icon: <FolderGit />,
     route: "/github-connections",
   },
   {
     label: "Bitbucket",
-    icon: <SourceIcon />,
+    icon: <Waypoints />,
     route: "/bitbucket-connections",
   },
   {
     label: "Scan Repo",
-    icon: <FolderIcon />,
+    icon: <Folder />,
     route: "/scan-repo",
   },
   {
     label: "Scan ZIP Code",
-    icon: <ArchiveIcon />,
+    icon: <Archive />,
     route: "/upload-zip",
   },
   {
     label: "Reports",
-    icon: <AssessmentIcon />,
+    icon: <ClipboardList />,
     route: "/report-list",
   },
   {
     label: "Vegeta Scan",
-    icon: <SpeedIcon />,
+    icon: <Gauge />,
     route: "/vegeta-scan",
   },
   {
     label: "WAF Scan",
-    icon: <PolicyIcon />,
+    icon: <ShieldCheck />,
     route: "/waf-scan",
   },
   {
     label: "Clouds Security Scan",
-    icon: <CloudOutlinedIcon />,
+    icon: <Cloud />,
     expandable: true,
     children: [
       {
         label: "Clouds Credentials",
-        icon: <ManageAccountsIcon />,
+        icon: <UserCog />,
         route: "/credentials",
       },
       {
         label: "Security Scan",
-        icon: <SecurityIcon />,
+        icon: <ShieldAlert />,
         route: "/security-scan",
       },
       {
         label: "ALB Health Preview",
-        icon: <LoadBalancerIcon />,
+        icon: <Router />,
         route: "/aws-alb-manager",
       },
     ],
   },
   {
     label: "OpenShield",
-    icon: <ShieldIcon />,
+    icon: <Shield />,
     external: () => {
       const accessToken = localStorage.getItem("access_token");
       const idToken = localStorage.getItem("id_token");
@@ -292,7 +291,7 @@ export const SidebarMenu = (navigate) => [
   },
   {
     label: "SecLens",
-    icon: <LanguageIcon />,
+    icon: <Globe />,
     external: () => {
       const accessToken = localStorage.getItem("access_token");
       const idToken = localStorage.getItem("id_token");
@@ -410,13 +409,13 @@ export const validateApiTestForm = (form) => {
 
 const HomeData = (navigate) => [
   {
-    icon: <ChatIcon />,
+    icon: <MessageSquare className="h-8 w-8 text-blue-500" />,
     title: "AI Copilot Chat",
     text: "Generate and refine Terraform, review diffs, and automate PRs.",
     buttons: [{ label: "Open Chat", action: () => navigate("/chat-start") }],
   },
   {
-    icon: <FolderIcon />,
+    icon: <FolderOpen className="h-8 w-8 text-emerald-500" />,
     title: "Scan Your Repos",
     text: "Run deep analysis and quality checks across your projects.",
     buttons: [
@@ -425,13 +424,13 @@ const HomeData = (navigate) => [
     ],
   },
   {
-    icon: <DescriptionIcon />,
+    icon: <FileText className="h-8 w-8 text-purple-500" />,
     title: "Reports & Insights",
     text: "Explore issues, hotspots, trends, and key metrics at a glance.",
     buttons: [{ label: "View Reports", action: () => navigate("/report-list") }],
   },
   {
-    icon: <ShieldIcon />,
+    icon: <Shield className="h-8 w-8 text-green-600" />,
     title: "OpenShield • Server Security",
     text: "Harden servers and detect vulnerabilities with Wazuh.",
     buttons: [
@@ -447,7 +446,7 @@ const HomeData = (navigate) => [
     ],
   },
   {
-    icon: <SecurityIcon />,
+    icon: <Lock className="h-8 w-8 text-orange-500" />,
     title: "SecLens • Web App Scans",
     text: "Scan domains and URLs for security risks with OWASP ZAP.",
     buttons: [
@@ -463,7 +462,7 @@ const HomeData = (navigate) => [
     ],
   },
   {
-    icon: <SourceIcon />,
+    icon: <FolderGit className="h-8 w-8 text-slate-600" />,
     title: "Connect Git Accounts",
     text: "Link GitHub or Bitbucket to enable PRs, branches, and pushes.",
     buttons: [
@@ -472,7 +471,7 @@ const HomeData = (navigate) => [
     ],
   },
   {
-    icon: <ShieldIcon />,
+    icon: <Shield className="h-8 w-8 text-indigo-500" />,
     title: "Secure AWS Credentials",
     text: "Store and manage credentials safely for scans and Terraform jobs.",
     buttons: [

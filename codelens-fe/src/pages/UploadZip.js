@@ -1,20 +1,9 @@
 import React, { useState } from "react";
+import { Loader2, FileArchive, UploadCloud } from "lucide-react";
 import RepoApiService from "../services/RepoApiService";
 import SnackbarNotification, {
   SNACKBAR_THEME,
 } from "../components/common/SnackbarNotification";
-
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  CircularProgress,
-  Divider,
-} from "@mui/material";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import { ENV } from '../config/env';
 
 const UploadZip = () => {
@@ -101,60 +90,69 @@ const UploadZip = () => {
   };
 
   return (
-    <Box className="upload-zip">
-      <Card className="upload-card">
-        <CardContent>
-          <Typography variant="h5" className="upload-title">
-            Upload Repository ZIP
-          </Typography>
-          <Typography variant="body2" className="upload-subtitle">
-            Upload your repository as a ZIP file for scanning and analysis.
-          </Typography>
+    <div className="upload-zip p-6">
+      <div className="upload-card bg-white rounded-lg shadow-lg p-6 max-w-2xl mx-auto">
+        <h2 className="upload-title text-2xl font-bold text-slate-900 mb-2">
+          Upload Repository ZIP
+        </h2>
+        <p className="upload-subtitle text-slate-600 mb-6">
+          Upload your repository as a ZIP file for scanning and analysis.
+        </p>
 
-          <Divider className="upload-divider" />
+        <hr className="upload-divider border-slate-200 my-6" />
 
-          <form onSubmit={handleSubmit}>
-            <Box className="form-group">
-              <label className="form-label">Repository ZIP File</label>
-              <Box className="file-upload">
-                <input
-                  type="file"
-                  accept=".zip"
-                  onChange={handleFileChange}
-                  id="zip-file"
-                  disabled={isUploading}
-                />
-                <label htmlFor="zip-file" className="file-upload-label">
-                  {selectedFile ? (
-                    <Box className="file-selected">
-                      <InsertDriveFileIcon className="file-icon" />
-                      <span>{selectedFile.name}</span>
-                    </Box>
-                  ) : (
-                    <Box className="file-placeholder">
-                      <CloudUploadIcon className="upload-icon" />
-                      <span>Click to choose a ZIP file</span>
-                    </Box>
-                  )}
-                </label>
-              </Box>
-            </Box>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group mb-6">
+            <label className="form-label block text-sm font-medium text-slate-700 mb-2">
+              Repository ZIP File
+            </label>
+            <div className="file-upload">
+              <input
+                type="file"
+                accept=".zip"
+                onChange={handleFileChange}
+                id="zip-file"
+                disabled={isUploading}
+                className="hidden"
+              />
+              <label
+                htmlFor="zip-file"
+                className="file-upload-label block w-full cursor-pointer"
+              >
+                {selectedFile ? (
+                  <div className="file-selected flex items-center gap-3 p-4 border-2 border-dashed border-slate-300 rounded-lg bg-slate-50">
+                    <FileArchive className="file-icon h-8 w-8 text-blue-500" />
+                    <span className="text-slate-900 font-medium">{selectedFile.name}</span>
+                  </div>
+                ) : (
+                  <div className="file-placeholder flex flex-col items-center gap-3 p-8 border-2 border-dashed border-slate-300 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
+                    <UploadCloud className="upload-icon h-12 w-12 text-slate-400" />
+                    <span className="text-slate-600">Click to choose a ZIP file</span>
+                  </div>
+                )}
+              </label>
+            </div>
+          </div>
 
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              className="upload-button"
-              disabled={isUploading || !selectedFile}
-              startIcon={
-                isUploading ? <CircularProgress size={20} /> : <CloudUploadIcon />
-              }
-            >
-              {isUploading ? "Uploading..." : "Upload Repository"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+          <button
+            type="submit"
+            className="upload-button w-full px-4 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            disabled={isUploading || !selectedFile}
+          >
+            {isUploading ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                <UploadCloud className="h-5 w-5" />
+                Upload Repository
+              </>
+            )}
+          </button>
+        </form>
+      </div>
 
       {snackbarStatus && (
         <SnackbarNotification
@@ -171,7 +169,7 @@ const UploadZip = () => {
           xPosition={"center"}
         />
       )}
-    </Box>
+    </div>
   );
 };
 

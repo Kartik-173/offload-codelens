@@ -1,4 +1,3 @@
-import { Typography, Tooltip } from "@mui/material";
 import { reportMetricsConfig } from "../../../services/ReportListService";
 
 const IssuesSeverityChart = ({ data, onIssueCountClick }) => {
@@ -36,12 +35,12 @@ const IssuesSeverityChart = ({ data, onIssueCountClick }) => {
                 className={`severity-row ${sev.colorClass} header-icons`}
               >
                 {sev.counts.map((item, idx) => (
-                  <Typography
+                  <span
                     key={idx}
                     className={typeof item === "number" ? "severity-count" : "metric-icon severity-count"}
                   >
                     {typeof item === "number" ? item.toLocaleString() : item}
-                  </Typography>
+                  </span>
                 ))}
               </div>
               <div
@@ -49,12 +48,12 @@ const IssuesSeverityChart = ({ data, onIssueCountClick }) => {
                 className={`severity-row ${sev.colorClass} header-labels`}
               >
                 {reportMetricsConfig.map((metric, idx) => (
-                  <Typography
+                  <span
                     key={idx}
                     className="severity-header-text"
                   >
                     {metric.metricLabel}
-                  </Typography>
+                  </span>
                 ))}
               </div>
             </>
@@ -73,17 +72,17 @@ const IssuesSeverityChart = ({ data, onIssueCountClick }) => {
                   }
                 };
                 return (
-                  <Tooltip key={idx} title={tooltipTitle} arrow placement="top">
-                    <Typography className="severity-count clickable" onClick={handleClick}>
+                  <span key={idx} title={tooltipTitle}>
+                    <span className="severity-count clickable" onClick={handleClick}>
                       {item.toLocaleString()}
-                    </Typography>
-                  </Tooltip>
+                    </span>
+                  </span>
                 );
               }
               return (
-                <Typography key={idx} className="metric-icon severity-count">
+                <span key={idx} className="metric-icon severity-count">
                   {item}
-                </Typography>
+                </span>
               );
             })}
           </div>

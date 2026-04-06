@@ -1,5 +1,4 @@
 import React from "react";
-import { Box, Typography, Avatar, Button } from "@mui/material";
 
 const ActivityTab = ({ hotspot }) => {
   if (!hotspot) return null;
@@ -15,30 +14,28 @@ const ActivityTab = ({ hotspot }) => {
   });
 
   return (
-    <Box className="activity-tab-wrapper">
-      <Typography variant="h6" className="activity-title">
+    <div className="activity-tab-wrapper">
+      <h3 className="activity-title text-lg font-semibold">
         Activity
-      </Typography>
+      </h3>
 
-      <Button variant="outlined" size="small" className="add-comment-btn">
+      <button type="button" className="add-comment-btn rounded-md border px-2 py-1 text-sm hover:bg-slate-50">
         Add a comment
-      </Button>
+      </button>
 
-      <Box className="activity-item">
-        <Avatar className="activity-avatar">
+      <div className="activity-item">
+        <div className="activity-avatar flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-sm font-medium">
           {author ? author[0].toUpperCase() : "U"}
-        </Avatar>
-        <Box className="activity-content">
-          <Typography className="activity-date">
-            {formattedDate}
-          </Typography>
-          <Typography className="activity-text">
+        </div>
+        <div className="activity-content">
+          <p className="activity-date text-xs text-slate-500">{formattedDate}</p>
+          <p className="activity-text text-sm">
             <span className="activity-author">{author}</span> created Security
             Hotspot
-          </Typography>
-        </Box>
-      </Box>
-    </Box>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 

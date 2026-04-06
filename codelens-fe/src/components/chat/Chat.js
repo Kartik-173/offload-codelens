@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Box, Paper } from "@mui/material";
 import { useOutletContext } from "react-router-dom";
 import { renameChat } from "../../config/chatDB.js";
 import { ChatApiService } from "../../services";
@@ -230,8 +229,8 @@ const Chat = () => {
   };
 
   return (
-    <Box display="flex" height="100vh">
-      <Paper className="chat-container" elevation={3}>
+    <div className="flex h-screen">
+      <div className="chat-container shadow-lg flex-1 flex flex-col h-full overflow-hidden">
         {!selectedChat ? (
           hasChats ? (
             <div />
@@ -239,7 +238,7 @@ const Chat = () => {
             <ChatEmptyState onStartChat={startNewChat} onStartTerraform={startNewTerraform} />
           )
         ) : (
-        <div className="chat-list">
+        <div className="chat-list flex-1 overflow-y-auto">
           {messages.map((msg, idx) => (
             <div key={idx} className="message-row-wrapper">
               {msg.text && !msg.files && (
@@ -307,8 +306,8 @@ const Chat = () => {
           xPosition={"center"}
         />
       )}
-      </Paper>
-    </Box>
+      </div>
+    </div>
   );
 };
 

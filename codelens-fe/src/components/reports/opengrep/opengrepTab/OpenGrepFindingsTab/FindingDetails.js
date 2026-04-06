@@ -1,19 +1,37 @@
 import React, { useState } from "react";
 import {
-  Drawer,
-  Typography,
-  Divider,
-  Box,
-  Chip,
-  IconButton,
-  Tooltip
-} from "@mui/material";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import CheckIcon from "@mui/icons-material/Check";
-import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
-import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
-import CodeOutlinedIcon from "@mui/icons-material/CodeOutlined";
-import NumbersOutlinedIcon from "@mui/icons-material/NumbersOutlined";
+  Copy as ContentCopyIcon,
+  Check as CheckIcon,
+  Folder as FolderOutlinedIcon,
+  Tag as LabelOutlinedIcon,
+  Code as CodeOutlinedIcon,
+  Hash as NumbersOutlinedIcon,
+  X,
+} from "lucide-react";
+
+const Box = ({ children, className = "" }) => (
+  <div className={className}>{children}</div>
+);
+
+const Typography = ({ children, className = "" }) => (
+  <p className={className}>{children}</p>
+);
+
+const Divider = ({ className = "" }) => <div className={className} />;
+
+const Chip = ({ label, className = "" }) => (
+  <span className={`inline-flex rounded-full border px-2 py-0.5 text-xs ${className}`.trim()}>{label}</span>
+);
+
+const IconButton = ({ children, onClick, className = "", title }) => (
+  <button type="button" onClick={onClick} className={className} title={title}>
+    {children}
+  </button>
+);
+
+const Tooltip = ({ children, title }) => (
+  <span title={typeof title === "string" ? title : undefined}>{children}</span>
+);
 
 const FindingDetails = ({ finding, onClose }) => {
   const [copied, setCopied] = useState(false);
@@ -26,21 +44,20 @@ const FindingDetails = ({ finding, onClose }) => {
   };
 
   return (
-    <Drawer
-      anchor="right"
-      open
-      onClose={onClose}
-      PaperProps={{ className: "finding-drawer" }}
-    >
+    <div className="fixed inset-0 z-40 flex justify-end bg-black/20" onClick={onClose}>
+      <div className="finding-drawer h-full w-full max-w-xl overflow-y-auto bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
       <Box className="finding-details">
         <Box className="finding-header">
           <Typography className="finding-title">
             {finding.rule_id}
           </Typography>
 
+          <IconButton className="rounded p-1 hover:bg-slate-100" onClick={onClose} title="Close">
+            <X className="h-4 w-4" />
+          </IconButton>
+
           <Chip
             label={finding.severity}
-            size="small"
             className={`severity-chip ${finding.severity.toLowerCase()}`}
           />
         </Box>
@@ -83,11 +100,10 @@ const FindingDetails = ({ finding, onClose }) => {
 
             <Tooltip title={copied ? "Copied" : "Copy"}>
               <IconButton
-                size="small"
                 onClick={handleCopy}
                 className="copy-btn"
               >
-                {copied ? <CheckIcon /> : <ContentCopyIcon />}
+                {copied ? <CheckIcon className="h-4 w-4" /> : <ContentCopyIcon className="h-4 w-4" />}
               </IconButton>
             </Tooltip>
           </Box>
@@ -97,7 +113,8 @@ const FindingDetails = ({ finding, onClose }) => {
           </pre>
         </Box>
       </Box>
-    </Drawer>
+      </div>
+    </div>
   );
 };
 

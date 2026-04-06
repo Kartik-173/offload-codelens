@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Box, Typography, Snackbar, Alert } from "@mui/material";
 import { getPriorityIcon } from "../../../../utils/Helpers";
 import HotspotHeader from "./HotspotHeader";
 import HotspotTabs from "./HotspotTabs";
@@ -71,16 +70,16 @@ const HotspotDetails = ({ selectedHotspot }) => {
   // Empty state
   if (!hotspot) {
     return (
-      <Box className="hotspot-details">
-        <Typography variant="body2" className="hotspot-empty">
+      <div className="hotspot-details">
+        <p className="hotspot-empty text-sm text-slate-500">
           Select a hotspot to view details
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   }
 
   return (
-    <Box className="hotspot-details">
+    <div className="hotspot-details">
       <HotspotHeader
         hotspot={hotspot}
         handleCopyPath={handleCopyPath}
@@ -96,17 +95,12 @@ const HotspotDetails = ({ selectedHotspot }) => {
         handleEditorMount={handleEditorMount}
       />
 
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={2000}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert severity="success" className="hotspot-toast">
+      {snackbarOpen && (
+        <div className="fixed left-1/2 top-5 z-50 -translate-x-1/2 rounded-md bg-emerald-600 px-4 py-2 text-sm text-white shadow-lg">
           Copied to clipboard!
-        </Alert>
-      </Snackbar>
-    </Box>
+        </div>
+      )}
+    </div>
   );
 };
 

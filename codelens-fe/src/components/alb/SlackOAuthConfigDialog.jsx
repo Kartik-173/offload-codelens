@@ -1,25 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Box,
-  Typography,
-  Alert,
-  CircularProgress,
-  Chip,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "../../components/ui/dialog";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Badge } from "../../components/ui/badge";
 import {
-  Info as InfoIcon,
-  CheckCircle as CheckCircleIcon,
-  Error as ErrorIcon,
-  Settings as SettingsIcon,
-} from '@mui/icons-material';
+  Info,
+  CheckCircle,
+  Loader2,
+  Settings,
+  MessageCircle,
+} from 'lucide-react';
 import SlackIntegrationService from '../../services/SlackIntegrationService';
 import { ENV } from '../../config/env';
 
@@ -146,121 +143,121 @@ const SlackOAuthConfigDialog = ({ open, onClose, onSuccess }) => {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-      <DialogTitle>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="h6">Slack Webhook Configuration</Typography>
-          {checkingConfig ? (
-            <CircularProgress size={20} />
-          ) : configExists ? (
-            <Chip 
-              icon={<CheckCircleIcon />} 
-              label="Configured" 
-              color="success" 
-              size="small" 
-            />
-          ) : (
-            <Chip 
-              icon={<ErrorIcon />} 
-              label="Not Configured" 
-              color="warning" 
-              size="small" 
-            />
-          )}
-        </Box>
-      </DialogTitle>
-      
-      <DialogContent>
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <MessageCircle className="h-5 w-5" />
+            Slack Webhook Configuration
+            {checkingConfig ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : configExists ? (
+              <Badge className="bg-green-100 text-green-800">Configured</Badge>
+            ) : (
+              <Badge className="bg-amber-100 text-amber-800">Not Configured</Badge>
+            )}
+          </DialogTitle>
+        </DialogHeader>
+        
         <form autoComplete="off" noValidate>
-          <Box sx={{ mb: 3 }}>
-            <Alert severity="info" icon={<InfoIcon />}>
-              <Typography variant="body2" component="div">
-                <strong>Setup Instructions:</strong>
-                <ol style={{ margin: '8px 0', paddingLeft: '20px' }}>
-                  <li>Create a Slack App at <a href="https://api.slack.com/apps" target="_blank" rel="noopener">https://api.slack.com/apps</a></li>
-                  <li>Enable <strong>Incoming Webhooks</strong></li>
-                  <li>Add a new webhook to your workspace and select the channel for alerts</li>
-                  <li>Copy the generated <strong>Webhook URL</strong> and paste below</li>
-                </ol>
-              </Typography>
-            </Alert>
-          </Box>
+          <div className="space-y-4 py-4">
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-start gap-2">
+                <Info className="h-5 w-5 text-blue-600 mt-0.5" />
+                <div>
+                  <p className="font-medium text-blue-800">Setup Instructions:</p>
+                  <ol className="text-sm text-blue-700 mt-2 space-y-1 list-decimal list-inside">
+                    <li>Create a Slack App at <a href="https://api.slack.com/apps" target="_blank" rel="noopener noreferrer" className="underline">https://api.slack.com/apps</a></li>
+                    <li>Enable <strong>Incoming Webhooks</strong></li>
+                    <li>Add a new webhook to your workspace and select the channel for alerts</li>
+                    <li>Copy the generated <strong>Webhook URL</strong> and paste below</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
 
-          {configExists && (
-          <Box sx={{ mb: 3 }}>
-            <Alert severity="success" icon={<CheckCircleIcon />}>
-              <Typography variant="body2" component="div">
-                <strong>Slack Webhook is already configured! 🎉</strong>
-                <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
-                  <li>Organization: <strong>{ENV.SLACK_OAUTH_NAME}</strong></li>
-                  <li>Status: <strong>Ready to send notifications</strong></li>
-                  <li>You can now send notifications to Slack channels</li>
-                </ul>
-              </Typography>
-            </Alert>
-          </Box>
-        )}
+            {configExists && (
+              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-green-800">Slack Webhook is already configured! 🎉</p>
+                    <ul className="text-sm text-green-700 mt-2 space-y-1 list-disc list-inside">
+                      <li>Organization: <strong>{ENV.SLACK_OAUTH_NAME}</strong></li>
+                      <li>Status: <strong>Ready to send notifications</strong></li>
+                      <li>You can now send notifications to Slack channels</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
 
-          {!configExists && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <TextField
-              label="Incoming Webhook URL"
-              value={formData.webhookUrl}
-              onChange={handleInputChange('webhookUrl')}
-              error={!!errors.webhookUrl}
-              helperText={errors.webhookUrl || "From your Slack App's Incoming Webhooks settings"}
-              fullWidth
-              disabled={configExists}
-              type="text"
-              autoComplete="off"
-              autoCorrect="off"
-              autoCapitalize="off"
-              spellCheck="false"
-              inputProps={{ 
-                autoComplete: 'new-password', 
-                autoFill: 'off',
-                form: { autoComplete: 'off' }
-              }}
-              name={`slack-webhook-url-${Date.now()}`}
-            />
-          </Box>
-        )}
+            {!configExists && (
+              <div className="space-y-2">
+                <Label htmlFor="webhookUrl">Incoming Webhook URL</Label>
+                <Input
+                  id="webhookUrl"
+                  value={formData.webhookUrl}
+                  onChange={handleInputChange('webhookUrl')}
+                  disabled={configExists}
+                  type="text"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck="false"
+                  placeholder="https://hooks.slack.com/services/..."
+                  name={`slack-webhook-url-${Date.now()}`}
+                />
+                {errors.webhookUrl && (
+                  <p className="text-sm text-red-600">{errors.webhookUrl}</p>
+                )}
+                <p className="text-xs text-slate-500">
+                  From your Slack App's Incoming Webhooks settings
+                </p>
+              </div>
+            )}
 
-        {configExists && (
-          <Box sx={{ textAlign: 'center', py: 4 }}>
-            <SettingsIcon sx={{ fontSize: 64, color: 'success.main', mb: 2 }} />
-            <Typography variant="h6" color="success.main" gutterBottom>
-              Slack Integration Ready
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Your Slack app is configured and ready to send notifications.
-            </Typography>
-          </Box>
-        )}
+            {configExists && (
+              <div className="text-center py-8">
+                <Settings className="h-16 w-16 text-green-600 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-green-700 mb-2">
+                  Slack Integration Ready
+                </h3>
+                <p className="text-sm text-slate-600">
+                  Your Slack app is configured and ready to send notifications.
+                </p>
+              </div>
+            )}
 
-          {errors.submit && (
-            <Box sx={{ mt: 2 }}>
-              <Alert severity="error">{errors.submit}</Alert>
-            </Box>
-          )}
+            {errors.submit && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+                {errors.submit}
+              </div>
+            )}
+          </div>
         </form>
-      </DialogContent>
 
-      <DialogActions sx={{ p: 3 }}>
-        <Button onClick={handleClose} disabled={loading}>
-          {configExists ? 'Close' : 'Cancel'}
-        </Button>
-        {!configExists && (
-          <Button 
-            onClick={handleSubmit} 
-            variant="contained" 
-            disabled={loading}
-            start={loading && <CircularProgress size={20} />}
-          >
-            {loading ? 'Saving...' : 'Save Configuration'}
+        <DialogFooter>
+          <Button variant="outline" onClick={handleClose} disabled={loading}>
+            {configExists ? 'Close' : 'Cancel'}
           </Button>
-        )}
-      </DialogActions>
+          {!configExists && (
+            <Button 
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Saving...
+                </>
+              ) : (
+                'Save Configuration'
+              )}
+            </Button>
+          )}
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 };

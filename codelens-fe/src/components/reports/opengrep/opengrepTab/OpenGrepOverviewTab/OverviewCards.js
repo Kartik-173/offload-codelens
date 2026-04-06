@@ -1,41 +1,50 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
-import BugReportOutlinedIcon from "@mui/icons-material/BugReportOutlined";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import {
+  Bug,
+  CircleAlert,
+  TriangleAlert,
+  Info,
+  CircleCheck,
+} from "lucide-react";
+
+const Box = ({ children, className = "" }) => (
+  <div className={className}>{children}</div>
+);
+
+const Typography = ({ children, className = "" }) => (
+  <p className={className}>{children}</p>
+);
 
 const CARDS = [
   {
     key: "TOTAL",
     label: "Total Findings",
     valueKey: "total_findings",
-    icon: <BugReportOutlinedIcon />,
+    icon: <Bug className="h-4 w-4" />,
     className: "card-total"
   },
   {
     key: "CRITICAL",
     label: "Critical",
-    icon: <ErrorOutlineIcon />,
+    icon: <CircleAlert className="h-4 w-4" />,
     className: "card-critical"
   },
   {
     key: "HIGH",
     label: "High",
-    icon: <WarningAmberOutlinedIcon />,
+    icon: <TriangleAlert className="h-4 w-4" />,
     className: "card-high"
   },
   {
     key: "MEDIUM",
     label: "Medium",
-    icon: <InfoOutlinedIcon />,
+    icon: <Info className="h-4 w-4" />,
     className: "card-medium"
   },
   {
     key: "LOW",
     label: "Low",
-    icon: <CheckCircleOutlineIcon />,
+    icon: <CircleCheck className="h-4 w-4" />,
     className: "card-low"
   }
 ];

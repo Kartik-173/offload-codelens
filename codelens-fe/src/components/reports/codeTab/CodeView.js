@@ -1,17 +1,16 @@
 import React, { useState, useMemo } from "react";
-import {
-  Box,
-  CircularProgress,
-  Typography,
-  Breadcrumbs,
-  Link,
-} from "@mui/material";
-import { ContentCopy as CopyIcon } from "@mui/icons-material";
+import { Folder, FileText } from "lucide-react";
 import DirectoryView from "./DirectoryView/DirectoryView";
 import FileView from "./fileView/FileView";
 import RepoApiService from "../../../services/RepoApiService.js";
-import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
-import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
+
+const Box = ({ children, className = "", ...rest }) => (
+  <div className={className} {...rest}>{children}</div>
+);
+
+const Typography = ({ children, className = "", ...rest }) => (
+  <p className={className} {...rest}>{children}</p>
+);
 
 const CodeView = ({ loading, reportDetails }) => {
   const [viewMode, setViewMode] = useState("directory");
@@ -61,16 +60,12 @@ const CodeView = ({ loading, reportDetails }) => {
     setFileContent(null);
   };
 
-  const handleCopyPath = () => {
-    navigator.clipboard.writeText(breadcrumbPath.join("/"));
-  };
-
   if (loading) {
     return (
       <Box className="code-tab-wrapper">
         <Box className="code-tab-container">
-          <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-            <CircularProgress />
+          <Box className="flex h-full items-center justify-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
           </Box>
         </Box>
       </Box>
@@ -81,8 +76,8 @@ const CodeView = ({ loading, reportDetails }) => {
     return (
       <Box className="code-tab-wrapper">
         <Box className="code-tab-container">
-          <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-            <Typography variant="h6" color="textSecondary">
+          <Box className="flex h-full items-center justify-center">
+            <Typography className="text-base text-slate-500">
               No report details available
             </Typography>
           </Box>
@@ -95,25 +90,26 @@ const CodeView = ({ loading, reportDetails }) => {
     <Box className="code-tab-wrapper">
       {/* ✅ Breadcrumb */}
       <Box className="breadcrumb-container">
-        <Breadcrumbs separator="›" aria-label="breadcrumb">
+        <div className="flex flex-wrap items-center gap-1" aria-label="breadcrumb">
           {breadcrumbPath.map((crumb, idx) => {
             const isFile = crumb.includes(".");
             return (
-              <Link
+              <button
                 key={idx}
+                type="button"
                 className="breadcrumb-item"
                 onClick={() => handleBreadcrumbClick(idx)}
               >
                 {isFile ? (
-                  <InsertDriveFileOutlinedIcon className="breadcrumb-icon file" />
+                  <FileText className="breadcrumb-icon file" />
                 ) : (
-                  <FolderOutlinedIcon className="breadcrumb-icon folder" />
+                  <Folder className="breadcrumb-icon folder" />
                 )}
                 {crumb}
-              </Link>
+              </button>
             );
           })}
-        </Breadcrumbs>
+        </div>
         {/* <CopyIcon
           fontSize="small"
           onClick={handleCopyPath}

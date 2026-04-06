@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Box, Paper, Tabs, Tab } from '@mui/material';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/ui/tabs";
+import { Card } from "../components/ui/card";
 import AwsScan from './AwsScan';
 import AzureScan from './AzureScan';
 
@@ -11,12 +12,12 @@ const Scan = () => {
   });
 
   return (
-    <Box className="scan-page">
-      <Paper className="scan-card" elevation={3}>
-        <Box className="scan-tabs">
+    <div className="scan-page p-6">
+      <Card className="scan-card shadow-lg p-6">
+        <div className="scan-tabs mb-6">
           <Tabs
             value={tab}
-            onChange={(_, v) => {
+            onValueChange={(v) => {
               setTab(v);
               const url = new URL(window.location.href);
               url.searchParams.set('tab', v);
@@ -24,14 +25,22 @@ const Scan = () => {
             }}
             aria-label="cloud provider tabs"
           >
-            <Tab label="AWS" value="aws" />
-            <Tab label="Azure" value="azure" />
-          </Tabs>
-        </Box>
+            <TabsList>
+              <TabsTrigger value="aws">☁️ AWS</TabsTrigger>
+              <TabsTrigger value="azure">🔷 Azure</TabsTrigger>
+            </TabsList>
 
-        {tab === 'aws' ? <AwsScan /> : <AzureScan />}
-      </Paper>
-    </Box>
+            <TabsContent value="aws">
+              <AwsScan />
+            </TabsContent>
+
+            <TabsContent value="azure">
+              <AzureScan />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </Card>
+    </div>
   );
 };
 

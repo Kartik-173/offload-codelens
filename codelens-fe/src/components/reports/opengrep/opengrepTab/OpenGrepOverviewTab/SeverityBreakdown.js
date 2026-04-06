@@ -1,6 +1,12 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
-import { PieChart } from "@mui/x-charts/PieChart";
+
+const Box = ({ children, className = "" }) => (
+  <div className={className}>{children}</div>
+);
+
+const Typography = ({ children, className = "" }) => (
+  <p className={className}>{children}</p>
+);
 
 const COLORS = {
   CRITICAL: "#dc2626",
@@ -19,6 +25,8 @@ const SeverityBreakdown = ({ severity }) => {
       color: COLORS[sev]
     }));
 
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+
   return (
     <Box className="opengrep-overview-container">
       <Box className="severity-panel">
@@ -26,25 +34,21 @@ const SeverityBreakdown = ({ severity }) => {
           Severity Distribution
         </Typography>
 
-        <Box className="severity-chart-wrapper">
-          <PieChart
-            series={[
-              {
-                data,
-                innerRadius: 70,
-                outerRadius: 120,
-                paddingAngle: 4,
-                cornerRadius: 6,
-                startAngle: -90,
-                endAngle: 270
-              }
-            ]}
-            width={320}
-            height={280}
-            slotProps={{
-              legend: { hidden: true }
-            }}
-          />
+        <Box className="severity-chart-wrapper space-y-3">
+          {data.map((item) => {
+            const percentage = total ? Math.round((item.value / total) * 100) : 0;
+            return (
+              <div key={item.id} className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium" style={{ color: item.color }}>{item.label}</span>
+                  <span>{item.value} ({percentage}%)</span>
+                </div>
+                <div className="h-2 rounded bg-slate-100">
+                  <div className="h-2 rounded" style={{ width: `${percentage}%`, backgroundColor: item.color }} />
+                </div>
+              </div>
+            );
+          })}
         </Box>
       </Box>
     </Box>

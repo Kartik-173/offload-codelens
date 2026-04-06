@@ -1,4 +1,3 @@
-import { Paper, Typography, Box, Grid, CircularProgress, Tooltip } from "@mui/material";
 import {
   bottomMetricsConfig,
   reportInfoConfig,
@@ -6,12 +5,35 @@ import {
 } from "../../../services/ReportListService";
 import IssuesSeverityChart from "./IssuesSeverityChart.js";
 
-const valueMap = {
-  A: 0,
-  B: 2,
-  C: 5,
-  D: 1,
-  E: 3,
+const Paper = ({ children, className = "" }) => <div className={className}>{children}</div>;
+
+const Typography = ({ children, className = "", onClick }) => (
+  <p className={className} onClick={onClick}>
+    {children}
+  </p>
+);
+
+const Box = ({ children, className = "" }) => <div className={className}>{children}</div>;
+
+const Grid = ({ children, className = "" }) => <div className={className}>{children}</div>;
+
+const Tooltip = ({ children, title }) => (
+  <span title={typeof title === "string" ? title : undefined}>{children}</span>
+);
+
+const CircularProgress = ({ value = 0, className = "", style = {} }) => {
+  const safeValue = Math.max(0, Math.min(100, Number(value) || 0));
+
+  return (
+    <div
+      className={className}
+      style={{
+        ...style,
+        background: `conic-gradient(currentColor ${safeValue * 3.6}deg, rgba(148,163,184,0.25) 0deg)`,
+        borderRadius: "9999px",
+      }}
+    />
+  );
 };
 
 const metricFilterMap = {

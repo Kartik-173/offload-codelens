@@ -1,14 +1,17 @@
 import React from "react";
-import { Box, Paper, Typography } from "@mui/material";
+
+const Box = ({ children, className = "" }) => <div className={className}>{children}</div>;
+const Paper = ({ children, className = "" }) => <div className={className}>{children}</div>;
+const Typography = ({ children, className = "" }) => <p className={className}>{children}</p>;
 
 const MetricCard = ({ label, value, children }) => {
   return (
-    <Paper elevation={0} className="file-view-metric-card">
+    <Paper className="file-view-metric-card">
       <Box className="file-view-metric-content">
-        <Typography variant="caption" className="file-view-metric-label">
+        <Typography className="file-view-metric-label">
           {label}
         </Typography>
-        <Typography variant="body1" className="file-view-metric-value">
+        <Typography className="file-view-metric-value">
           {value}
         </Typography>
       </Box>

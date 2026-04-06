@@ -1,16 +1,10 @@
 import React from "react";
-import {
-  Card,
-  CardContent,
-  Typography,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Button,
-  Divider,
-} from "@mui/material";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { CircleCheck as CheckCircleIcon } from "lucide-react";
+
+const Card = ({ children, className = "" }) => <div className={className}>{children}</div>;
+const CardContent = ({ children, className = "" }) => <div className={className}>{children}</div>;
+const Typography = ({ children, className = "" }) => <p className={className}>{children}</p>;
+const Divider = ({ className = "" }) => <div className={className} />;
 
 const TerraformFilePreviewCard = ({ files, onOpenEditor }) => {
   const fileNames = Object.keys(files || {});
@@ -18,25 +12,23 @@ const TerraformFilePreviewCard = ({ files, onOpenEditor }) => {
   return (
     <Card className="terraform-preview-card">
       <CardContent className="terraform-preview-content">
-        <Typography variant="subtitle2" className="terraform-preview-title">
+        <Typography className="terraform-preview-title">
           ✅ Terraform Files Generated
         </Typography>
         <Divider className="terraform-preview-divider" />
-        <List className="terraform-preview-list">
+        <div className="terraform-preview-list">
           {fileNames.map((file, idx) => (
-            <ListItem
+            <button
               key={idx}
-              button
+              type="button"
               className="terraform-preview-list-item"
               onClick={onOpenEditor}
             >
-              <ListItemIcon>
-                <CheckCircleIcon fontSize="small" color="success" />
-              </ListItemIcon>
-              <ListItemText primary={file} />
-            </ListItem>
+              <CheckCircleIcon className="h-4 w-4 text-emerald-600" />
+              <span>{file}</span>
+            </button>
           ))}
-        </List>
+        </div>
       </CardContent>
     </Card>
   );

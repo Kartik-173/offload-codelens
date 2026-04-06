@@ -1,22 +1,15 @@
 import React from 'react';
+import { Card } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Badge } from "../../components/ui/badge";
 import {
-  Box,
-  Card,
-  CardContent,
-  Grid,
-  Typography,
-  Chip,
-  Button,
-  Alert,
-} from '@mui/material';
-import {
-  BugReport as BugReportIcon,
-  Healing as HealingIcon,
-  Email as EmailIcon,
-  PlayArrow as AutoDeregisterIcon,
-  Shield as ShieldIcon,
-  Chat as SlackIcon,
-} from '@mui/icons-material';
+  Bug,
+  HeartPulse,
+  Mail,
+  Play,
+  Shield,
+  MessageCircle,
+} from 'lucide-react';
 import { getTargetGroupHealthSummary, getUnhealthyTargetsCount } from '../../utils/Helpers';
 
 const StatusSummary = ({ 
@@ -40,190 +33,129 @@ const StatusSummary = ({
   const unhealthyCount = getUnhealthyTargetsCount(targetGroups, albs);
 
   return (
-    <Card sx={{ mb: 3 }}>
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
-          ALB Status Summary
-        </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={6} md={3}>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h4" color="primary">
-                {albs.length}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Total ALBs
-              </Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={6} md={3}>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h4" color="success.main">
-                {albs.filter(alb => alb.state === 'active').length}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Active ALBs
-              </Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={6} md={3}>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h4" color="info.main">
-                {new Set(albs.map(alb => alb.region)).size}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Regions with ALBs
-              </Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={6} md={3}>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h4" color="warning.main">
-                {Object.keys(targetGroups).length}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Target Groups
-              </Typography>
-            </Box>
-          </Grid>
-        </Grid>
+    <Card className="mb-6">
+      <div className="p-6">
+        <h2 className="text-xl font-semibold mb-4">Load Balancers Summary</h2>
+        
+        {/* Summary Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="text-center">
+            <p className="text-3xl font-bold text-slate-800">{albs.length}</p>
+            <p className="text-sm text-slate-600">Total ALBs</p>
+          </div>
+          <div className="text-center">
+            <p className="text-3xl font-bold text-green-600">{albs.filter(alb => alb.state === 'active').length}</p>
+            <p className="text-sm text-slate-600">Active ALBs</p>
+          </div>
+          <div className="text-center">
+            <p className="text-3xl font-bold text-blue-600">{new Set(albs.map(alb => alb.region)).size}</p>
+            <p className="text-sm text-slate-600">Regions with ALBs</p>
+          </div>
+          <div className="text-center">
+            <p className="text-3xl font-bold text-amber-600">{Object.keys(targetGroups).length}</p>
+            <p className="text-sm text-slate-600">Target Groups</p>
+          </div>
+        </div>
         
         {/* Target Health Summary */}
         {Object.keys(targetGroups).length > 0 && (
-          <Box sx={{ mt: 3, pt: 2, borderTop: 1, borderColor: 'divider' }}>
-            <Typography variant="subtitle2" gutterBottom>
-              Target Health Summary
-            </Typography>
-            <Grid container spacing={3} sx={{ mb: 3 }}>
-              <Grid item xs={4}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6" color="primary.main">
-                    {healthSummary.totalTargets}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Total Targets
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={4}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6" color="error.main">
-                    {unhealthyCount}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Unhealthy
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={4}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6" color="success.main">
-                    {healthSummary.healthyTargets}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Healthy
-                  </Typography>
-                </Box>
-              </Grid>
-            </Grid>
+          <div className="mt-6 pt-4 border-t border-slate-200">
+            <h3 className="text-lg font-medium mb-3">Target Health Summary</h3>
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <div className="text-center">
+                <p className="text-2xl font-semibold text-slate-800">{healthSummary.totalTargets}</p>
+                <p className="text-xs text-slate-600">Total Targets</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-semibold text-red-600">{unhealthyCount}</p>
+                <p className="text-xs text-slate-600">Unhealthy</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-semibold text-green-600">{healthSummary.healthyTargets}</p>
+                <p className="text-xs text-slate-600">Healthy</p>
+              </div>
+            </div>
             
             {/* Auto-Deregister Monitoring Status */}
             {autoDeregisterEnabled && (
-              <Box sx={{ mt: 2, p: 2, bgcolor: 'info.light', borderRadius: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                  <ShieldIcon color="info" />
-                  <Typography variant="subtitle2" color="info.dark">
-                    Auto-Deregister Monitor
-                  </Typography>
+              <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Shield className="h-5 w-5 text-blue-600" />
+                  <span className="font-medium">Auto-Deregister Monitor</span>
                   {monitoringAutoDeregister && (
-                    <Chip 
-                      label="Active" 
-                      size="small" 
-                      color="success" 
-                      variant="outlined"
-                    />
+                    <Badge className="bg-green-100 text-green-800 text-xs">Active</Badge>
                   )}
-                </Box>
-                <Typography variant="body2" color="text.secondary">
+                </div>
+                <p className="text-sm text-slate-600">
                   {monitoringAutoDeregister 
                     ? "Monitoring for auto-deregister activity... UI will refresh automatically when targets are deregistered."
                     : "Monitor not active - refresh page to see latest auto-deregister results."
                   }
-                </Typography>
+                </p>
                 {lastAutoDeregisterActivity?.lastRunAt && (
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                  <p className="text-xs text-slate-500 mt-2">
                     Last activity: {new Date(lastAutoDeregisterActivity.lastRunAt).toLocaleString()}
                     {lastAutoDeregisterActivity.totalDeregistered > 0 && 
                       ` • ${lastAutoDeregisterActivity.totalDeregistered} targets deregistered`
                     }
-                  </Typography>
+                  </p>
                 )}
-              </Box>
+              </div>
             )}
 
             {/* Unhealthy Instances Quick Actions */}
             {!autoDeregisterEnabled && unhealthyCount > 0 && (
-              <Box sx={{ mt: 3, p: 2, bgcolor: 'error.light', borderRadius: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <BugReportIcon color="error" />
-                  <Typography variant="subtitle2" color="error.dark">
+              <div className="mt-4 p-4 bg-red-50 rounded-lg border border-red-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <Bug className="h-5 w-5 text-red-600" />
+                  <span className="font-medium text-red-800">
                     ⚠️ {unhealthyCount} Unhealthy Instance{unhealthyCount > 1 ? 's' : ''} Detected
-                  </Typography>
-                </Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  </span>
+                </div>
+                <p className="text-sm text-slate-600 mb-3">
                   Some instances are experiencing health issues. Click below to view detailed information and take action.
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                </p>
+                <div className="flex gap-2 flex-wrap">
                   <Button
-                    variant="contained"
-                    color="error"
-                    startIcon={<HealingIcon />}
+                    variant="destructive"
+                    size="sm"
                     onClick={onViewUnhealthyDetails}
-                    size="small"
                   >
+                    <HeartPulse className="h-4 w-4 mr-1" />
                     View Unhealthy Details
                   </Button>
                   <Button
-                    variant="outlined"
-                    color="primary"
-                    startIcon={<EmailIcon />}
+                    variant="outline"
+                    size="sm"
                     onClick={onConfigureEmail}
-                    size="small"
                   >
+                    <Mail className="h-4 w-4 mr-1" />
                     Configure Email Alerts
                   </Button>
-                </Box>
-              </Box>
+                </div>
+              </div>
             )}
 
             {/* Email Configuration Button (always visible) */}
-            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-              <Button
-                variant="text"
-                color="primary"
-                startIcon={<EmailIcon />}
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                className="text-blue-600 hover:underline text-sm flex items-center gap-1"
                 onClick={onConfigureEmail}
-                size="small"
-                sx={{ textTransform: 'none' }}
               >
-                <EmailIcon sx={{ mr: 1 }} />
+                <Mail className="h-4 w-4" />
                 Email Settings
-              </Button>
-              
-              <Button
-                variant="text"
-                color="primary"
-                startIcon={<SlackIcon />}
+              </button>
+              <button
+                className="text-blue-600 hover:underline text-sm flex items-center gap-1"
                 onClick={onConfigureSlack}
-                size="small"
-                sx={{ textTransform: 'none' }}
               >
+                <MessageCircle className="h-4 w-4" />
                 Slack Settings
-              </Button>
-            </Box>
-          </Box>
+              </button>
+            </div>
+          </div>
         )}
-      </CardContent>
+      </div>
     </Card>
   );
 };

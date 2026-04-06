@@ -1,25 +1,28 @@
 import React, { useState, useEffect } from "react";
 import {
-  List,
-  ListItem,
-  ListItemText,
-  Collapse,
-  Checkbox,
-  FormControlLabel,
-  Typography,
-  Button,
-  IconButton,
-  Chip,
-  CircularProgress,
-} from "@mui/material";
-import {
-  ExpandLess,
-  ExpandMore,
-  NavigateBefore,
-  NavigateNext,
-  KeyboardArrowUp,
-  KeyboardArrowDown,
-} from "@mui/icons-material";
+  ChevronUp as ExpandLess,
+  ChevronDown as ExpandMore,
+  ChevronLeft as NavigateBefore,
+  ChevronRight as NavigateNext,
+  ArrowUp as KeyboardArrowUp,
+  ArrowDown as KeyboardArrowDown,
+} from "lucide-react";
+
+const List = ({ children, className = "" }) => <div className={className}>{children}</div>;
+const ListItem = ({ children, className = "", button, onClick }) => (
+  <div className={className}>{button ? <button type="button" onClick={onClick} className="w-full text-left">{children}</button> : children}</div>
+);
+const ListItemText = ({ primary }) => <span>{primary}</span>;
+const Collapse = ({ in: isOpen, children }) => (isOpen ? <>{children}</> : null);
+const Checkbox = ({ checked, onChange, indeterminate }) => (
+  <input type="checkbox" checked={checked} onChange={onChange} ref={(el) => { if (el) el.indeterminate = !!indeterminate; }} />
+);
+const FormControlLabel = ({ control, label }) => <label className="inline-flex items-center gap-2">{control}{label}</label>;
+const Typography = ({ children, className = "" }) => <p className={className}>{children}</p>;
+const Button = ({ children, className = "", onClick, disabled }) => <button type="button" className={className} onClick={onClick} disabled={disabled}>{children}</button>;
+const IconButton = ({ children, onClick, className = "" }) => <button type="button" onClick={onClick} className={className}>{children}</button>;
+const Chip = ({ label, className = "" }) => <span className={`inline-flex rounded-full border px-2 py-0.5 text-xs ${className}`.trim()}>{label}</span>;
+const CircularProgress = () => <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />;
 
 const filterGroups = [
   {
@@ -132,7 +135,7 @@ export default function IssuesView({ loading, reportDetails, issueFilter }) {
   };
 
   const renderFilters = (items) => (
-    <List dense>
+    <List>
       {items.map((item) => (
         <ListItem key={item.key}>
           <FormControlLabel
@@ -145,7 +148,6 @@ export default function IssuesView({ loading, reportDetails, issueFilter }) {
                     [item.key]: !prev[item.key],
                   }))
                 }
-                size="small"
               />
             }
             label={<span>{item.name}</span>}
@@ -214,12 +216,12 @@ export default function IssuesView({ loading, reportDetails, issueFilter }) {
           </div>
 
           <div className="action-right">
-            <Typography variant="body2">Navigate to issue</Typography>
+            <Typography>Navigate to issue</Typography>
             <div className="navigate-controls">
-              <IconButton size="small"><NavigateBefore /></IconButton>
-              <IconButton size="small"><KeyboardArrowUp /></IconButton>
-              <IconButton size="small"><KeyboardArrowDown /></IconButton>
-              <IconButton size="small"><NavigateNext /></IconButton>
+              <IconButton><NavigateBefore className="h-4 w-4" /></IconButton>
+              <IconButton><KeyboardArrowUp className="h-4 w-4" /></IconButton>
+              <IconButton><KeyboardArrowDown className="h-4 w-4" /></IconButton>
+              <IconButton><NavigateNext className="h-4 w-4" /></IconButton>
             </div>
           </div>
         </div>
@@ -245,7 +247,6 @@ export default function IssuesView({ loading, reportDetails, issueFilter }) {
                         <Chip
                           key={tag}
                           label={tag}
-                          size="small"
                           className="tag-chip"
                         />
                       ))}
@@ -255,12 +256,10 @@ export default function IssuesView({ loading, reportDetails, issueFilter }) {
                     <div className="issue-left">
                       <Chip
                         label={issue.category}
-                        size="small"
                         className={`category-chip chip-${issue.severity.toLowerCase()}`}
                       />
                       <Chip
                         label={issue.severity}
-                        size="small"
                         className={`severity-chip chip-${issue.severity.toLowerCase()}`}
                       />
                     </div>
@@ -277,13 +276,11 @@ export default function IssuesView({ loading, reportDetails, issueFilter }) {
           ))}
 
           <div className="issues-footer">
-            <Typography variant="body2">
+            <Typography>
               {`${visibleIssues.length} of ${filteredIssues.length} shown`}
             </Typography>
             {visibleIssues.length < filteredIssues.length && (
               <Button
-                variant="outlined"
-                size="small"
                 onClick={() => setVisibleCount((prev) => prev + 100)}
               >
                 Show More

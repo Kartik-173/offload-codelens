@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Box, Typography, Button } from "@mui/material";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { Copy } from "lucide-react";
 import Editor from "@monaco-editor/react";
 
 const RiskTab = ({ filePath, codeValue, hotspot, handleCopyPath, handleEditorMount }) => {
@@ -71,28 +70,25 @@ const RiskTab = ({ filePath, codeValue, hotspot, handleCopyPath, handleEditorMou
   }, [hotspot]);
 
   return (
-    <Box className="hotspot-code-card">
-      <Box className="hotspot-code-header">
-        <Box className="hotspot-code-header-left">
-          <Typography className="hotspot-code-path">{filePath}</Typography>
-          <ContentCopyIcon
-            fontSize="small"
+    <div className="hotspot-code-card">
+      <div className="hotspot-code-header">
+        <div className="hotspot-code-header-left">
+          <p className="hotspot-code-path text-sm text-slate-700">{filePath}</p>
+          <Copy
             onClick={handleCopyPath}
-            className="file-view-copy-icon"
+            className="file-view-copy-icon h-4 w-4 cursor-pointer"
           />
-        </Box>
-        <Button variant="outlined" className="open-ide-btn">
+        </div>
+        <button type="button" className="open-ide-btn rounded-md border px-3 py-1.5 text-sm hover:bg-slate-50">
           Open in IDE
-        </Button>
-      </Box>
+        </button>
+      </div>
 
-      <Box className="hotspot-callout">
-        <Typography className="hotspot-callout-text">
-          {hotspot.message}
-        </Typography>
-      </Box>
+      <div className="hotspot-callout">
+        <p className="hotspot-callout-text">{hotspot.message}</p>
+      </div>
 
-      <Box className="monaco-wrapper">
+      <div className="monaco-wrapper">
         <Editor
           height="370px"
           defaultLanguage="typescript"
@@ -110,8 +106,8 @@ const RiskTab = ({ filePath, codeValue, hotspot, handleCopyPath, handleEditorMou
           }}
           className="hotspot-monaco-editor"
         />
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };
 

@@ -1,26 +1,25 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Typography,
-  Grid,
-  Snackbar,
-  Alert,
-  Paper,
-  CircularProgress,
-} from "@mui/material";
-import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { FileText as InsertDriveFileOutlinedIcon, Copy as ContentCopyIcon } from "lucide-react";
 
 import MetricCard from "./MetricCard.js";
 import MetricMenu from "./MetricMenu.js";
+
+const Box = ({ children, className = "" }) => <div className={className}>{children}</div>;
+const Typography = ({ children, className = "", component = "p", ...rest }) => {
+  const Tag = component;
+  return <Tag className={className} {...rest}>{children}</Tag>;
+};
+const Paper = ({ children, className = "" }) => <div className={className}>{children}</div>;
 
 const FileView = ({ currentFile, fileContent }) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   if (!currentFile || !fileContent) {
-    return <Box className="repo-list-loading">
-      <CircularProgress />
-    </Box>;
+    return (
+      <Box className="repo-list-loading flex items-center justify-center py-8">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
+      </Box>
+    );
   }
 
   const displayPath = currentFile.path || "";
@@ -37,51 +36,47 @@ const FileView = ({ currentFile, fileContent }) => {
         <Box className="file-view-path-wrapper">
           <InsertDriveFileOutlinedIcon className="file" />
           <Typography
-            variant="subtitle2"
-            color="textSecondary"
-            noWrap
             className="file-view-path"
           >
             {displayPath}
           </Typography>
           <ContentCopyIcon
-            fontSize="small"
             onClick={handleCopyPath}
-            className="file-view-copy-icon"
+            className="file-view-copy-icon h-4 w-4"
           />
         </Box>
 
         {/* Metrics */}
         <Box className="file-view-metrics-wrapper">
           {/* Group 1 */}
-          <Grid container spacing={1} wrap="nowrap" className="file-view-metrics-grid">
+          <div className="file-view-metrics-grid flex flex-nowrap gap-2">
             {[
               { label: "Lines", value: fileContent.metrics?.lines ?? "-" },
               { label: "Coverage", value: fileContent.metrics?.coverage != null ? `${fileContent.metrics.coverage}%` : "-" },
               { label: "Duplications", value: fileContent.metrics?.duplications != null ? `${fileContent.metrics.duplications}%` : "-" },
             ].map((m, idx) => (
-              <Grid key={idx}>
+              <div key={idx}>
                 <MetricCard label={m.label} value={m.value} />
-              </Grid>
+              </div>
             ))}
-          </Grid>
+          </div>
 
           <Box className="file-view-metrics-divider" />
 
           {/* Group 2 */}
-          <Grid container spacing={1} wrap="nowrap" className="file-view-metrics-grid clickable">
+          <div className="file-view-metrics-grid clickable flex flex-nowrap gap-2">
             {[
               { label: "Security", value: fileContent.metrics?.security ?? "-" },
               { label: "Reliability", value: fileContent.metrics?.reliability ?? "-" },
               { label: "Maintainability", value: fileContent.metrics?.maintainability ?? "-" },
               { label: "Security Hotspot", value: fileContent.metrics?.securityHotspots ?? "-" },
             ].map((m, idx) => (
-              <Grid key={idx}>
+              <div key={idx}>
                 <MetricCard label={m.label} value={m.value}>
                 </MetricCard>
-              </Grid>
+              </div>
             ))}
-          </Grid>
+          </div>
           <MetricMenu />
         </Box>
       </Box>
@@ -94,7 +89,6 @@ const FileView = ({ currentFile, fileContent }) => {
               <Box className="file-view-line-number">{src.line}</Box>
               <Box className="file-view-line-content">
                 <Typography
-                  variant="body2"
                   component="pre"
                   className="file-view-code-text"
                   dangerouslySetInnerHTML={{ __html: src.code }}
@@ -105,17 +99,11 @@ const FileView = ({ currentFile, fileContent }) => {
         </Box>
       </Paper>
 
-      {/* Snackbar */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={2000}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert severity="success" sx={{ fontSize: "0.85rem" }}>
+      {snackbarOpen && (
+        <div className="fixed right-4 top-4 z-50 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800 shadow">
           Copied to clipboard!
-        </Alert>
-      </Snackbar>
+        </div>
+      )}
     </Box>
   );
 };

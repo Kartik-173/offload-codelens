@@ -1,49 +1,177 @@
 import React, { useState, useMemo, useEffect } from "react";
 import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Grid,
-  IconButton,
-  Collapse,
-  CircularProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  TextField,
-  InputAdornment,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TablePagination,
-  Tooltip,
-  Badge,
-  Divider,
-} from "@mui/material";
-import SecurityIcon from "@mui/icons-material/Security";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import SearchIcon from "@mui/icons-material/Search";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import TimerIcon from "@mui/icons-material/Timer";
-import FolderOpenIcon from "@mui/icons-material/FolderOpen";
-import CodeIcon from "@mui/icons-material/Code";
-import ShieldIcon from "@mui/icons-material/Shield";
-import BugReportIcon from "@mui/icons-material/BugReport";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import LockIcon from "@mui/icons-material/Lock";
-import DescriptionIcon from "@mui/icons-material/Description";
+  Shield as SecurityIcon,
+  TriangleAlert as WarningAmberIcon,
+  CircleCheck as CheckCircleIcon,
+  Search as SearchIcon,
+  Eye as VisibilityIcon,
+  EyeOff as VisibilityOffIcon,
+  ChevronDown as ExpandMoreIcon,
+  Timer as TimerIcon,
+  FolderOpen as FolderOpenIcon,
+  Code as CodeIcon,
+  TrendingUp as TrendingUpIcon,
+  Lock as LockIcon,
+  FileText as DescriptionIcon,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+
+const Box = ({ children, className = "", ...rest }) => (
+  <div className={className} {...rest}>{children}</div>
+);
+
+const Card = ({ children, className = "", ...rest }) => (
+  <div className={className} {...rest}>{children}</div>
+);
+
+const CardContent = ({ children, className = "", ...rest }) => (
+  <div className={className} {...rest}>{children}</div>
+);
+
+const Typography = ({ children, className = "", component = "p", ...rest }) => {
+  const Tag = component;
+  return <Tag className={className} {...rest}>{children}</Tag>;
+};
+
+const Chip = ({ label, className = "", onDelete }) => (
+  <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${className}`.trim()}>
+    {label}
+    {onDelete ? (
+      <button type="button" onClick={onDelete} className="text-slate-500">×</button>
+    ) : null}
+  </span>
+);
+
+const Grid = ({ children, className = "", ...rest }) => (
+  <div className={className} {...rest}>{children}</div>
+);
+
+const IconButton = ({ children, onClick, className = "", ...rest }) => (
+  <button type="button" onClick={onClick} className={className} {...rest}>{children}</button>
+);
+
+const Collapse = ({ in: isOpen, children }) => (isOpen ? <>{children}</> : null);
+
+const CircularProgress = () => (
+  <div className="h-14 w-14 animate-spin rounded-full border-4 border-slate-300 border-t-slate-700" />
+);
+
+const TableContainer = ({ children, className = "" }) => (
+  <div className={className}>{children}</div>
+);
+
+const Table = ({ children, className = "" }) => (
+  <table className={className}>{children}</table>
+);
+
+const TableHead = ({ children }) => <thead>{children}</thead>;
+const TableBody = ({ children }) => <tbody>{children}</tbody>;
+const TableRow = ({ children, className = "" }) => <tr className={className}>{children}</tr>;
+const TableCell = ({ children, className = "", colSpan }) => (
+  <td className={className} colSpan={colSpan}>{children}</td>
+);
+
+const InputAdornment = ({ children }) => <span className="inline-flex items-center">{children}</span>;
+const FormControl = ({ children, className = "" }) => <div className={className}>{children}</div>;
+const InputLabel = ({ children }) => <span className="text-xs text-slate-500">{children}</span>;
+const Select = ({ children, className = "", value, onChange }) => (
+  <select value={value} onChange={onChange} className={`h-9 rounded-md border border-input bg-background px-3 text-sm ${className}`.trim()}>
+    {children}
+  </select>
+);
+const MenuItem = ({ children, value }) => <option value={value}>{children}</option>;
+
+const TextField = ({
+  value,
+  onChange,
+  placeholder,
+  className = "",
+  InputProps,
+  select,
+  children,
+}) => {
+  if (select) {
+    return (
+      <Select value={value} onChange={onChange} className={className}>
+        {children}
+      </Select>
+    );
+  }
+
+  return (
+    <div className="relative">
+      {InputProps?.startAdornment ? (
+        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+          {InputProps.startAdornment}
+        </span>
+      ) : null}
+      <input
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className={`h-9 rounded-md border border-input bg-background px-3 text-sm ${InputProps?.startAdornment ? "pl-9" : ""} ${className}`.trim()}
+      />
+    </div>
+  );
+};
+
+const Tooltip = ({ children, title }) => (
+  <span title={typeof title === "string" ? title : undefined}>{children}</span>
+);
+
+const Divider = ({ className = "" }) => <div className={className} />;
+
+const TablePagination = ({
+  count,
+  page,
+  onPageChange,
+  rowsPerPage,
+  onRowsPerPageChange,
+  rowsPerPageOptions = [10, 25, 50],
+  className = "",
+}) => {
+  const totalPages = Math.max(1, Math.ceil(count / rowsPerPage));
+  const start = count === 0 ? 0 : page * rowsPerPage + 1;
+  const end = Math.min(count, (page + 1) * rowsPerPage);
+
+  return (
+    <div className={`flex flex-wrap items-center justify-between gap-2 px-2 py-3 text-sm ${className}`.trim()}>
+      <div className="flex items-center gap-2">
+        <span>Rows per page:</span>
+        <select
+          value={rowsPerPage}
+          onChange={onRowsPerPageChange}
+          className="h-8 rounded border border-input bg-background px-2"
+        >
+          {rowsPerPageOptions.map((opt) => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
+      </div>
+      <div className="flex items-center gap-2">
+        <span>{start}-{end} of {count}</span>
+        <button
+          type="button"
+          onClick={() => onPageChange(null, Math.max(0, page - 1))}
+          disabled={page <= 0}
+          className="rounded border p-1 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        <span>{page + 1}/{totalPages}</span>
+        <button
+          type="button"
+          onClick={() => onPageChange(null, Math.min(totalPages - 1, page + 1))}
+          disabled={page >= totalPages - 1}
+          className="rounded border p-1 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 export default function GitSecretsView({ loading, gitSecretsReport }) {
   const [expandedRows, setExpandedRows] = useState(new Set());
@@ -54,7 +182,10 @@ export default function GitSecretsView({ loading, gitSecretsReport }) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const findings = Array.isArray(gitSecretsReport?.findings) ? gitSecretsReport.findings : [];
+  const findings = useMemo(
+    () => (Array.isArray(gitSecretsReport?.findings) ? gitSecretsReport.findings : []),
+    [gitSecretsReport]
+  );
 
   const uniqueRules = useMemo(() => {
     const rules = [...new Set(findings.map(f => f.rule))];

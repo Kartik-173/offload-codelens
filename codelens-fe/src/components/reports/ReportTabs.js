@@ -1,5 +1,4 @@
 import React from "react";
-import { Tabs, Tab } from "@mui/material";
 
 /**
  * @param {number} value - selected tab index
@@ -8,19 +7,23 @@ import { Tabs, Tab } from "@mui/material";
  */
 const ReportTabs = ({ value, onChange, tabs }) => {
   return (
-    <div className="report-tabs-wrapper">
-      <Tabs
-        value={value}
-        onChange={(e, newValue) => onChange(newValue)}
-        indicatorColor="primary"
-        textColor="primary"
-        variant="scrollable"
-        scrollButtons="auto"
-      >
+    <div className="report-tabs-wrapper overflow-x-auto">
+      <div className="inline-flex min-w-full border-b">
         {tabs.map((tab, index) => (
-          <Tab key={index} label={tab.label} />
+          <button
+            key={index}
+            type="button"
+            onClick={() => onChange(index)}
+            className={`whitespace-nowrap border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
+              value === index
+                ? "border-blue-600 text-blue-600"
+                : "border-transparent text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            {tab.label}
+          </button>
         ))}
-      </Tabs>
+      </div>
     </div>
   );
 };

@@ -1,7 +1,13 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
-import { PieChart } from "@mui/x-charts/PieChart";
-import CodeIcon from "@mui/icons-material/Code";
+import { Code } from "lucide-react";
+
+const Box = ({ children, className = "" }) => (
+  <div className={className}>{children}</div>
+);
+
+const Typography = ({ children, className = "" }) => (
+  <p className={className}>{children}</p>
+);
 
 const LANGUAGE_COLORS = [
   "#2563eb",
@@ -27,32 +33,30 @@ const LanguageSummary = ({ languages }) => {
     })
   );
 
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+
   return (
     <Box className="language-panel">
       <Typography className="panel-title">
-        <CodeIcon fontSize="small" />
+        <Code className="h-4 w-4" />
         Languages
       </Typography>
 
-      <Box className="language-chart-wrapper">
-        <PieChart
-          series={[
-            {
-              data,
-              innerRadius: 65,
-              outerRadius: 120,
-              paddingAngle: 4,
-              cornerRadius: 6,
-              startAngle: -90,
-              endAngle: 270
-            }
-          ]}
-          width={300}
-          height={260}
-          slotProps={{
-            legend: { hidden: true }
-          }}
-        />
+      <Box className="language-chart-wrapper space-y-3">
+        {data.map((item) => {
+          const percentage = total ? Math.round((item.value / total) * 100) : 0;
+          return (
+            <div key={item.id} className="space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium" style={{ color: item.color }}>{item.label}</span>
+                <span>{item.value} ({percentage}%)</span>
+              </div>
+              <div className="h-2 rounded bg-slate-100">
+                <div className="h-2 rounded" style={{ width: `${percentage}%`, backgroundColor: item.color }} />
+              </div>
+            </div>
+          );
+        })}
       </Box>
     </Box>
   );

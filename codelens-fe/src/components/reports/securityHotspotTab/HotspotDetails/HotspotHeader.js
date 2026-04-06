@@ -1,63 +1,59 @@
 import React from "react";
-import { Box, Typography, Button } from "@mui/material";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { Copy } from "lucide-react";
 
 const HotspotHeader = ({ hotspot, handleCopyPath, getPriorityIcon }) => {
   return (
-    <Box className="hotspot-header">
-      <Box className="hotspot-summary-text">
-        <Typography variant="h6" className="hotspot-summary-title">
+    <div className="hotspot-header">
+      <div className="hotspot-summary-text">
+        <h3 className="hotspot-summary-title text-lg font-semibold">
           {hotspot.message}
-          <ContentCopyIcon
-            fontSize="small"
+          <Copy
             onClick={handleCopyPath}
-            className="file-view-copy-icon"
+            className="file-view-copy-icon ml-2 inline h-4 w-4 cursor-pointer"
           />
-        </Typography>
+        </h3>
 
-        <Typography variant="body2" className="hotspot-summary-subtitle">
+        <p className="hotspot-summary-subtitle text-sm text-slate-600">
           {hotspot.rule.name} {hotspot.rule.key}
-        </Typography>
+        </p>
 
-        <Box className="hotspot-summary-status">
-          <Box className="hotspot-summary-text-box">
-            <Typography className="hotspot-status-text">
+        <div className="hotspot-summary-status">
+          <div className="hotspot-summary-text-box">
+            <p className="hotspot-status-text">
               Status: {hotspot.status}
-            </Typography>
-            <Typography className="hotspot-status-desc">
+            </p>
+            <p className="hotspot-status-desc text-sm text-slate-600">
               This security hotspot needs to be reviewed to assess whether the
               code poses a risk.
-            </Typography>
-          </Box>
+            </p>
+          </div>
 
-          <Button variant="contained" className="review-btn">
+          <button type="button" className="review-btn rounded-md bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
             Review
-          </Button>
-        </Box>
-      </Box>
+          </button>
+        </div>
+      </div>
 
-      <Box className="hotspot-summary-meta">
-        <Box className="meta-item">
-          <Typography className="meta-label">Review priority:</Typography>
-          <Typography className="meta-value">
+      <div className="hotspot-summary-meta">
+        <div className="meta-item">
+          <p className="meta-label">Review priority:</p>
+          <p className="meta-value">
             {getPriorityIcon(hotspot.rule.vulnerabilityProbability)}
             {hotspot.rule.vulnerabilityProbability}
-          </Typography>
-        </Box>
+          </p>
+        </div>
 
-        <Box className="meta-item">
-          <Typography className="meta-label">Category:</Typography>
-          <Typography className="meta-value">
-            {hotspot.rule.securityCategory}
-          </Typography>
-        </Box>
+        <div className="meta-item">
+          <p className="meta-label">Category:</p>
+          <p className="meta-value">{hotspot.rule.securityCategory}</p>
+        </div>
 
-        <Box className="meta-item">
-          <Typography className="meta-label">Assignee:</Typography>
-          <Typography className="meta-value">Not assigned</Typography>
-        </Box>
-      </Box>
-    </Box>
+        <div className="meta-item">
+          <p className="meta-label">Assignee:</p>
+          <p className="meta-value">Not assigned</p>
+        </div>
+      </div>
+    </div>
   );
 };
 

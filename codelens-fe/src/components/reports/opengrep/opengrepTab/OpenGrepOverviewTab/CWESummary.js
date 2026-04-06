@@ -1,18 +1,21 @@
 import React from "react";
-import {
-  Box,
-  Typography,
-  LinearProgress
-} from "@mui/material";
-import SecurityIcon from "@mui/icons-material/Security";
+import { ShieldAlert as SecurityIcon } from "lucide-react";
 import { CWE_LABELS } from "../../../../../utils/Helpers";
+
+const Box = ({ children, className = "" }) => (
+  <div className={className}>{children}</div>
+);
+
+const Typography = ({ children, className = "" }) => (
+  <p className={className}>{children}</p>
+);
 
 const CWESummary = ({ cwe }) => {
   if (!cwe || Object.keys(cwe).length === 0) {
     return (
       <Box className="cwe-panel">
         <Typography className="panel-title">
-          <SecurityIcon fontSize="small" />
+          <SecurityIcon className="h-4 w-4" />
           CWE Summary
         </Typography>
         <Typography className="cwe-empty">
@@ -31,7 +34,7 @@ const CWESummary = ({ cwe }) => {
   return (
     <Box className="cwe-panel">
       <Typography className="panel-title">
-        <SecurityIcon fontSize="small" />
+        <SecurityIcon className="h-4 w-4" />
         Top CWEs
       </Typography>
 
@@ -48,11 +51,12 @@ const CWESummary = ({ cwe }) => {
                 {CWE_LABELS[id] || "Security Weakness"}
               </Typography>
 
-              <LinearProgress
-                variant="determinate"
-                value={(count / max) * 100}
-                className="cwe-bar"
-              />
+              <div className="cwe-bar h-2 w-full overflow-hidden rounded bg-slate-200">
+                <div
+                  className="h-full bg-blue-600"
+                  style={{ width: `${(count / max) * 100}%` }}
+                />
+              </div>
             </Box>
           ))}
         </Box>

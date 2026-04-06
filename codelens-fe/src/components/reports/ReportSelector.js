@@ -1,27 +1,27 @@
 import React from "react";
-import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { formatReportName } from "../../utils/Helpers";
 
 const ReportSelector = ({ reports, selected, onChange }) => {
   return (
     <div className="repo-select-grid">
       <div className="dropdown-half">
-        <FormControl className="select-control" fullWidth>
-          <InputLabel id="report-select-label">Select</InputLabel>
-          <Select
-            labelId="report-select-label"
+        <div className="select-control w-full">
+          <label htmlFor="report-select" className="mb-1 block text-sm font-medium">
+            Select
+          </label>
+          <select
+            id="report-select"
             value={selected}
-            label="Report"
-            size="small"
+            className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
             onChange={(e) => onChange(e.target.value)}
           >
             {reports.map((item, idx) => (
-              <MenuItem key={idx} value={item.Key}>
+              <option key={idx} value={item.Key}>
                 {formatReportName(item.projectKey)}
-              </MenuItem>
+              </option>
             ))}
-          </Select>
-        </FormControl>
+          </select>
+        </div>
       </div>
     </div>
   );

@@ -1,9 +1,18 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
-import LinkIcon from "@mui/icons-material/Link";
-import AccountTreeIcon from "@mui/icons-material/AccountTree";
-import TimerIcon from "@mui/icons-material/Timer";
-import BuildIcon from "@mui/icons-material/Build";
+import {
+  Link2 as LinkIcon,
+  Waypoints as AccountTreeIcon,
+  Timer as TimerIcon,
+  Wrench as BuildIcon,
+} from "lucide-react";
+
+const Box = ({ children, className = "" }) => (
+  <div className={className}>{children}</div>
+);
+
+const Typography = ({ children, className = "" }) => (
+  <p className={className}>{children}</p>
+);
 
 const ScanMetadata = ({ metadata }) => {
   if (!metadata) return null;
@@ -15,28 +24,28 @@ const ScanMetadata = ({ metadata }) => {
       </Typography>
 
       <Box className="scan-meta-row">
-        <LinkIcon fontSize="small" />
+        <LinkIcon className="h-4 w-4" />
         <Typography className="scan-meta-value">
           {metadata.repo?.url}
         </Typography>
       </Box>
 
       <Box className="scan-meta-row">
-        <AccountTreeIcon fontSize="small" />
+        <AccountTreeIcon className="h-4 w-4" />
         <Typography className="scan-meta-value">
           Branch: {metadata.branch}
         </Typography>
       </Box>
 
       <Box className="scan-meta-row">
-        <TimerIcon fontSize="small" />
+        <TimerIcon className="h-4 w-4" />
         <Typography className="scan-meta-value">
           Duration: {metadata.duration_seconds}s
         </Typography>
       </Box>
 
       <Box className="scan-meta-row">
-        <BuildIcon fontSize="small" />
+        <BuildIcon className="h-4 w-4" />
         <Typography className="scan-meta-value">
           Tool: {metadata.tool}
         </Typography>

@@ -1,35 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  CircularProgress,
-  Alert,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Fab,
-  Snackbar,
-  Chip,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Switch,
-  FormControlLabel,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
+  Mail,
+  Globe,
+  AlertTriangle,
+  MessageSquare,
+  Loader2,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw,
+  Trash2,
+  Save,
+  Play,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+  Server,
+  Activity,
+  Bell,
+} from 'lucide-react';
 import {
-  Email as EmailIcon,
-  Public,
-  WarningAmber as WarningAmberIcon,
-  Chat as SlackIcon,
-} from '@mui/icons-material';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "../components/ui/dialog";
+import { Button } from "../components/ui/button";
+import { Card } from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Checkbox } from "../components/ui/checkbox";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../components/ui/table";
+
 import { 
   AWS_REGIONS, 
   getUserId, 
@@ -545,55 +556,48 @@ const AwsAlbManager = () => {
   }, [autoDeregisterEnabled, storedCredentials, selectedRegions, selectedAccountId, accountSettingsLoading]);
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
+    <div className="p-6">
+      <h1 className="text-3xl font-bold text-slate-900 mb-6">
         Load Balancer Health Preview
-      </Typography>
+      </h1>
       
       {/* Loading State */}
       {loading && (
-        <Card sx={{ mb: 3 }}>
-          <CardContent sx={{ textAlign: 'center', py: 4 }}>
-            <CircularProgress size={40} sx={{ mb: 2 }} />
-            <Typography variant="h6" color="text.secondary" gutterBottom>
-              {selectedRegions.length > 0 ? `Fetching Load Balancers...` : 'Loading...'}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {selectedRegions.length > 0 ? `Checking ${selectedRegions.length} region(s) for Load Balancers` : 'Please select regions'}
-            </Typography>
-          </CardContent>
-        </Card>
+        <div className="bg-white rounded-lg shadow mb-6 p-6 text-center">
+          <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-blue-500" />
+          <h2 className="text-xl font-semibold text-slate-600 mb-2">
+            {selectedRegions.length > 0 ? `Fetching Load Balancers...` : 'Loading...'}
+          </h2>
+          <p className="text-slate-500">
+            {selectedRegions.length > 0 ? `Checking ${selectedRegions.length} region(s) for Load Balancers` : 'Please select regions'}
+          </p>
+        </div>
       )}
 
       {/* Credential Status */}
       {!storedCredentials && (
-        <Card sx={{ mb: 3, border: '2px dashed #ff9800', backgroundColor: '#fff8e1' }}>
-          <CardContent sx={{ textAlign: 'center', py: 3 }}>
-            <Typography variant="h6" color="#f57c00" gutterBottom>
-              🔐 AWS Credentials Required
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Automatically retrieving your cloud credentials...
-            </Typography>
-            <Button 
-              variant="outlined" 
-              color="warning" 
-              size="small"
+        <div className="bg-amber-50 border-2 border-dashed border-amber-400 rounded-lg mb-6 p-6 text-center">
+          <h2 className="text-xl font-semibold text-amber-700 mb-2">
+            🔐 AWS Credentials Required
+          </h2>
+          <p className="text-slate-600 mb-4">
+            Automatically retrieving your cloud credentials...
+          </p>
+          <div className="flex justify-center gap-2">
+            <button 
+              className="px-4 py-2 border border-amber-500 text-amber-700 rounded-md hover:bg-amber-100 text-sm"
               onClick={fetchStoredCredentials}
-              sx={{ mr: 1 }}
             >
               Refresh Credentials
-            </Button>
-            <Button 
-              variant="contained" 
-              color="warning" 
-              size="small"
+            </button>
+            <button 
+              className="px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 text-sm"
               onClick={() => window.location.reload()}
             >
               Reload Page
-            </Button>
-          </CardContent>
-        </Card>
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Enhanced Status Summary */}
@@ -642,19 +646,25 @@ const AwsAlbManager = () => {
 
       {/* Alerts */}
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
-          {error}
-        </Alert>
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 flex justify-between items-center">
+          <span>{error}</span>
+          <button onClick={() => setError('')} className="text-red-500 hover:text-red-700">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
       )}
       {success && (
-        <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>
-          {success}
-        </Alert>
+        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md mb-4 flex justify-between items-center">
+          <span>{success}</span>
+          <button onClick={() => setSuccess('')} className="text-green-500 hover:text-green-700">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
       )}
 
       {/* Load Balancers List */}
       {albs.length > 0 ? (
-        <Box>
+        <div>
           <RegionFilter
             albs={albs}
             availableRegions={availableRegions}
@@ -681,185 +691,156 @@ const AwsAlbManager = () => {
             autoDeregisterEnabled={autoDeregisterEnabled}
             onDeregisterSingleTarget={handleDeregisterSingleTargetConfirmRequest}
           />
-        </Box>
+        </div>
       ) : (
-        <Card sx={{ mb: 3 }}>
-          <CardContent sx={{ textAlign: 'center', py: 4 }}>
-            <Typography variant="h6" color="text.secondary" gutterBottom>
+        <Card className="mb-3">
+          <div className="text-center py-8">
+            <h6 className="text-lg font-semibold text-slate-600 mb-2">
               No Load Balancers Found
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            </h6>
+            <p className="text-sm text-slate-500 mb-4">
               {selectedRegions.length > 0
                 ? `No Load Balancers found. Try selecting different regions or check your AWS permissions.`
                 : 'Please select regions and click "Fetch" to load Load Balancers.'}
-            </Typography>
+            </p>
             {selectedRegions.length === 0 && (
-              <Box sx={{ mt: 3 }}>
-                <Typography variant="body2" color="primary" sx={{ fontWeight: 'bold' }}>
+              <div className="mt-4">
+                <p className="text-sm text-blue-600 font-bold">
                   👆 Select regions from the dropdown above and click "Fetch" to get started
-                </Typography>
-              </Box>
+                </p>
+              </div>
             )}
-          </CardContent>
+          </div>
         </Card>
       )}
 
       {/* Unhealthy Target Details Dialog */}
       <Dialog
         open={Boolean(unhealthyDetailsDialog.open)}
-        onClose={handleCloseUnhealthyDetails}
-        maxWidth="md"
-        fullWidth
+        onOpenChange={(open) => !open && handleCloseUnhealthyDetails()}
       >
-        <DialogTitle>
-          Unhealthy Target Details
-          {unhealthyDetailsDialog.targetGroupName && (
-            <Typography variant="subtitle2" color="text.secondary">
-              Target Group: {unhealthyDetailsDialog.targetGroupName}
-            </Typography>
-          )}
-        </DialogTitle>
-        <DialogContent>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              Unhealthy Target Details
+              {unhealthyDetailsDialog.targetGroupName && (
+                <p className="text-sm text-slate-500 mt-1">
+                  Target Group: {unhealthyDetailsDialog.targetGroupName}
+                </p>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          
           {unhealthyDetailsDialog.loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-              <CircularProgress />
-              <Typography sx={{ ml: 2 }}>Loading unhealthy target details...</Typography>
-            </Box>
+            <div className="flex justify-center items-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-500 mr-2" />
+              <span>Loading unhealthy target details...</span>
+            </div>
           ) : unhealthyDetailsDialog.data ? (
-            <Box>
+            <div>
               {/* Summary */}
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                  Summary
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                  <Chip label={`Healthy: ${unhealthyDetailsDialog.data.summary?.healthyCount || 0}`} color="success" />
-                  <Chip label={`Unhealthy: ${unhealthyDetailsDialog.data.summary?.unhealthyCount || 0}`} color="error" />
-                  <Chip label={`Unknown: ${unhealthyDetailsDialog.data.summary?.unknownCount || 0}`} color="default" />
-                </Box>
-              </Box>
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3">Summary</h3>
+                <div className="flex gap-2 mb-4">
+                  <Badge className="bg-green-100 text-green-800">Healthy: {unhealthyDetailsDialog.data.summary?.healthyCount || 0}</Badge>
+                  <Badge className="bg-red-100 text-red-800">Unhealthy: {unhealthyDetailsDialog.data.summary?.unhealthyCount || 0}</Badge>
+                  <Badge className="bg-gray-100 text-gray-800">Unknown: {unhealthyDetailsDialog.data.summary?.unknownCount || 0}</Badge>
+                </div>
+              </div>
 
               {/* Unhealthy Targets */}
               {unhealthyDetailsDialog.data.unhealthyTargets && unhealthyDetailsDialog.data.unhealthyTargets.length > 0 && (
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="h6" gutterBottom>
-                    Unhealthy Targets
-                  </Typography>
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-3">Unhealthy Targets</h3>
                   {unhealthyDetailsDialog.data.unhealthyTargets.map((target, index) => (
-                    <Card key={index} sx={{ mb: 2, border: '1px solid', borderColor: 'divider', borderLeft: '4px solid', borderLeftColor: 'error.main' }}>
-                      <CardContent>
-                        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 2 }}>
-                          <Typography variant="subtitle1" gutterBottom>
-                            Target: {target.id}
-                          </Typography>
-                          <Box sx={{ display: 'flex', gap: 1 }}>
-                            <Tooltip
-                              title={(() => {
+                    <Card key={index} className="mb-3 border border-slate-200 border-l-4 border-l-red-500">
+                      <div className="p-4">
+                        <div className="flex items-start justify-between gap-4 mb-3">
+                          <h4 className="font-medium">Target: {target.id}</h4>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="warning"
+                              size="sm"
+                              disabled={(() => {
+                                const tid = target.id;
+                                const p = target.port;
+                                return isTargetSelected(tid, p) || isTargetExcluded(tid, p);
+                              })()}
+                              onClick={() => {
                                 const tid = target.id;
                                 const p = target.port;
                                 const isProtected = isTargetSelected(tid, p) || isTargetExcluded(tid, p);
-                                return isProtected
-                                  ? 'Protected targets cannot be deregistered'
-                                  : 'Deregister this target';
-                              })()}
+                                const tgArn = target.targetGroupArn || unhealthyDetailsDialog.targetGroupArn;
+                                handleDeregisterSingleTargetConfirmRequest({
+                                  targetGroupArn: tgArn,
+                                  targetId: tid,
+                                  port: p,
+                                  isProtected,
+                                });
+                              }}
                             >
-                              <span>
-                                <Button
-                                  variant="contained"
-                                  color="warning"
-                                  size="small"
-                                  disabled={(() => {
-                                    const tid = target.id;
-                                    const p = target.port;
-                                    return isTargetSelected(tid, p) || isTargetExcluded(tid, p);
-                                  })()}
-                                  onClick={() => {
-                                    const tid = target.id;
-                                    const p = target.port;
-                                    const isProtected = isTargetSelected(tid, p) || isTargetExcluded(tid, p);
-                                    const tgArn = target.targetGroupArn || unhealthyDetailsDialog.targetGroupArn;
-                                    handleDeregisterSingleTargetConfirmRequest({
-                                      targetGroupArn: tgArn,
-                                      targetId: tid,
-                                      port: p,
-                                      isProtected,
-                                    });
-                                  }}
-                                >
-                                  Deregister
-                                </Button>
-                              </span>
-                            </Tooltip>
-                          </Box>
-                        </Box>
-                        <Typography variant="body2" color="text.secondary">
-                          Port: {target.port}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Health: {target.health}
-                        </Typography>
+                              Deregister
+                            </Button>
+                          </div>
+                        </div>
+                        <p className="text-sm text-slate-600 mb-1">Port: {target.port}</p>
+                        <p className="text-sm text-slate-600 mb-1">Health: {target.health}</p>
                         {target.reason && (
-                          <Typography variant="body2" color="text.secondary">
-                            Reason: {target.reason}
-                          </Typography>
+                          <p className="text-sm text-slate-600 mb-1">Reason: {target.reason}</p>
                         )}
                         {target.possibleCauses && target.possibleCauses.length > 0 && (
-                          <Box sx={{ mt: 2 }}>
-                            <Typography variant="subtitle2" gutterBottom>
-                              Possible Causes:
-                            </Typography>
-                            <ul>
+                          <div className="mt-3">
+                            <p className="text-sm font-medium mb-2">Possible Causes:</p>
+                            <ul className="text-sm text-slate-600 list-disc pl-4">
                               {target.possibleCauses.map((cause, i) => (
                                 <li key={i}>{cause}</li>
                               ))}
                             </ul>
-                          </Box>
+                          </div>
                         )}
                         {target.recommendedActions && target.recommendedActions.length > 0 && (
-                          <Box sx={{ mt: 2 }}>
-                            <Typography variant="subtitle2" gutterBottom>
-                              Recommended Actions:
-                            </Typography>
-                            <ul>
+                          <div className="mt-3">
+                            <p className="text-sm font-medium mb-2">Recommended Actions:</p>
+                            <ul className="text-sm text-slate-600 list-disc pl-4">
                               {target.recommendedActions.map((action, i) => (
                                 <li key={i}>{action}</li>
                               ))}
                             </ul>
-                          </Box>
+                          </div>
                         )}
-                      </CardContent>
+                      </div>
                     </Card>
                   ))}
-                </Box>
+                </div>
               )}
 
               {/* All Targets */}
               {unhealthyDetailsDialog.data.allTargets && unhealthyDetailsDialog.data.allTargets.length > 0 && (
-                <Box>
-                  <Typography variant="h6" gutterBottom>
-                    All Targets
-                  </Typography>
-                  <Table size="small">
-                    <TableHead>
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">All Targets</h3>
+                  <Table>
+                    <TableHeader>
                       <TableRow>
-                        <TableCell>Target ID</TableCell>
-                        <TableCell>Port</TableCell>
-                        <TableCell>Health</TableCell>
-                        <TableCell>Reason</TableCell>
-                        <TableCell>Description</TableCell>
+                        <TableHead>Target ID</TableHead>
+                        <TableHead>Port</TableHead>
+                        <TableHead>Health</TableHead>
+                        <TableHead>Reason</TableHead>
+                        <TableHead>Description</TableHead>
                       </TableRow>
-                    </TableHead>
+                    </TableHeader>
                     <TableBody>
                       {unhealthyDetailsDialog.data.allTargets.map((target, index) => (
                         <TableRow key={index}>
                           <TableCell>{target.id}</TableCell>
                           <TableCell>{target.port}</TableCell>
                           <TableCell>
-                            <Chip 
-                              label={target.health} 
-                              color={target.health === 'healthy' ? 'success' : target.health === 'unhealthy' ? 'error' : 'default'}
-                              size="small"
-                            />
+                            <Badge className={
+                              target.health === 'healthy' ? 'bg-green-100 text-green-800' : 
+                              target.health === 'unhealthy' ? 'bg-red-100 text-red-800' : 
+                              'bg-gray-100 text-gray-800'
+                            }>
+                              {target.health}
+                            </Badge>
                           </TableCell>
                           <TableCell>{target.reason || '-'}</TableCell>
                           <TableCell>{target.description || '-'}</TableCell>
@@ -867,55 +848,53 @@ const AwsAlbManager = () => {
                       ))}
                     </TableBody>
                   </Table>
-                </Box>
+                </div>
               )}
-            </Box>
+            </div>
           ) : (
-            <Typography variant="body2" color="text.secondary">
-              No data available
-            </Typography>
+            <p className="text-sm text-slate-600">No data available</p>
           )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseUnhealthyDetails}>
+        <DialogFooter>
+          <Button variant="outline" onClick={handleCloseUnhealthyDetails}>
             Close
           </Button>
-        </DialogActions>
+        </DialogFooter>
       </Dialog>
 
       <Dialog
         open={manualDeregisterConfirm.open}
-        onClose={() => setManualDeregisterConfirm({ open: false, payload: null })}
-        maxWidth="sm"
-        fullWidth
+        onOpenChange={(open) => !open && setManualDeregisterConfirm({ open: false, payload: null })}
       >
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <WarningAmberIcon color="warning" />
-          Confirm Deregister
-        </DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" color="text.secondary">
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Confirm Deregister
+            </DialogTitle>
+          </DialogHeader>
+          
+          <p className="text-sm text-slate-600 mb-4">
             This will deregister the instance from the target group.
-          </Typography>
+          </p>
           {manualDeregisterConfirm.payload?.targetId && (
-            <Typography variant="body2" sx={{ mt: 2 }}>
+            <p className="text-sm mb-4">
               Instance: <strong>{manualDeregisterConfirm.payload.targetId}</strong>
               {manualDeregisterConfirm.payload?.port !== undefined && manualDeregisterConfirm.payload?.port !== null
                 ? `:${manualDeregisterConfirm.payload.port}`
                 : ''}
-            </Typography>
+            </p>
           )}
         </DialogContent>
-        <DialogActions>
+        <DialogFooter>
           <Button
+            variant="outline"
             onClick={() => setManualDeregisterConfirm({ open: false, payload: null })}
-            color="inherit"
           >
             Cancel
           </Button>
           <Button
-            variant="contained"
-            color="warning"
+            variant="warning"
             onClick={async () => {
               const payload = manualDeregisterConfirm.payload;
               setManualDeregisterConfirm({ open: false, payload: null });
@@ -926,7 +905,7 @@ const AwsAlbManager = () => {
           >
             Deregister
           </Button>
-        </DialogActions>
+        </DialogFooter>
       </Dialog>
 
       {/* Email Configuration Dialog */}
@@ -953,57 +932,42 @@ const AwsAlbManager = () => {
       {/* Floating Action Buttons */}
       {storedCredentials && (
         <>
-          <Fab
-            color="primary"
-            aria-label="configure-email"
+          <button
             onClick={handleOpenEmailConfig}
-            sx={{
-              position: 'fixed',
-              bottom: 24,
-              right: 24,
-              background: 'linear-gradient(45deg, #667eea, #764ba2)',
-              '&:hover': {
-                background: 'linear-gradient(45deg, #764ba2, #667eea)',
-              },
-            }}
+            className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center"
+            aria-label="configure-email"
           >
-            <EmailIcon />
-          </Fab>
+            <Mail className="h-6 w-6" />
+          </button>
           
-          <Fab
-            color="secondary"
-            aria-label="realtime-alb-monitoring"
+          <button
             onClick={handleOpenAlbDataDialog}
-            sx={{
-              position: 'fixed',
-              bottom: 24,
-              right: 90,
-              background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
-              '&:hover': {
-                background: 'linear-gradient(45deg, #42a5f5, #1976d2)',
-              },
-            }}
+            className="fixed bottom-6 right-24 z-40 w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-sky-500 text-white shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center"
+            aria-label="realtime-alb-monitoring"
           >
-            <Public />
-          </Fab>
+            <Globe className="h-6 w-6" />
+          </button>
         </>
       )}
 
-      <Snackbar
-        open={toast.open}
-        autoHideDuration={4000}
-        onClose={() => setToast(prev => ({ ...prev, open: false }))}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert
-          severity={toast.severity}
-          onClose={() => setToast(prev => ({ ...prev, open: false }))}
-          sx={{ width: '100%' }}
-        >
-          {toast.message}
-        </Alert>
-      </Snackbar>
-    </Box>
+      {toast.open && (
+        <div className={`fixed top-4 right-4 z-50 max-w-sm px-4 py-3 rounded-md shadow-lg ${
+          toast.severity === 'error' ? 'bg-red-50 border border-red-200 text-red-700' : 
+          toast.severity === 'warning' ? 'bg-amber-50 border border-amber-200 text-amber-700' : 
+          'bg-green-50 border border-green-200 text-green-700'
+        }`}>
+          <div className="flex items-center justify-between gap-4">
+            <span>{toast.message}</span>
+            <button 
+              onClick={() => setToast(prev => ({ ...prev, open: false }))}
+              className="text-current opacity-50 hover:opacity-100"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

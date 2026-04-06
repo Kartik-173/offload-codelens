@@ -1,33 +1,155 @@
 import React, { useMemo, useState } from "react";
 import {
-  Box,
-  Paper,
-  Typography,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Chip,
-  Stack,
-  TextField,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  InputAdornment,
-  ToggleButton,
-  ToggleButtonGroup,
-  Tooltip,
-  Button,
-} from "@mui/material";
-import DownloadIcon from "@mui/icons-material/Download";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import SearchIcon from "@mui/icons-material/Search";
-import UpgradeIcon from "@mui/icons-material/Upgrade";
-import ExtensionIcon from "@mui/icons-material/Extension";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+  Download as DownloadIcon,
+  Filter as FilterListIcon,
+  Search as SearchIcon,
+  ArrowUpCircle as UpgradeIcon,
+  Puzzle as ExtensionIcon,
+  ArrowUp as ArrowUpwardIcon,
+  ArrowDown as ArrowDownwardIcon,
+  X,
+} from "lucide-react";
+
+const Box = ({ children, className = "", component = "div", sx, ...rest }) => {
+  const Tag = component === "span" ? "span" : "div";
+  return (
+    <Tag className={className} {...rest}>
+      {children}
+    </Tag>
+  );
+};
+
+const Paper = ({ children, className = "", sx, ...rest }) => (
+  <div className={className} {...rest}>{children}</div>
+);
+
+const Typography = ({ children, className = "", component = "p", sx, ...rest }) => {
+  const Tag = component;
+  return (
+    <Tag className={className} {...rest}>{children}</Tag>
+  );
+};
+
+const Table = ({ children, className = "", ...rest }) => (
+  <table className={`w-full text-sm ${className}`.trim()} {...rest}>{children}</table>
+);
+const TableHead = ({ children, ...rest }) => <thead {...rest}>{children}</thead>;
+const TableBody = ({ children, ...rest }) => <tbody {...rest}>{children}</tbody>;
+const TableRow = ({ children, className = "", ...rest }) => <tr className={className} {...rest}>{children}</tr>;
+const TableCell = ({ children, className = "", align, colSpan, sx, ...rest }) => (
+  <td
+    className={`px-3 py-2 ${align === "center" ? "text-center" : "text-left"} ${className}`.trim()}
+    colSpan={colSpan}
+    {...rest}
+  >
+    {children}
+  </td>
+);
+
+const Stack = ({ children, direction, spacing, className = "", ...rest }) => (
+  <div className={`flex flex-wrap items-center gap-2 ${className}`.trim()} {...rest}>{children}</div>
+);
+
+const InputAdornment = ({ children }) => <span className="inline-flex items-center">{children}</span>;
+
+const MenuItem = ({ children, value }) => <option value={value}>{children}</option>;
+
+const Select = ({ value, onChange, children, className = "", ...rest }) => (
+  <select
+    value={value}
+    onChange={onChange}
+    className={`h-9 rounded-md border border-input bg-background px-3 text-sm ${className}`.trim()}
+    {...rest}
+  >
+    {children}
+  </select>
+);
+
+const InputLabel = ({ children }) => <span className="text-xs text-slate-500">{children}</span>;
+const FormControl = ({ children, className = "" }) => <div className={className}>{children}</div>;
+
+const TextField = ({
+  select,
+  value,
+  onChange,
+  children,
+  placeholder,
+  className = "",
+  InputProps,
+  ...rest
+}) => {
+  if (select) {
+    return (
+      <Select value={value} onChange={onChange} className={className} {...rest}>
+        {children}
+      </Select>
+    );
+  }
+
+  return (
+    <div className="relative">
+      {InputProps?.startAdornment && (
+        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+          {InputProps.startAdornment}
+        </span>
+      )}
+      <input
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className={`h-9 rounded-md border border-input bg-background px-3 text-sm ${InputProps?.startAdornment ? "pl-9" : ""} ${className}`.trim()}
+      />
+    </div>
+  );
+};
+
+const ToggleButton = ({ children, value, groupValue = [], onGroupChange, className = "", ...rest }) => {
+  const selected = groupValue.includes(value);
+
+  return (
+    <button
+      type="button"
+      className={`rounded-md border px-2 py-1 text-xs ${selected ? "bg-slate-900 text-white" : "bg-white text-slate-700"} ${className}`.trim()}
+      onClick={() => {
+        const next = selected ? groupValue.filter((v) => v !== value) : [...groupValue, value];
+        onGroupChange?.(null, next);
+      }}
+      {...rest}
+    >
+      {children}
+    </button>
+  );
+};
+
+const ToggleButtonGroup = ({ children, value = [], onChange, className = "" }) => (
+  <div className={`flex flex-wrap gap-1 ${className}`.trim()}>
+    {React.Children.map(children, (child) =>
+      React.isValidElement(child)
+        ? React.cloneElement(child, { groupValue: value, onGroupChange: onChange })
+        : child
+    )}
+  </div>
+);
+
+const Tooltip = ({ children, title }) => <span title={typeof title === "string" ? title : undefined}>{children}</span>;
+
+const Chip = ({ label, className = "", onDelete }) => (
+  <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${className}`.trim()}>
+    {label}
+    {onDelete && (
+      <button type="button" onClick={onDelete} className="rounded p-0.5 hover:bg-slate-100">
+        <X className="h-3 w-3" />
+      </button>
+    )}
+  </span>
+);
+
+const Button = ({ children, onClick, className = "", startIcon }) => (
+  <button type="button" onClick={onClick} className={`inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-sm ${className}`.trim()}>
+    {startIcon}
+    {children}
+  </button>
+);
 
 const statusColor = (status) => {
   switch (status) {

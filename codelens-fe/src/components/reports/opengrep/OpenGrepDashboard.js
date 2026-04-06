@@ -1,9 +1,4 @@
 import React, { useState } from "react";
-import {
-  Box,
-  CircularProgress,
-  Typography
-} from "@mui/material";
 
 import { useOpenGrepDetails } from "../../../hooks/useOpenGrepDetails";
 import ReportTabs from "../ReportTabs";
@@ -33,17 +28,17 @@ const OpenGrepDashboard = ({ projectKey, onError }) => {
 
   if (loading) {
     return (
-      <Box className="repo-list-loading">
-        <CircularProgress />
-      </Box>
+      <div className="repo-list-loading flex items-center justify-center py-8">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
+      </div>
     );
   }
 
   if (!details) {
     return (
-      <Typography sx={{ padding: 2 }}>
+      <p className="p-2 text-sm text-slate-600">
         No OpenGrep data available
-      </Typography>
+      </p>
     );
   }
 

@@ -1,5 +1,12 @@
 import React, { useMemo, useState } from "react";
-import { Box, Typography } from "@mui/material";
+
+const Box = ({ children, className = "" }) => (
+  <div className={className}>{children}</div>
+);
+
+const Typography = ({ children, className = "", ...props }) => (
+  <p className={className} {...props}>{children}</p>
+);
 
 const highlight = (line) => {
   return line

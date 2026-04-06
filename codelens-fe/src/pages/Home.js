@@ -1,86 +1,85 @@
 import React from "react";
-import {
-  Box,
-  Container,
-  Typography,
-  Button,
-  Card,
-  CardContent,
-  CardActions,
-} from "@mui/material";
-import Grid from "@mui/material/Grid";  
 import { useNavigate } from "react-router-dom";
 import HomeData from "../utils/Helpers";
+import { Button } from "../components/ui/button";
+import { Card, CardContent, CardFooter } from "../components/ui/card";
+import { Sparkles, Scan } from "lucide-react";
 
 const Home = () => {
   const navigate = useNavigate();
   const cards = HomeData(navigate);
 
   return (
-    <Box className="home-page">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Hero Section */}
-      <section className="home-hero">
-        <Container className="home-hero-container">
-          <Typography variant="h3" className="home-hero-title">
+      <section className="px-6 py-16 lg:py-24">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-sm font-medium mb-6">
+            <Sparkles className="h-4 w-4" />
+            AI-Powered Infrastructure
+          </div>
+          <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
             CodeLens for Cloud
-          </Typography>
-          <Typography variant="body1" className="home-hero-subtitle">
+          </h1>
+          <p className="text-lg lg:text-xl text-slate-600 max-w-2xl mx-auto mb-10">
             Generate, review, and secure Terraform with an AI copilot. Connect
             your repos, scan for issues, and ship with confidence.
-          </Typography>
-          <div className="home-hero-cta">
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              className="home-btn primary"
+              size="lg"
+              className="gap-2"
               onClick={() => navigate("/chat-start")}
             >
+              <Sparkles className="h-4 w-4" />
               Start a Chat
             </Button>
             <Button
-              className="home-btn secondary"
+              variant="outline"
+              size="lg"
+              className="gap-2"
               onClick={() => navigate("/scan-repo")}
             >
+              <Scan className="h-4 w-4" />
               Scan a Repository
             </Button>
           </div>
-        </Container>
+        </div>
       </section>
 
       {/* Action Cards */}
-      <section className="home-actions">
-        <Grid container spacing={3} className="home-actions-grid">
-          {cards.map((card, idx) => (
-            <Grid
-              key={idx}
-              size={{ xs: 12, md: 5 }}
-              sx={{ display: "flex" }}
-            >
-              <Card className="home-card" sx={{ width: "100%" }}>
-                <CardContent className="home-card-content">
-                  <div className="home-card-icon">{card.icon}</div>
-                  <Typography variant="h6" className="home-card-title">
+      <section className="px-6 pb-16">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {cards.map((card, idx) => (
+              <Card key={idx} className="flex flex-col hover:shadow-lg transition-shadow">
+                <CardContent className="flex-1 pt-6">
+                  <div className="mb-4">{card.icon}</div>
+                  <h3 className="text-xl font-semibold text-slate-900 mb-2">
                     {card.title}
-                  </Typography>
-                  <Typography className="home-card-text">
+                  </h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
                     {card.text}
-                  </Typography>
+                  </p>
                 </CardContent>
-                <CardActions className="home-card-actions">
+                <CardFooter className="flex flex-wrap gap-2 pt-0">
                   {card.buttons.map((btn, bIdx) => (
                     <Button
                       key={bIdx}
-                      className="home-btn small"
+                      variant={bIdx === 0 ? "default" : "outline"}
+                      size="sm"
                       onClick={btn.action}
                     >
                       {btn.label}
                     </Button>
                   ))}
-                </CardActions>
+                </CardFooter>
               </Card>
-            </Grid>
-          ))}
-        </Grid>
+            ))}
+          </div>
+        </div>
       </section>
-    </Box>
+    </div>
   );
 };
 

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Box, Tabs, Tab, CircularProgress, Typography } from "@mui/material";
 import RiskTab from "./tabs/RiskTab";
 import DescTab from "./tabs/DescTab";
 import AssessTab from "./tabs/AssessTab";
@@ -60,29 +59,38 @@ const HotspotTabs = ({
 
   return (
     <>
-      <Tabs
-        value={activeTab}
-        onChange={(e, v) => setActiveTab(v)}
-        className="hotspot-summary-tabs"
-      >
-        <Tab value="risk" label="Where is the risk?" />
-        <Tab value="desc" label="What's the risk?" />
-        <Tab value="assess" label="Assess the risk" />
-        <Tab value="fix" label="How can I fix it?" />
-        <Tab value="activity" label="Activity" />
-      </Tabs>
+      <div className="hotspot-summary-tabs flex flex-wrap gap-2 border-b pb-2">
+        {[
+          { value: "risk", label: "Where is the risk?" },
+          { value: "desc", label: "What's the risk?" },
+          { value: "assess", label: "Assess the risk" },
+          { value: "fix", label: "How can I fix it?" },
+          { value: "activity", label: "Activity" },
+        ].map((tab) => (
+          <button
+            key={tab.value}
+            type="button"
+            onClick={() => setActiveTab(tab.value)}
+            className={`rounded-md px-3 py-1.5 text-sm ${
+              activeTab === tab.value
+                ? "bg-blue-600 text-white"
+                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-      <Box className="hotspot-summary-content">
+      <div className="hotspot-summary-content">
         {activeTab === "risk" && (
           <>
             {loading ? (
-              <Box className="hotspot-loader">
-                <CircularProgress size={24} />
-              </Box>
+              <div className="hotspot-loader flex items-center justify-center py-6">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
+              </div>
             ) : error ? (
-              <Typography variant="body2" color="error">
-                {error}
-              </Typography>
+              <p className="text-sm text-red-600">{error}</p>
             ) : (
               <RiskTab
                 filePath={filePath}
@@ -99,7 +107,7 @@ const HotspotTabs = ({
         {activeTab === "assess" && <AssessTab hotspot={hotspot} />}
         {activeTab === "fix" && <FixTab hotspot={hotspot} />}
         {activeTab === "activity" && <ActivityTab hotspot={hotspot} />}
-      </Box>
+      </div>
     </>
   );
 };

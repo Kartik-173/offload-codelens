@@ -1,17 +1,5 @@
 import React from "react";
-import {
-  Box,
-  Typography,
-  Tabs,
-  Tab,
-  Paper,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
-} from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { getPriorityIcon } from "../../../utils/Helpers.js";
 
 const HotspotList = ({
@@ -26,66 +14,71 @@ const HotspotList = ({
   setSelectedHotspot,
 }) => {
   return (
-    <Paper className="hotspot-list">
-      <Tabs
-        value={selectedTab}
-        onChange={handleTabChange}
-        className="hotspot-tabs"
-      >
-        <Tab value="TO_REVIEW" label="To review" />
-        <Tab value="ACKNOWLEDGED" label="Acknowledged" />
-        <Tab value="FIXED" label="Fixed" />
-        <Tab value="SAFE" label="Safe" />
-      </Tabs>
+    <div className="hotspot-list rounded-md border bg-card">
+      <div className="hotspot-tabs flex flex-wrap border-b">
+        {[
+          { value: "TO_REVIEW", label: "To review" },
+          { value: "ACKNOWLEDGED", label: "Acknowledged" },
+          { value: "FIXED", label: "Fixed" },
+          { value: "SAFE", label: "Safe" },
+        ].map((tab) => (
+          <button
+            key={tab.value}
+            type="button"
+            onClick={(e) => handleTabChange(e, tab.value)}
+            className={`border-b-2 px-4 py-2 text-sm ${
+              selectedTab === tab.value
+                ? "border-blue-600 text-blue-600"
+                : "border-transparent text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-      <Divider />
-
-      <Typography variant="body2" className="hotspot-count-box">
+      <p className="hotspot-count-box text-sm">
         <span className="hotspot-count">{filteredHotspots.length}</span> Security
         Hotspots to review
-      </Typography>
+      </p>
 
       {Object.entries(grouped).map(([priority, categories]) => (
-        <Box key={priority} className="priority-section">
-          <Typography variant="subtitle2" className="priority-title">
+        <div key={priority} className="priority-section">
+          <p className="priority-title text-sm font-semibold">
             Review priority: {getPriorityIcon(priority)}
             <span className="priority-text">{priority}</span>
-          </Typography>
+          </p>
 
           {Object.entries(categories).map(([category, items]) => {
             const key = `${priority}-${category}`;
             const expanded = expandedCategories[key];
 
             return (
-              <Box key={category} className="category-box">
-                <Box
+              <div key={category} className="category-box">
+                <button
+                  type="button"
                   className={`category-header ${expanded ? "selected" : ""}`}
                   onClick={() => toggleCategory(priority, category)}
                 >
-                  <Box className="category-left">
+                  <div className="category-left">
                     {getPriorityIcon(priority)}
-                    <Typography className="category-title">
-                      {category}
-                    </Typography>
-                  </Box>
-                  <Box className="category-right">
-                    <Typography className="category-count">
-                      {items.length}
-                    </Typography>
+                    <span className="category-title">{category}</span>
+                  </div>
+                  <div className="category-right">
+                    <span className="category-count">{items.length}</span>
                     {expanded ? (
-                      <ExpandLessIcon fontSize="small" />
+                      <ChevronUp className="h-4 w-4" />
                     ) : (
-                      <ExpandMoreIcon fontSize="small" />
+                      <ChevronDown className="h-4 w-4" />
                     )}
-                  </Box>
-                </Box>
+                  </div>
+                </button>
 
                 {expanded && (
-                  <List disablePadding>
+                  <ul className="list-none p-0">
                     {items.map((h) => (
-                      <ListItem
+                      <li
                         key={h.key}
-                        button
                         onClick={() => {
                           setSelectedHotspotKey(h.key);
                           setSelectedHotspot(h);   
@@ -94,22 +87,22 @@ const HotspotList = ({
                           selectedHotspotKey === h.key ? "selected" : ""
                         }`}
                       >
-                        <ListItemText primary={h.message} />
-                      </ListItem>
+                        {h.message}
+                      </li>
 
                     ))}
-                  </List>
+                  </ul>
                 )}
-              </Box>
+              </div>
             );
           })}
-        </Box>
+        </div>
       ))}
 
-      <Typography variant="body2" className="hotspot-footer">
+      <p className="hotspot-footer text-sm">
         {filteredHotspots.length} of {filteredHotspots.length} shown
-      </Typography>
-    </Paper>
+      </p>
+    </div>
   );
 };
 

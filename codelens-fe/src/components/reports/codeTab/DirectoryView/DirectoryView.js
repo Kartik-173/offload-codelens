@@ -1,23 +1,16 @@
 import React from "react";
 import {
-  Box,
-  Paper,
-  TextField,
-  InputAdornment,
-  Alert,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Typography,
-} from "@mui/material";
-import {
   Search as SearchIcon,
-  Warning as WarningIcon,
+  TriangleAlert as WarningIcon,
   Folder as FolderIcon,
-  InsertDriveFile as FileIcon,
-} from "@mui/icons-material";
+  File as FileIcon,
+} from "lucide-react";
+
+const Box = ({ children, className = "" }) => <div className={className}>{children}</div>;
+const Typography = ({ children, className = "", component = "p" }) => {
+  const Tag = component;
+  return <Tag className={className}>{children}</Tag>;
+};
 
 const DirectoryView = ({
   searchQuery,
@@ -39,80 +32,67 @@ const DirectoryView = ({
 
   return (
     <Box className="directory-view-container">
-      <Alert
-        variant="outlined"
-        severity="warning"
-        icon={<WarningIcon />}
-        className="code-tab-warning-banner"
-        onClose={() => {}}
-      >
+      <div className="code-tab-warning-banner">
+        <WarningIcon className="h-4 w-4" />
         The last analysis has warnings. See details
-      </Alert>
+      </div>
 
-      <TextField
-        fullWidth
-        placeholder="Search for files..."
-        variant="outlined"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="code-tab-search-bar"
-        size="small"
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon className="search-icon" />
-            </InputAdornment>
-          ),
-        }}
-      />
+      <div className="relative">
+        <SearchIcon className="search-icon pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+        <input
+          type="text"
+          placeholder="Search for files..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="code-tab-search-bar h-9 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm"
+        />
+      </div>
 
-      {/* Table */}
-      <Paper className="code-tab-table-container">
-        <Table size="small" stickyHeader>
-          <TableHead>
-            <TableRow className="code-tab-table-header">
-              <TableCell className="code-tab-name-column">Name</TableCell>
-              <TableCell align="right">Lines of Code</TableCell>
-              <TableCell align="right">Security</TableCell>
-              <TableCell align="right">Reliability</TableCell>
-              <TableCell align="right">Maintainability</TableCell>
-              <TableCell align="right">Security Hotspots</TableCell>
-              <TableCell align="right">Coverage</TableCell>
-              <TableCell align="right">Duplications</TableCell>
-            </TableRow>
-          </TableHead>
+      <div className="code-tab-table-container overflow-x-auto rounded-md border">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="code-tab-table-header">
+              <th className="code-tab-name-column px-3 py-2 text-left">Name</th>
+              <th className="px-3 py-2 text-right">Lines of Code</th>
+              <th className="px-3 py-2 text-right">Security</th>
+              <th className="px-3 py-2 text-right">Reliability</th>
+              <th className="px-3 py-2 text-right">Maintainability</th>
+              <th className="px-3 py-2 text-right">Security Hotspots</th>
+              <th className="px-3 py-2 text-right">Coverage</th>
+              <th className="px-3 py-2 text-right">Duplications</th>
+            </tr>
+          </thead>
 
-          <TableBody>
+          <tbody>
             {filteredNodes.map((node) => (
-              <TableRow
+              <tr
                 key={node.path}
-                hover
-                style={{ cursor: "pointer" }}
+                className="cursor-pointer border-t hover:bg-slate-50"
                 onClick={() =>
                   node.type === "DIR" ? onFolderClick(node.name) : onFileClick(node)
                 }
               >
-                <TableCell className="tree-node-name">
+                <td className="tree-node-name px-3 py-2">
                   {node.type === "DIR" ? (
-                    <FolderIcon className="folder-icon" fontSize="small" />
+                    <FolderIcon className="folder-icon h-4 w-4" />
                   ) : (
-                    <FileIcon className="file-icon" fontSize="small" />
+                    <FileIcon className="file-icon h-4 w-4" />
                   )}
                   <Typography component="span">{node.name}</Typography>
-                </TableCell>
+                </td>
 
-                <TableCell align="right">{node.metrics?.lines ?? "-"}</TableCell>
-                <TableCell align="right">{node.metrics?.security ?? "-"}</TableCell>
-                <TableCell align="right">{node.metrics?.reliability ?? "-"}</TableCell>
-                <TableCell align="right">{node.metrics?.maintainability ?? "-"}</TableCell>
-                <TableCell align="right">{node.metrics?.securityHotspots ?? "-"}</TableCell>
-                <TableCell align="right">{node.metrics?.coverage ?? "-"}</TableCell>
-                <TableCell align="right">{node.metrics?.duplications ?? "-"}</TableCell>
-              </TableRow>
+                <td className="px-3 py-2 text-right">{node.metrics?.lines ?? "-"}</td>
+                <td className="px-3 py-2 text-right">{node.metrics?.security ?? "-"}</td>
+                <td className="px-3 py-2 text-right">{node.metrics?.reliability ?? "-"}</td>
+                <td className="px-3 py-2 text-right">{node.metrics?.maintainability ?? "-"}</td>
+                <td className="px-3 py-2 text-right">{node.metrics?.securityHotspots ?? "-"}</td>
+                <td className="px-3 py-2 text-right">{node.metrics?.coverage ?? "-"}</td>
+                <td className="px-3 py-2 text-right">{node.metrics?.duplications ?? "-"}</td>
+              </tr>
             ))}
-          </TableBody>
-        </Table>
-      </Paper>
+          </tbody>
+        </table>
+      </div>
     </Box>
   );
 };

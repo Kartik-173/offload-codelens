@@ -1,31 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { Card } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Badge } from "../../components/ui/badge";
+import { Switch } from "../../components/ui/switch";
+import { Label } from "../../components/ui/label";
 import {
-  Card,
-  CardContent,
-  Typography,
-  Grid,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Box,
-  Button,
-  Tooltip,
-  CircularProgress,
-  Switch,
-  FormControlLabel,
-  IconButton,
-  Avatar,
-} from '@mui/material';
-import { Alert } from '@mui/material';
-
-// Import Alert component for target protection notice
-import {
-  Refresh,
-  Email as EmailIcon,
-  Info as InfoIcon,
-  Shield as ShieldIcon,
-} from '@mui/icons-material';
+  RefreshCw,
+  Mail,
+  Info,
+  Shield,
+  Loader2,
+} from 'lucide-react';
 import RegionSelector from './RegionSelector';
 
 const AccountInfo = ({
@@ -58,49 +43,49 @@ const AccountInfo = ({
     setUiAutoDeregisterEnabled(autoDeregisterEnabled);
   }, [autoDeregisterEnabled]);
   return (
-    <Card sx={{ mb: 3 }}>
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
+    <Card className="mb-6">
+      <div className="p-6">
+        <h2 className="text-xl font-semibold mb-2">
           AWS Account Information
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        </h2>
+        <p className="text-sm text-slate-600 mb-4">
           Select a region to fetch load balancers from that specific AWS region
-        </Typography>
+        </p>
         {lastFetchTime && (
-          <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
+          <p className="text-xs text-slate-500 mb-2">
             Last fetched: {lastFetchTime.toLocaleString()}
-          </Typography>
+          </p>
         )}
         
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={3}>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center mb-4">
+          <div className="md:col-span-3">
             {accountIds.length > 1 ? (
-              <FormControl size="small" sx={{ minWidth: 200 }}>
-                <InputLabel>Select Account</InputLabel>
-                <Select
+              <div className="w-full">
+                <label className="block text-sm font-medium mb-1">Select Account</label>
+                <select
+                  className="w-full p-2 border rounded text-sm"
                   value={selectedAccountId}
-                  label="Select Account"
                   onChange={(e) => onAccountChange(e.target.value)}
                 >
                   {accountIds.map((accountId) => (
-                    <MenuItem key={accountId} value={accountId}>
+                    <option key={accountId} value={accountId}>
                       {accountIdToName?.[accountId]
                         ? `${accountId}-${accountIdToName[accountId]}`
                         : accountId}
-                    </MenuItem>
+                    </option>
                   ))}
-                </Select>
-              </FormControl>
+                </select>
+              </div>
             ) : (
-              <Typography variant="body2" color="text.secondary">
+              <p className="text-sm text-slate-600">
                 Account ID: {accountIdToName?.[storedCredentials.accountId]
                   ? `${storedCredentials.accountId}-${accountIdToName[storedCredentials.accountId]}`
                   : storedCredentials.accountId}
-              </Typography>
+              </p>
             )}
-          </Grid>
+          </div>
           
-          <Grid item xs={12} md={9}>
+          <div className="md:col-span-9">
             <RegionSelector
               selectedRegions={selectedRegions}
               onRegionsChange={onRegionsChange}
@@ -108,85 +93,75 @@ const AccountInfo = ({
               onSelectAllRegions={onSelectAllRegions}
               loading={loading}
             />
-          </Grid>
-        </Grid>
+          </div>
+        </div>
         
-        <Grid container spacing={2} alignItems="center" sx={{ mt: 2 }}>
-          <Grid item xs={12}>
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-              <Tooltip title={selectedRegions.length > 0 ? `Fetch load balancers from ${selectedRegions.length} region(s)` : "Please select at least one region first"}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  startIcon={loading ? <CircularProgress size={20} /> : <Refresh />}
-                  onClick={onFetchAlbs}
-                  disabled={loading || selectedRegions.length === 0}
-                  sx={{ minWidth: 140 }}
-                >
-                  {loading ? 'Fetching...' : 'Fetch Load Balancers'}
-                </Button>
-              </Tooltip>
-              
-              <Tooltip title="Configure email notifications">
-                <IconButton
-                  color="primary"
-                  onClick={onOpenEmailConfig}
-                  disabled={loading}
-                  size="small"
-                >
-                  <EmailIcon />
-                </IconButton>
-              </Tooltip>
-              
-              <Tooltip title="Configure Slack notifications">
-                <IconButton
-                  color="primary"
-                  onClick={onOpenSlackConfig}
-                  disabled={loading}
-                  size="small"
-                >
-                  <img 
-                    src="/slack-icon.png"
-                    alt="Slack" 
-                    style={{ width: 20, height: 20 }}
-                  />
-                </IconButton>
-              </Tooltip>
-              
-              <FormControlLabel
-                sx={{ ml: 1 }}
-                control={
-                  <Switch
-                      checked={uiAutoDeregisterEnabled}
-                      onChange={(e) => {
-                        const newValue = e.target.checked;
-                        console.log('Auto Deregister toggled to:', newValue);
-                        setUiAutoDeregisterEnabled(newValue);
-                        // Call the backend API
-                        onAutoDeregisterToggle(e);
-                      }}
-                      color="error"
-                    />
-                }
-                label="Auto Deregister"
+        <div className="grid grid-cols-1 gap-4 items-center">
+          <div className="flex flex-wrap gap-3 items-center">
+            <Button
+              onClick={onFetchAlbs}
+              disabled={loading || selectedRegions.length === 0}
+              className="min-w-[140px]"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Fetching...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Fetch Load Balancers
+                </>
+              )}
+            </Button>
+            
+            <button
+              className="p-2 text-blue-600 hover:bg-blue-50 rounded disabled:opacity-50"
+              title="Configure email notifications"
+              onClick={onOpenEmailConfig}
+              disabled={loading}
+            >
+              <Mail className="h-5 w-5" />
+            </button>
+            
+            <button
+              className="p-2 text-blue-600 hover:bg-blue-50 rounded disabled:opacity-50"
+              title="Configure Slack notifications"
+              onClick={onOpenSlackConfig}
+              disabled={loading}
+            >
+              <img 
+                src="/slack-icon.png"
+                alt="Slack" 
+                className="w-5 h-5"
               />
-            </Box>
-          </Grid>
+            </button>
+            
+            <div className="flex items-center gap-2 ml-2">
+              <Switch
+                checked={uiAutoDeregisterEnabled}
+                onCheckedChange={(checked) => {
+                  console.log('Auto Deregister toggled to:', checked);
+                  setUiAutoDeregisterEnabled(checked);
+                  onAutoDeregisterToggle({ target: { checked } });
+                }}
+              />
+              <Label className="text-sm">Auto Deregister</Label>
+            </div>
+          </div>
           
           {/* Target Protection Notice */}
-          <Grid item xs={12}>
-            <Alert 
-              severity="info" 
-              icon={<ShieldIcon />}
-              sx={{ mt: 2 }}
-            >
-              <Typography variant="body2">
+          <div className="mt-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+              <Info className="h-5 w-5 text-blue-600 mt-0.5" />
+              <p className="text-sm text-slate-700">
                 Protected targets will not be automatically removed.
-              </Typography>
-            </Alert>
-          </Grid>
-        </Grid>
-      </CardContent>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </Card>
   );
 };

@@ -1,40 +1,237 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Typography,
-  Button,
-  TablePagination,
-  IconButton,
-  Paper,
-  Tooltip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Menu,
-  Checkbox,
-  TextField,
-  ListItemText,
-  Divider,
-  Skeleton,
-} from '@mui/material';
 import AWSScanApiService from '../services/AWSScanApiService';
 import CredentialsApiService from '../services/CredentialsApiService';
-import SnackbarNotification, {
-  SNACKBAR_THEME,
-} from '../components/common/SnackbarNotification';
-import ViewColumnIcon from '@mui/icons-material/ViewColumn';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import DensityMediumIcon from '@mui/icons-material/DensityMedium';
-import GetAppIcon from '@mui/icons-material/GetApp';
-import Grid from '@mui/material/Grid';
-import CloseIcon from '@mui/icons-material/Close';
+import SnackbarNotification, { SNACKBAR_THEME } from '../components/common/SnackbarNotification';
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import {
+  Eye,
+  Filter,
+  Menu as MenuIcon,
+  Download,
+  Columns,
+  X,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+} from 'lucide-react';
+
+const Grid = ({ children, className = '' }) => (
+  <div className={className}>{children}</div>
+);
+
+const Box = ({ children, className = '' }) => (
+  <div className={className}>{children}</div>
+);
+
+const FormControl = ({ children, className = '', disabled = false }) => (
+  <div className={`${className} ${disabled ? 'pointer-events-none opacity-60' : ''}`.trim()}>
+    {children}
+  </div>
+);
+
+const InputLabel = ({ children, id }) => (
+  <label htmlFor={id} className="mb-1 block text-xs text-muted-foreground">
+    {children}
+  </label>
+);
+
+const Checkbox = ({ checked = false, indeterminate = false, className = '' }) => (
+  <input
+    type="checkbox"
+    checked={checked}
+    readOnly
+    ref={(el) => {
+      if (el) {
+        el.indeterminate = Boolean(indeterminate);
+      }
+    }}
+    className={`h-4 w-4 rounded border-input ${className}`.trim()}
+  />
+);
+
+const MenuItem = ({
+  children,
+  onClick,
+  className = '',
+  disabled = false,
+  selected = false,
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50 ${
+      selected ? 'bg-muted' : ''
+    } ${className}`.trim()}
+  >
+    {children}
+  </button>
+);
+
+const Select = ({ value, onChange, children, disabled = false, className = '' }) => (
+  <select
+    value={value}
+    onChange={onChange}
+    disabled={disabled}
+    className={`h-9 w-full rounded-md border border-input bg-background px-3 text-sm shadow-sm ${className}`.trim()}
+  >
+    {React.Children.map(children, (child) => {
+      if (!React.isValidElement(child)) return child;
+      if (child.type === MenuItem) {
+        return (
+          <option value={child.props.value} disabled={child.props.disabled}>
+            {child.props.children}
+          </option>
+        );
+      }
+      return child;
+    })}
+  </select>
+);
+
+const Tooltip = ({ children, title }) => (
+  <span title={typeof title === 'string' ? title : undefined}>{children}</span>
+);
+
+const Typography = ({ children, className = '' }) => (
+  <p className={className}>{children}</p>
+);
+
+const IconButton = ({
+  children,
+  onClick,
+  className = '',
+  disabled = false,
+  'aria-label': ariaLabel,
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    aria-label={ariaLabel}
+    className={`inline-flex h-8 w-8 items-center justify-center rounded-md border border-transparent hover:bg-muted disabled:opacity-50 ${className}`.trim()}
+  >
+    {children}
+  </button>
+);
+
+const Menu = ({ open, onClose, children, className = '' }) => {
+  if (!open) return null;
+
+  return (
+    <div
+      className={`absolute z-20 mt-2 min-w-[180px] rounded-md border bg-popover p-1 text-popover-foreground shadow-md ${className}`.trim()}
+      onMouseLeave={onClose}
+    >
+      {children}
+    </div>
+  );
+};
+
+const ListItemText = ({ primary }) => <span className="text-sm">{primary}</span>;
+
+const Divider = () => <div className="my-1 border-t" />;
+
+const Skeleton = ({ height = 32, className = '' }) => (
+  <div
+    className={`animate-pulse rounded bg-muted ${className}`.trim()}
+    style={{ height }}
+  />
+);
+
+const TextField = ({ value, onChange, placeholder = '', className = '' }) => (
+  <Input
+    value={value}
+    onChange={onChange}
+    placeholder={placeholder}
+    className={className}
+  />
+);
+
+const TableContainer = ({ children, className = '' }) => (
+  <div className={className}>{children}</div>
+);
+
+const Table = ({ children, className = '' }) => (
+  <table className={`w-full caption-bottom text-sm ${className}`.trim()}>{children}</table>
+);
+
+const TableHead = ({ children, className = '' }) => (
+  <thead className={className}>{children}</thead>
+);
+
+const TableBody = ({ children, className = '' }) => (
+  <tbody className={className}>{children}</tbody>
+);
+
+const TableRow = ({ children, className = '' }) => (
+  <tr className={className}>{children}</tr>
+);
+
+const TableCell = ({ children, className = '', sx }) => (
+  <td className={`p-2 align-top ${className}`.trim()} style={sx}>
+    {children}
+  </td>
+);
+
+const TablePagination = ({
+  count,
+  page,
+  onPageChange,
+  rowsPerPage,
+  onRowsPerPageChange,
+  rowsPerPageOptions = [25, 50, 100],
+}) => {
+  const totalPages = Math.max(1, Math.ceil(count / rowsPerPage));
+  const from = count === 0 ? 0 : page * rowsPerPage + 1;
+  const to = Math.min(count, (page + 1) * rowsPerPage);
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 border-t px-3 py-2 text-sm">
+      <div className="text-muted-foreground">{from}-{to} of {count}</div>
+      <div className="flex items-center gap-2">
+        <label htmlFor="aws-scan-rows-per-page" className="text-muted-foreground">
+          Rows per page
+        </label>
+        <select
+          id="aws-scan-rows-per-page"
+          value={rowsPerPage}
+          onChange={onRowsPerPageChange}
+          className="h-8 rounded-md border border-input bg-background px-2"
+        >
+          {rowsPerPageOptions.map((opt) => (
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
+          ))}
+        </select>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={(e) => onPageChange(e, Math.max(0, page - 1))}
+          disabled={page === 0}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <span className="text-muted-foreground">
+          {page + 1}/{totalPages}
+        </span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={(e) => onPageChange(e, Math.min(totalPages - 1, page + 1))}
+          disabled={page >= totalPages - 1}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+};
 
 const AwsScan = () => {
   const [isTriggerLoading, setIsTriggerLoading] = useState(false);
@@ -705,7 +902,7 @@ const AwsScan = () => {
                 disabled={isReportListLoading || !findings.length}
                 sx={{ flex: { lg: '0 0 auto' } }}
               >
-                <GetAppIcon className="scan-download-icon" />
+                <Download className="h-5 w-5" />
               </Button>
             </span>
           </Tooltip>
@@ -761,7 +958,7 @@ const AwsScan = () => {
                   className="aws-scan-table-action-iconbtn"
                   onClick={handleOpenColumnsMenu}
                 >
-                  <ViewColumnIcon />
+                  <Columns className="h-5 w-5" />
                 </IconButton>
                 <span
                   className="aws-scan-table-action-label aws-scan-table-action-label-clickable"
@@ -824,7 +1021,7 @@ const AwsScan = () => {
                   className="aws-scan-table-action-iconbtn"
                   onClick={handleToggleFiltersBar}
                 >
-                  <FilterListIcon />
+                  <Filter className="h-5 w-5" />
                 </IconButton>
                 <span
                   className="aws-scan-table-action-label aws-scan-table-action-label-clickable"
@@ -840,7 +1037,7 @@ const AwsScan = () => {
                   className="aws-scan-table-action-iconbtn"
                   onClick={handleOpenDensityMenu}
                 >
-                  <DensityMediumIcon />
+                  <MenuIcon className="h-5 w-5" />
                 </IconButton>
                 <span
                   className="aws-scan-table-action-label aws-scan-table-action-label-clickable"
@@ -862,7 +1059,7 @@ const AwsScan = () => {
                     onClick={() => handleChangeDensity('compact')}
                     className="aws-scan-density-menu-item"
                   >
-                    <DensityMediumIcon fontSize="small" className="aws-scan-density-menu-icon" />
+                    <MenuIcon className="h-4 w-4" />
                     <ListItemText primary="Compact" />
                   </MenuItem>
                   <MenuItem
@@ -870,7 +1067,7 @@ const AwsScan = () => {
                     onClick={() => handleChangeDensity('standard')}
                     className="aws-scan-density-menu-item"
                   >
-                    <DensityMediumIcon fontSize="small" className="aws-scan-density-menu-icon" />
+                    <MenuIcon className="h-4 w-4" />
                     <ListItemText primary="Standard" />
                   </MenuItem>
                   <MenuItem
@@ -878,7 +1075,7 @@ const AwsScan = () => {
                     onClick={() => handleChangeDensity('comfortable')}
                     className="aws-scan-density-menu-item"
                   >
-                    <DensityMediumIcon fontSize="small" className="aws-scan-density-menu-icon" />
+                    <MenuIcon className="h-4 w-4" />
                     <ListItemText primary="Comfortable" />
                   </MenuItem>
                 </Menu>
@@ -890,7 +1087,7 @@ const AwsScan = () => {
                   onClick={handleOpenExportMenu}
                   disabled={!findings.length}
                 >
-                  <GetAppIcon />
+                  <Download className="h-5 w-5" />
                 </IconButton>
                 <span
                   className="aws-scan-table-action-label aws-scan-table-action-label-clickable"
@@ -935,7 +1132,7 @@ const AwsScan = () => {
                 className="aws-scan-filter-close-btn"
                 onClick={handleClearFilter}
               >
-                <CloseIcon fontSize="small" />
+                <X className="h-4 w-4" />
               </IconButton>
               <div className="aws-scan-filter-main">
                 <div className="aws-scan-filter-field aws-scan-filter-column">

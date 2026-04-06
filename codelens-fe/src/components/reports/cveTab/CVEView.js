@@ -1,34 +1,72 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Grid,
-  IconButton,
-  Collapse,
-  Divider,
-  CircularProgress,
-  Tooltip,
-} from "@mui/material";
-import Inventory2Icon from "@mui/icons-material/Inventory2";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import SecurityIcon from "@mui/icons-material/Security";
-import ShieldIcon from "@mui/icons-material/Shield";
-import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import ReportProblemIcon from "@mui/icons-material/ReportProblem";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import LinkIcon from "@mui/icons-material/Link";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+  Package as Inventory2Icon,
+  TriangleAlert as WarningAmberIcon,
+  ShieldAlert as SecurityIcon,
+  Shield as ShieldIcon,
+  Flame as LocalFireDepartmentIcon,
+  CircleAlert as ErrorOutlineIcon,
+  AlertTriangle as ReportProblemIcon,
+  Info as InfoOutlinedIcon,
+  Link2 as LinkIcon,
+  ChevronDown as ExpandMoreIcon,
+  CheckCircle as CheckCircleIcon,
+} from "lucide-react";
+
+const Box = ({ children, className = "", ...props }) => (
+  <div className={className} {...props}>{children}</div>
+);
+
+const Card = ({ children, className = "" }) => (
+  <div className={className}>{children}</div>
+);
+
+const CardContent = ({ children, className = "" }) => (
+  <div className={className}>{children}</div>
+);
+
+const Typography = ({ children, className = "", ...props }) => (
+  <p className={className} {...props}>{children}</p>
+);
+
+const Grid = ({ children, className = "" }) => (
+  <div className={className}>{children}</div>
+);
+
+const Tooltip = ({ children, title }) => (
+  <span title={typeof title === "string" ? title : undefined}>{children}</span>
+);
+
+const Chip = ({ label, className = "", icon, ...props }) => (
+  <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${className}`.trim()} {...props}>
+    {icon}
+    {label}
+  </span>
+);
+
+const IconButton = ({ children, className = "", onClick }) => (
+  <button type="button" className={className} onClick={onClick}>{children}</button>
+);
+
+const Collapse = ({ in: open, children }) => (open ? <>{children}</> : null);
+
+const Divider = ({ className = "" }) => <div className={className} />;
+
+const CircularProgress = ({ size = 40 }) => (
+  <div
+    className="animate-spin rounded-full border-2 border-slate-300 border-t-slate-700"
+    style={{ width: size, height: size }}
+  />
+);
 
 export default function CVEView({ loading, cveReport }) {
   const [expandedPkg, setExpandedPkg] = useState({});
   const [expandedVuln, setExpandedVuln] = useState({});
 
-  const items = Array.isArray(cveReport?.items) ? cveReport.items : [];
+  const items = useMemo(
+    () => (Array.isArray(cveReport?.items) ? cveReport.items : []),
+    [cveReport]
+  );
 
   const firstPkgKey = useMemo(() => {
     if (!items.length) return null;

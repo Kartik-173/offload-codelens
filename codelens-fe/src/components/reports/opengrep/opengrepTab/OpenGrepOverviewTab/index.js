@@ -1,11 +1,15 @@
 import React from "react";
-import { Box, Divider } from "@mui/material";
-
 import OverviewCards from "./OverviewCards";
 import SeverityBreakdown from "./SeverityBreakdown";
 import CWESummary from "./CWESummary";
 import LanguageSummary from "./LanguageSummary";
 import ScanMetadata from "./ScanMetadata";
+
+const Box = ({ children, className = "" }) => (
+  <div className={className}>{children}</div>
+);
+
+const Divider = ({ className = "" }) => <div className={className} />;
 
 const OpenGrepOverviewTab = ({ details }) => {
   if (!details) return null;

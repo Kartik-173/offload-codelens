@@ -1,27 +1,13 @@
 import React, { useEffect, useState, useCallback } from "react";
-import {
-  Box,
-  Button,
-  Typography,
-  TextField,
-  Divider,
-  CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
-  Tooltip,
-} from "@mui/material";
-
-import CloudQueueIcon from "@mui/icons-material/CloudQueue";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-
+import { Cloud, Trash2 } from "lucide-react";
 import SnackbarNotification, {
   SNACKBAR_THEME,
 } from "../common/SnackbarNotification";
-
 import CredentialsApiService from "../../services/CredentialsApiService";
+
+const Box = ({ children, className = "" }) => <div className={className}>{children}</div>;
+const Typography = ({ children, className = "" }) => <p className={className}>{children}</p>;
+const Divider = () => <hr className="my-4 border-slate-200" />;
 
 const EMPTY_FORM = {
   accountId: "",
@@ -228,7 +214,7 @@ const AwsAccountsManager = () => {
   if (loading) {
     return (
       <Box className="credentials-loader">
-        <CircularProgress size={28} />
+        <div className="h-7 w-7 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
         <Typography>Loading AWS accounts…</Typography>
       </Box>
     );
@@ -241,15 +227,15 @@ const AwsAccountsManager = () => {
 
       <Box className="aws-header">
         <Box className="credentials-logo-circle">
-          <CloudQueueIcon className="credentials-logo-icon" />
+          <Cloud className="credentials-logo-icon" size={24} />
         </Box>
 
         <Box>
-          <Typography variant="h5" className="credentials-title">
+          <Typography className="credentials-title">
             AWS Accounts
           </Typography>
 
-          <Typography variant="body2" className="credentials-subtext">
+          <Typography className="credentials-subtext">
             Manage multiple AWS accounts securely
           </Typography>
         </Box>
@@ -285,7 +271,7 @@ const AwsAccountsManager = () => {
           </Box>
 
           {accounts.length === 0 && (
-            <Typography color="text.secondary" sx={{ mb: 2 }}>
+            <Typography className="text-slate-500 mb-2">
               No accounts added yet
             </Typography>
           )}
@@ -300,32 +286,29 @@ const AwsAccountsManager = () => {
             >
               <Typography>{acc?.name ? `${acc.id}-${acc.name}` : acc.id}</Typography>
 
-              <Tooltip
-                title="Delete"
-                placement="left"
-              >
-                <IconButton
-                  size="small"
+              <div className="group relative">
+                <button
+                  type="button"
                   className="credentials-info-btn"
                   onClick={(e) => {
                     e.stopPropagation();
                     openDeleteDialogFor(acc);
                   }}
+                  title="Delete"
                 >
-                  <DeleteOutlineIcon fontSize="inherit" />
-                </IconButton>
-              </Tooltip>
+                  <Trash2 size={16} />
+                </button>
+              </div>
             </Box>
           ))}
 
-          <Button
-            variant="outlined"
-            fullWidth
+          <button
+            type="button"
             className="aws-add-btn"
             onClick={resetForm}
           >
             + Add Account
-          </Button>
+          </button>
         </Box>
 
         {/* Right Panel */}
@@ -342,77 +325,73 @@ const AwsAccountsManager = () => {
 
           <form onSubmit={saveAccount}>
 
-            <TextField
-              label="AWS Account ID"
-              fullWidth
-              required
+            <input
+              type="text"
+              className="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              placeholder="AWS Account ID (12 digits)"
               value={form.accountId}
+              maxLength={12}
               onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, ''); // Only allow digits
+                const value = e.target.value.replace(/\D/g, '');
                 setForm({ ...form, accountId: value });
               }}
-              margin="normal"
-              inputProps={{
-                maxLength: 12,
-                placeholder: "12-digit AWS Account ID"
-              }}
-              helperText={form.accountId && form.accountId.length !== 12 ? "AWS Account ID must be exactly 12 digits" : ""}
-              error={form.accountId && form.accountId.length !== 12}
-            />
-
-            <TextField
-              label="Account Name"
-              fullWidth
               required
+            />
+            {form.accountId && form.accountId.length !== 12 && (
+              <p className="mt-1 text-xs text-red-500">AWS Account ID must be exactly 12 digits</p>
+            )}
+
+            <input
+              type="text"
+              className="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              placeholder="Account Name"
               value={form.name}
               onChange={(e) =>
                 setForm({ ...form, name: e.target.value })
               }
-              margin="normal"
+              required
             />
 
-            <TextField
-              label="Access Key ID"
-              fullWidth
-              required
+            <input
+              type="text"
+              className="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              placeholder="Access Key ID"
               value={form.accessKey}
               onChange={(e) =>
                 setForm({ ...form, accessKey: e.target.value })
               }
-              margin="normal"
+              required
             />
 
-            <TextField
-              label="Secret Access Key"
+            <input
               type="password"
-              fullWidth
-              required
+              className="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              placeholder="Secret Access Key"
               value={form.secretKey}
               onChange={(e) =>
                 setForm({ ...form, secretKey: e.target.value })
               }
-              margin="normal"
+              required
             />
 
             <Box className="aws-editor-actions">
 
-              <Button
+              <button
                 type="submit"
-                variant="contained"
+                className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
                 disabled={saving}
               >
                 {saving ? "Saving…" : "Save"}
-              </Button>
+              </button>
 
-              <Button
+              <button
                 type="button"
-                variant="outlined"
-                color="error"
+                className="rounded border border-red-300 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
                 disabled={saving || !selected}
                 onClick={openDeleteDialog}
               >
                 Delete
-              </Button>
+              </button>
 
             </Box>
           </form>
@@ -436,23 +415,32 @@ const AwsAccountsManager = () => {
         />
       )}
 
-      <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog} maxWidth="xs" fullWidth>
-        <DialogTitle>Delete AWS Account</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete credentials for{' '}
-            <strong>{deleteTarget?.id}</strong>?
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button variant="outlined" onClick={closeDeleteDialog} disabled={saving}>
-            Cancel
-          </Button>
-          <Button variant="contained" color="error" onClick={deleteAccount} disabled={saving}>
-            {saving ? "Deleting…" : "Delete"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {deleteDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+            <h3 className="mb-4 text-lg font-semibold">Delete AWS Account</h3>
+            <p className="mb-6 text-slate-600">
+              Are you sure you want to delete credentials for <strong>{deleteTarget?.id}</strong>?
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                className="rounded border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                onClick={closeDeleteDialog}
+                disabled={saving}
+              >
+                Cancel
+              </button>
+              <button
+                className="rounded bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                onClick={deleteAccount}
+                disabled={saving}
+              >
+                {saving ? "Deleting…" : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </Box>
   );
