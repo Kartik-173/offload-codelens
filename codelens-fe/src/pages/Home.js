@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import HomeData from "../utils/Helpers";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardFooter } from "../components/ui/card";
-import { Sparkles, Scan } from "lucide-react";
+import { Scan } from "lucide-react";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -14,10 +14,6 @@ const Home = () => {
       {/* Hero Section */}
       <section className="px-6 py-16 lg:py-24">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-sm font-medium mb-6">
-            <Sparkles className="h-4 w-4" />
-            AI-Powered Infrastructure
-          </div>
           <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
             CodeLens for Cloud
           </h1>
@@ -27,15 +23,6 @@ const Home = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              size="lg"
-              className="gap-2"
-              onClick={() => navigate("/chat-start")}
-            >
-              <Sparkles className="h-4 w-4" />
-              Start a Chat
-            </Button>
-            <Button
-              variant="outline"
               size="lg"
               className="gap-2"
               onClick={() => navigate("/scan-repo")}

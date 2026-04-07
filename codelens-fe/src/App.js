@@ -7,8 +7,6 @@ import {
   Navigate,
 } from "react-router-dom";
 import FormPage from "./pages/FormPage";
-import Chat from "./components/chat/Chat";
-import ChatStart from "./pages/ChatStart.js";
 import ScanRepo from "./pages/ScanRepo.js";
 import Home from "./pages/Home.js";
 import UploadZip from "./pages/UploadZip.js";
@@ -17,7 +15,6 @@ import Credentials from "./pages/Credentials.js";
 import Scan from "./pages/Scan.js";
 import ApiTLoadest from "./pages/ApiLoadTest.js";
 import WafScan from "./pages/WafScan.js";
-import AwsAlbManager from "./pages/AwsAlbManager.js";
 import SidebarLayout from "./pages/SidebarLayout.js";
 import GitHubConnections from "./pages/GitHubConnections.js";
 import BitBucketConnections from "./pages/BitBucketConnections.js";
@@ -25,7 +22,7 @@ import ProtectedRoute from "./components/common/ProtectedRoute";
 
 function App() {
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route
           path="/"
@@ -36,8 +33,6 @@ function App() {
           }
         >
           <Route index element={<Navigate to="home" />} />
-          <Route path="chat" element={<Chat />} />
-          <Route path="chat-start" element={<ChatStart />} />
           <Route path="home" element={<Home />} />
           <Route path="credentials" element={<Credentials />} />
           <Route path="scan-repo" element={<ScanRepo />} />
@@ -48,7 +43,6 @@ function App() {
           <Route path="bitbucket-connections" element={<BitBucketConnections />} />
           <Route path="vegeta-scan" element={<ApiTLoadest />} />
           <Route path="waf-scan" element={<WafScan />} />
-          <Route path="aws-alb-manager" element={<AwsAlbManager />} />
         </Route>
 
         <Route path="/form" element={<FormPage />} />

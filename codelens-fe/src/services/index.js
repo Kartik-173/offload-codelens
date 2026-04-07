@@ -12,7 +12,6 @@ export { default as APIConstants } from './APIConstants';
 
 // Individual API services
 export { default as BitbucketApiService } from './BitbucketApiService';
-export { default as ChatApiService } from './ChatApiService';
 export { default as CredentialsApiService } from './CredentialsApiService';
 export { default as GithubApiService } from './GithubApiService';
 export { default as RepoApiService } from './RepoApiService';
