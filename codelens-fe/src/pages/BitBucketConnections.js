@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Loader2, Check } from "lucide-react";
-
-import SnackbarNotification, {
-  SNACKBAR_THEME,
-} from "../components/common/SnackbarNotification";
+import { useToast } from "../components/common/ToastProvider";
 import BitbucketApiService from "../services/BitbucketApiService";
 import { ENV } from '../config/env';
 
@@ -63,8 +60,7 @@ const BITBUCKET_STEPS = [
 
 
 const BitbucketConnections = () => {
-  const [snackbarStatus, setSnackbarStatus] = useState(null);
-  const [snackbarMessage, setSnackbarMessage] = useState(null);
+  const { success, error } = useToast();
   const [bitbucketUser, setBitbucketUser] = useState(null);
   const [loadingConfig, setLoadingConfig] = useState(true);
   const [hasOrgOAuthConfig, setHasOrgOAuthConfig] = useState(false);
@@ -97,10 +93,7 @@ const BitbucketConnections = () => {
         const res = await BitbucketApiService.fetchBitbucketOAuthStatus(oauthKey);
         setHasOrgOAuthConfig(Boolean(res?.exists));
       } catch (error) {
-        setSnackbarStatus("error");
-        setSnackbarMessage(
-          "Failed to check Bitbucket OAuth configuration. Please try again."
-        );
+        error("Failed to check Bitbucket OAuth configuration. Please try again.");
       } finally {
         setLoadingConfig(false);
       }
@@ -118,14 +111,11 @@ const BitbucketConnections = () => {
     e.preventDefault();
 
     if (!clientId || !clientSecret) {
-      setSnackbarStatus("error");
-      setSnackbarMessage("Please provide both Client ID and Client Secret.");
+      error("Please provide both Client ID and Client Secret.");
       return;
     }
 
     setSavingConfig(true);
-    setSnackbarStatus(null);
-    setSnackbarMessage(null);
 
     try {
       await BitbucketApiService.saveBitbucketOAuthConfig({
@@ -137,13 +127,9 @@ const BitbucketConnections = () => {
       setHasOrgOAuthConfig(true);
       setClientId("");
       setClientSecret("");
-      setSnackbarStatus("success");
-      setSnackbarMessage(
-        "Bitbucket OAuth app configuration saved successfully."
-      );
+      success("Bitbucket OAuth app configuration saved successfully.");
     } catch (error) {
-      setSnackbarStatus("error");
-      setSnackbarMessage(
+      error(
         error?.response?.data?.message ||
           "Failed to save Bitbucket OAuth configuration. Please try again."
       );
@@ -160,11 +146,9 @@ const BitbucketConnections = () => {
       localStorage.removeItem("bitbucket_avatar_url");
       localStorage.removeItem("bitbucket_display_name");
       setBitbucketUser(null);
-      setSnackbarStatus("success");
-      setSnackbarMessage("Bitbucket account removed successfully.");
+      success("Bitbucket account removed successfully.");
     } catch (error) {
-      setSnackbarStatus("error");
-      setSnackbarMessage("Failed to remove Bitbucket account.");
+      error("Failed to remove Bitbucket account.");
     }
   };
 
@@ -380,22 +364,6 @@ const BitbucketConnections = () => {
           </div>
         )}
       </div>
-
-      {snackbarStatus && (
-        <SnackbarNotification
-          initialOpen={true}
-          duration={5000}
-          message={snackbarMessage}
-          actionButtonName={"Ok"}
-          theme={
-            snackbarStatus === "success"
-              ? SNACKBAR_THEME.GREEN
-              : SNACKBAR_THEME.RED
-          }
-          yPosition={"top"}
-          xPosition={"center"}
-        />
-      )}
     </div>
   );
 };

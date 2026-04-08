@@ -1,26 +1,19 @@
 import React, { useEffect, useState, useCallback } from "react";
 import ReportSelector from "../components/reports/ReportSelector";
-import SnackbarNotification, {
-  SNACKBAR_THEME,
-} from "../components/common/SnackbarNotification";
+import { useToast } from "../components/common/ToastProvider";
 import RunWafScanner from "../components/reports/wafscan/RunWafScanner";
 import WafScanDashboard from "../components/reports/wafscan/WafScanDashboard";
 import WafScanApiService from "../services/WafScanApiService";
 
 const WafScan = () => {
-  const [snackbar, setSnackbar] = useState(null);
+  const { error } = useToast();
   const [reportList, setReportList] = useState([]);
   const [selectedKey, setSelectedKey] = useState("");
   const [loadingList, setLoadingList] = useState(false);
   const [report, setReport] = useState(null);
   const [loadingReport, setLoadingReport] = useState(false);
 
-  const showError = (msg) =>
-    setSnackbar({
-      id: Date.now(),
-      type: "error",
-      msg,
-    });
+  const showError = (msg) => error(msg);
 
   const fetchReportList = useCallback(async () => {
     try {
@@ -35,7 +28,7 @@ const WafScan = () => {
     } finally {
       setLoadingList(false);
     }
-  }, []);
+  }, [showError]);
 
   const fetchReportByKey = useCallback(async (key) => {
     if (!key) return;
@@ -49,7 +42,7 @@ const WafScan = () => {
     } finally {
       setLoadingReport(false);
     }
-  }, []);
+  }, [showError]);
 
   const fetchLatestWafReport = useCallback(async () => {
     const scans = await fetchReportList();
@@ -95,18 +88,6 @@ const WafScan = () => {
           <WafScanDashboard report={report} loading={loadingReport} />
         </div>
       </div>
-
-      {snackbar && (
-        <SnackbarNotification
-          key={snackbar.id}
-          initialOpen={true}
-          message={snackbar.msg}
-          theme={SNACKBAR_THEME.RED}
-          yPosition="top"
-          xPosition="center"
-          onCloseHandler={() => setSnackbar(null)}
-        />
-      )}
     </div>
   );
 };

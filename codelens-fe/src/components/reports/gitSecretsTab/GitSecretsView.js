@@ -1,176 +1,24 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
-  Shield as SecurityIcon,
-  TriangleAlert as WarningAmberIcon,
-  CircleCheck as CheckCircleIcon,
-  Search as SearchIcon,
-  Eye as VisibilityIcon,
-  EyeOff as VisibilityOffIcon,
-  ChevronDown as ExpandMoreIcon,
-  Timer as TimerIcon,
-  FolderOpen as FolderOpenIcon,
-  Code as CodeIcon,
-  TrendingUp as TrendingUpIcon,
-  Lock as LockIcon,
-  FileText as DescriptionIcon,
+  Shield,
+  TriangleAlert,
+  CircleCheck,
+  Search,
+  Eye,
+  EyeOff,
+  ChevronDown,
+  Timer,
+  Calendar,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { Card, CardContent } from "../../ui/card";
+import { Badge } from "../../ui/badge";
 
-const Box = ({ children, className = "", ...rest }) => (
-  <div className={className} {...rest}>{children}</div>
-);
-
-const Card = ({ children, className = "", ...rest }) => (
-  <div className={className} {...rest}>{children}</div>
-);
-
-const CardContent = ({ children, className = "", ...rest }) => (
-  <div className={className} {...rest}>{children}</div>
-);
-
-const Typography = ({ children, className = "", component = "p", ...rest }) => {
-  const Tag = component;
-  return <Tag className={className} {...rest}>{children}</Tag>;
-};
-
-const Chip = ({ label, className = "", onDelete }) => (
-  <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${className}`.trim()}>
-    {label}
-    {onDelete ? (
-      <button type="button" onClick={onDelete} className="text-slate-500">×</button>
-    ) : null}
-  </span>
-);
-
-const Grid = ({ children, className = "", ...rest }) => (
-  <div className={className} {...rest}>{children}</div>
-);
-
-const IconButton = ({ children, onClick, className = "", ...rest }) => (
-  <button type="button" onClick={onClick} className={className} {...rest}>{children}</button>
-);
-
-const Collapse = ({ in: isOpen, children }) => (isOpen ? <>{children}</> : null);
-
-const CircularProgress = () => (
-  <div className="h-14 w-14 animate-spin rounded-full border-4 border-slate-300 border-t-slate-700" />
-);
-
-const TableContainer = ({ children, className = "" }) => (
-  <div className={className}>{children}</div>
-);
-
-const Table = ({ children, className = "" }) => (
-  <table className={className}>{children}</table>
-);
-
-const TableHead = ({ children }) => <thead>{children}</thead>;
-const TableBody = ({ children }) => <tbody>{children}</tbody>;
-const TableRow = ({ children, className = "" }) => <tr className={className}>{children}</tr>;
-const TableCell = ({ children, className = "", colSpan }) => (
-  <td className={className} colSpan={colSpan}>{children}</td>
-);
-
-const InputAdornment = ({ children }) => <span className="inline-flex items-center">{children}</span>;
-const FormControl = ({ children, className = "" }) => <div className={className}>{children}</div>;
-const InputLabel = ({ children }) => <span className="text-xs text-slate-500">{children}</span>;
-const Select = ({ children, className = "", value, onChange }) => (
-  <select value={value} onChange={onChange} className={`h-9 rounded-md border border-input bg-background px-3 text-sm ${className}`.trim()}>
-    {children}
-  </select>
-);
-const MenuItem = ({ children, value }) => <option value={value}>{children}</option>;
-
-const TextField = ({
-  value,
-  onChange,
-  placeholder,
-  className = "",
-  InputProps,
-  select,
-  children,
-}) => {
-  if (select) {
-    return (
-      <Select value={value} onChange={onChange} className={className}>
-        {children}
-      </Select>
-    );
-  }
-
-  return (
-    <div className="relative">
-      {InputProps?.startAdornment ? (
-        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
-          {InputProps.startAdornment}
-        </span>
-      ) : null}
-      <input
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        className={`h-9 rounded-md border border-input bg-background px-3 text-sm ${InputProps?.startAdornment ? "pl-9" : ""} ${className}`.trim()}
-      />
-    </div>
-  );
-};
-
-const Tooltip = ({ children, title }) => (
-  <span title={typeof title === "string" ? title : undefined}>{children}</span>
-);
-
-const Divider = ({ className = "" }) => <div className={className} />;
-
-const TablePagination = ({
-  count,
-  page,
-  onPageChange,
-  rowsPerPage,
-  onRowsPerPageChange,
-  rowsPerPageOptions = [10, 25, 50],
-  className = "",
-}) => {
-  const totalPages = Math.max(1, Math.ceil(count / rowsPerPage));
-  const start = count === 0 ? 0 : page * rowsPerPage + 1;
-  const end = Math.min(count, (page + 1) * rowsPerPage);
-
-  return (
-    <div className={`flex flex-wrap items-center justify-between gap-2 px-2 py-3 text-sm ${className}`.trim()}>
-      <div className="flex items-center gap-2">
-        <span>Rows per page:</span>
-        <select
-          value={rowsPerPage}
-          onChange={onRowsPerPageChange}
-          className="h-8 rounded border border-input bg-background px-2"
-        >
-          {rowsPerPageOptions.map((opt) => (
-            <option key={opt} value={opt}>{opt}</option>
-          ))}
-        </select>
-      </div>
-      <div className="flex items-center gap-2">
-        <span>{start}-{end} of {count}</span>
-        <button
-          type="button"
-          onClick={() => onPageChange(null, Math.max(0, page - 1))}
-          disabled={page <= 0}
-          className="rounded border p-1 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </button>
-        <span>{page + 1}/{totalPages}</span>
-        <button
-          type="button"
-          onClick={() => onPageChange(null, Math.min(totalPages - 1, page + 1))}
-          disabled={page >= totalPages - 1}
-          className="rounded border p-1 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
-      </div>
-    </div>
-  );
+const severityStyles = {
+  HIGH: "border-red-200 bg-red-50 text-red-700",
+  MEDIUM: "border-amber-200 bg-amber-50 text-amber-700",
+  LOW: "border-sky-200 bg-sky-50 text-sky-700",
 };
 
 export default function GitSecretsView({ loading, gitSecretsReport }) {
@@ -188,449 +36,280 @@ export default function GitSecretsView({ loading, gitSecretsReport }) {
   );
 
   const uniqueRules = useMemo(() => {
-    const rules = [...new Set(findings.map(f => f.rule))];
-    return rules.sort();
+    return [...new Set(findings.map((finding) => finding.rule).filter(Boolean))].sort();
   }, [findings]);
 
   const filteredFindings = useMemo(() => {
-    return findings.filter(finding => {
-      const matchesSearch = !searchTerm || 
-        finding.file.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        finding.rule.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        finding.content.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesSeverity = severityFilter === "all" || finding.severity === severityFilter.toUpperCase();
+    return findings.filter((finding) => {
+      const search = searchTerm.trim().toLowerCase();
+      const matchesSearch =
+        !search ||
+        String(finding.file || "").toLowerCase().includes(search) ||
+        String(finding.rule || "").toLowerCase().includes(search) ||
+        String(finding.content || "").toLowerCase().includes(search);
+      const matchesSeverity =
+        severityFilter === "all" ||
+        String(finding.severity || "").toUpperCase() === severityFilter;
       const matchesRule = ruleFilter === "all" || finding.rule === ruleFilter;
-      
       return matchesSearch && matchesSeverity && matchesRule;
     });
   }, [findings, searchTerm, severityFilter, ruleFilter]);
 
   const paginatedFindings = useMemo(() => {
-    const startIndex = page * rowsPerPage;
-    return filteredFindings.slice(startIndex, startIndex + rowsPerPage);
+    const start = page * rowsPerPage;
+    return filteredFindings.slice(start, start + rowsPerPage);
   }, [filteredFindings, page, rowsPerPage]);
 
   useEffect(() => {
     setPage(0);
   }, [searchTerm, severityFilter, ruleFilter]);
 
-  const toggleRowExpansion = (rowKey) => {
-    const newExpanded = new Set(expandedRows);
-    if (newExpanded.has(rowKey)) newExpanded.delete(rowKey);
-    else newExpanded.add(rowKey);
-    setExpandedRows(newExpanded);
+  const maskSecret = (content = "") => {
+    if (showSecrets) return content;
+    if (content.length <= 8) return "*".repeat(content.length);
+    return `${content.slice(0, 4)}${"*".repeat(content.length - 8)}${content.slice(-4)}`;
   };
 
-  const maskSecret = (content) => {
-    if (showSecrets) return content;
-    if (content.length <= 8) return '*'.repeat(content.length);
-    return content.substring(0, 4) + '*'.repeat(content.length - 8) + content.substring(content.length - 4);
+  const toggleRowExpansion = (rowKey) => {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      if (next.has(rowKey)) next.delete(rowKey);
+      else next.add(rowKey);
+      return next;
+    });
   };
+
+  const summary = {
+    totalFindings: gitSecretsReport?.totalFindings || findings.length,
+    status: gitSecretsReport?.status || "UNKNOWN",
+    scanDuration: gitSecretsReport?.scanDuration || 0,
+    scanTime: gitSecretsReport?.scanTime || "",
+  };
+
+  const totalPages = Math.max(1, Math.ceil(filteredFindings.length / rowsPerPage));
+  const visibleStart = filteredFindings.length === 0 ? 0 : page * rowsPerPage + 1;
+  const visibleEnd = Math.min(filteredFindings.length, (page + 1) * rowsPerPage);
 
   if (loading) {
     return (
-      <Box className="git-secrets-view">
-        <Box className="git-secrets-loading-container">
-          <Box className="git-secrets-loading-spinner">
-            <CircularProgress size={60} thickness={4} className="git-secrets-spinner" />
-          </Box>
-          <Typography variant="h6" className="git-secrets-loading-text">
-            Scanning Repository for Secrets
-          </Typography>
-          <Typography variant="body2" className="git-secrets-loading-subtext">
-            Analyzing files for sensitive information...
-          </Typography>
-        </Box>
-      </Box>
+      <div className="flex min-h-[340px] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
+      </div>
     );
   }
 
-  const summary = {
-    totalFindings: gitSecretsReport?.totalFindings || 0,
-    status: gitSecretsReport?.status || 'UNKNOWN',
-    scanDuration: gitSecretsReport?.scanDuration || 0,
-    scanTime: gitSecretsReport?.scanTime || '',
-  };
-
   return (
-    <Box className="git-secrets-view">
-      {/* Summary Cards */}
-      <Grid container spacing={2} className="git-secrets-summary-grid">
-        <Grid size={{ xs: 6, md: 3 }}>
-          <Card className="git-secrets-stat-card">
-            <CardContent className="git-secrets-stat-content">
-              <Box className="git-secrets-stat-icon-wrapper git-secrets-stat-icon-secrets">
-                <SecurityIcon className="git-secrets-stat-icon" />
-              </Box>
-              <Typography variant="h4" className="git-secrets-stat-value">
-                {summary.totalFindings}
-              </Typography>
-              <Typography variant="caption" className="git-secrets-stat-label">
-                Secrets Found
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+    <div className="space-y-4 p-2">
+      <Card className="border-slate-200 bg-gradient-to-r from-slate-50 via-white to-emerald-50">
+        <CardContent className="space-y-4 p-4 sm:p-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h3 className="text-lg font-semibold text-slate-900">Git Secrets</h3>
+              <p className="text-sm text-slate-600">Secret detection findings with masked previews and rule-level filtering.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowSecrets((prev) => !prev)}
+              className={`inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-sm ${showSecrets ? "border-amber-300 bg-amber-50 text-amber-800" : "border-slate-200 bg-white text-slate-700"}`}
+            >
+              {showSecrets ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showSecrets ? "Hide Secrets" : "Show Secrets"}
+            </button>
+          </div>
 
-        <Grid size={{ xs: 6, md: 3 }}>
-          <Card className="git-secrets-stat-card">
-            <CardContent className="git-secrets-stat-content">
-              <Box className={`git-secrets-stat-icon-wrapper git-secrets-stat-icon-status-${summary.status.toLowerCase()}`}>
-                {summary.status === 'PASSED' ? (
-                  <CheckCircleIcon className="git-secrets-stat-icon" />
-                ) : (
-                  <WarningAmberIcon className="git-secrets-stat-icon" />
-                )}
-              </Box>
-              <Chip 
-                label={summary.status} 
-                size="small"
-                color={summary.status === 'PASSED' ? 'success' : 'error'}
-                className="git-secrets-status-chip"
-              />
-              <Typography variant="caption" className="git-secrets-stat-label">
-                Status
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 6, md: 3 }}>
-          <Card className="git-secrets-stat-card">
-            <CardContent className="git-secrets-stat-content">
-              <Box className="git-secrets-stat-icon-wrapper git-secrets-stat-icon-duration">
-                <TimerIcon className="git-secrets-stat-icon" />
-              </Box>
-              <Typography variant="h4" className="git-secrets-stat-value">
-                {summary.scanDuration}<Typography component="span" variant="caption" className="git-secrets-stat-unit">ms</Typography>
-              </Typography>
-              <Typography variant="caption" className="git-secrets-stat-label">
-                Duration
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 6, md: 3 }}>
-          <Card className="git-secrets-stat-card">
-            <CardContent className="git-secrets-stat-content">
-              <Box className="git-secrets-stat-icon-wrapper git-secrets-stat-icon-time">
-                <SecurityIcon className="git-secrets-stat-icon" />
-              </Box>
-              <Typography variant="body2" className="git-secrets-stat-date">
-                {new Date(summary.scanTime).toLocaleDateString()}
-              </Typography>
-              <Typography variant="caption" className="git-secrets-stat-label">
-                Last Scan
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-
-      {/* Filters Section */}
-      <Box className="git-secrets-filters-wrapper">
-        <Box className="git-secrets-filters-controls">
-            <TextField
-              size="small"
-              placeholder="Search by file, rule, or content..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon className="git-secrets-search-icon" />
-                  </InputAdornment>
-                ),
-              }}
-              className="git-secrets-search-field"
-            />
-            
-            <FormControl size="small" className="git-secrets-filter-select">
-              <InputLabel>Severity</InputLabel>
-              <Select
-                value={severityFilter}
-                label="Severity"
-                onChange={(e) => setSeverityFilter(e.target.value)}
-              >
-                <MenuItem value="all">All Severities</MenuItem>
-                <MenuItem value="HIGH">High</MenuItem>
-              </Select>
-            </FormControl>
-
-            <FormControl size="small" className="git-secrets-filter-select">
-              <InputLabel>Rule Type</InputLabel>
-              <Select
-                value={ruleFilter}
-                label="Rule Type"
-                onChange={(e) => setRuleFilter(e.target.value)}
-              >
-                <MenuItem value="all">All Rules</MenuItem>
-                {uniqueRules.map(rule => (
-                  <MenuItem key={rule} value={rule}>{rule}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <Tooltip title={showSecrets ? "Hide Secrets" : "Show Secrets"}>
-              <IconButton
-                onClick={() => setShowSecrets(!showSecrets)}
-                className={`git-secrets-visibility-btn ${showSecrets ? 'git-secrets-visibility-btn-active' : ''}`}
-                size="small"
-              >
-                {showSecrets ? <VisibilityOffIcon /> : <VisibilityIcon />}
-              </IconButton>
-            </Tooltip>
-          </Box>
-        </Box>
-
-      {/* Results Section */}
-      {filteredFindings.length === 0 ? (
-        <Card className="git-secrets-empty-card">
-          <CardContent className="git-secrets-empty-content">
-            <Box className="git-secrets-empty-icon-wrapper">
-              {findings.length === 0 ? (
-                <CheckCircleIcon className="git-secrets-empty-icon git-secrets-empty-icon-success" />
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div className="rounded-xl border border-red-200 bg-red-50 p-3">
+              <Shield className="h-4 w-4 text-red-600" />
+              <p className="mt-2 text-xs uppercase tracking-wide text-red-700">Findings</p>
+              <p className="text-2xl font-semibold text-red-900">{summary.totalFindings}</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-3">
+              {summary.status === "PASSED" ? (
+                <CircleCheck className="h-4 w-4 text-emerald-600" />
               ) : (
-                <SearchIcon className="git-secrets-empty-icon git-secrets-empty-icon-search" />
+                <TriangleAlert className="h-4 w-4 text-amber-600" />
               )}
-            </Box>
-            <Typography variant="h5" className="git-secrets-empty-title">
+              <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Status</p>
+              <p className="text-base font-semibold text-slate-900">{summary.status}</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-3">
+              <Timer className="h-4 w-4 text-indigo-600" />
+              <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Duration</p>
+              <p className="text-base font-semibold text-slate-900">{summary.scanDuration} ms</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-3">
+              <Calendar className="h-4 w-4 text-slate-600" />
+              <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Last Scan</p>
+              <p className="text-base font-semibold text-slate-900">
+                {summary.scanTime ? new Date(summary.scanTime).toLocaleDateString() : "—"}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <div className="relative min-w-[240px] flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="Search by file, rule, or content"
+                className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm outline-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100"
+              />
+            </div>
+
+            <select
+              value={severityFilter}
+              onChange={(event) => setSeverityFilter(event.target.value)}
+              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700"
+            >
+              <option value="all">All Severities</option>
+              <option value="HIGH">High</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="LOW">Low</option>
+            </select>
+
+            <select
+              value={ruleFilter}
+              onChange={(event) => setRuleFilter(event.target.value)}
+              className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700"
+            >
+              <option value="all">All Rules</option>
+              {uniqueRules.map((rule) => (
+                <option key={rule} value={rule}>{rule}</option>
+              ))}
+            </select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {filteredFindings.length === 0 ? (
+        <Card className="border-slate-200">
+          <CardContent className="py-12 text-center">
+            <CircleCheck className="mx-auto h-10 w-10 text-emerald-500" />
+            <p className="mt-3 text-base font-semibold text-slate-900">
               {findings.length === 0 ? "No Secrets Detected" : "No Matching Results"}
-            </Typography>
-            <Typography variant="body1" className="git-secrets-empty-subtitle">
-              {findings.length === 0 
-                ? "Your repository appears to be clean of exposed credentials and sensitive data."
-                : "Try adjusting your search criteria or filters to find what you're looking for."
-              }
-            </Typography>
+            </p>
+            <p className="mt-1 text-sm text-slate-500">
+              {findings.length === 0
+                ? "Your repository appears clear of exposed credentials."
+                : "Try adjusting the search or filters."}
+            </p>
           </CardContent>
         </Card>
       ) : (
-        <Card className="git-secrets-results-card">
-          <CardContent className="git-secrets-results-content">
-            <Box className="git-secrets-results-header">
-              <Box className="git-secrets-results-header-left">
-                <LockIcon className="git-secrets-results-icon" />
-                <Typography variant="h6" className="git-secrets-results-title">
-                  Detected Secrets
-                </Typography>
-                <Chip 
-                  label={`${filteredFindings.length} findings`}
-                  size="small"
-                  className="git-secrets-results-count-chip"
-                />
-              </Box>
-            </Box>
-            <Divider className="git-secrets-results-divider" />
-            <TableContainer className="git-secrets-table-container">
-              <Table className="git-secrets-table">
-                <TableHead>
-                  <TableRow className="git-secrets-table-header-row">
-                    <TableCell className="git-secrets-table-header-cell">
-                      <Box className="git-secrets-header-cell-content">
-                        <FolderOpenIcon className="git-secrets-header-cell-icon" />
-                        File Path
-                      </Box>
-                    </TableCell>
-                    <TableCell className="git-secrets-table-header-cell">
-                      <Box className="git-secrets-header-cell-content">
-                        <CodeIcon className="git-secrets-header-cell-icon" />
-                        Line
-                      </Box>
-                    </TableCell>
-                    <TableCell className="git-secrets-table-header-cell">
-                      <Box className="git-secrets-header-cell-content">
-                        <DescriptionIcon className="git-secrets-header-cell-icon" />
-                        Rule Type
-                      </Box>
-                    </TableCell>
-                    <TableCell className="git-secrets-table-header-cell">
-                      <Box className="git-secrets-header-cell-content">
-                        <LockIcon className="git-secrets-header-cell-icon" />
-                        Detected Content
-                      </Box>
-                    </TableCell>
-                    <TableCell className="git-secrets-table-header-cell">
-                      <Box className="git-secrets-header-cell-content">
-                        <TrendingUpIcon className="git-secrets-header-cell-icon" />
-                        Severity
-                      </Box>
-                    </TableCell>
-                    <TableCell className="git-secrets-table-header-cell git-secrets-table-header-cell-actions">
-                      Actions
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {paginatedFindings.map((finding, index) => {
-                    const rowKey = `${finding.file}:${finding.line}:${finding.rule}:${page}:${index}`;
-                    const isExpanded = expandedRows.has(rowKey);
-                    return (
-                      <React.Fragment key={rowKey}>
-                        <TableRow className={`git-secrets-table-row ${isExpanded ? 'git-secrets-table-row-expanded' : ''}`}>
-                          <TableCell className="git-secrets-table-cell git-secrets-file-cell">
-                            <Tooltip title={finding.file} placement="top">
-                              <Typography variant="body2" className="git-secrets-file-path">
-                                {finding.file}
-                              </Typography>
-                            </Tooltip>
-                          </TableCell>
-                          <TableCell className="git-secrets-table-cell git-secrets-line-cell">
-                            <Chip 
-                              label={finding.line} 
-                              size="small" 
-                              variant="outlined"
-                              className="git-secrets-line-chip"
-                            />
-                          </TableCell>
-                          <TableCell className="git-secrets-table-cell git-secrets-rule-cell">
-                            <Chip 
-                              label={finding.rule} 
-                              size="small" 
-                              color="primary"
-                              className="git-secrets-rule-chip"
-                            />
-                          </TableCell>
-                          <TableCell className="git-secrets-table-cell git-secrets-content-cell">
-                            <Box className="git-secrets-content-wrapper">
-                              <Typography variant="body2" className="git-secrets-content-text">
-                                {maskSecret(finding.content)}
-                              </Typography>
-                            </Box>
-                          </TableCell>
-                          <TableCell className="git-secrets-table-cell git-secrets-severity-cell">
-                            <Chip 
-                              label={finding.severity} 
-                              size="small" 
-                              color="error"
-                              className="git-secrets-severity-chip"
-                            />
-                          </TableCell>
-                          <TableCell className="git-secrets-table-cell git-secrets-actions-cell">
-                            <Tooltip title={isExpanded ? "Hide Details" : "Show Details"}>
-                              <IconButton 
-                                size="small"
-                                onClick={() => toggleRowExpansion(rowKey)}
-                                className={`git-secrets-expand-btn ${isExpanded ? 'git-secrets-expand-btn-active' : ''}`}
-                              >
-                                <ExpandMoreIcon className="git-secrets-expand-icon" />
-                              </IconButton>
-                            </Tooltip>
-                          </TableCell>
-                        </TableRow>
-                        {isExpanded && (
-                          <TableRow className="git-secrets-details-row">
-                            <TableCell colSpan={6} className="git-secrets-details-cell">
-                              <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                                <Box className="git-secrets-details-container">
-                                  <Box className="git-secrets-details-header">
-                                    <SecurityIcon className="git-secrets-details-header-icon" />
-                                    <Typography variant="h6" className="git-secrets-details-header-title">
-                                      Finding Details
-                                    </Typography>
-                                  </Box>
-                                  <Divider className="git-secrets-details-divider" />
-                                  <Grid container spacing={3} className="git-secrets-details-grid">
-                                    <Grid item xs={12} md={6}>
-                                      <Box className="git-secrets-detail-item">
-                                        <Typography variant="caption" className="git-secrets-detail-label">
-                                          File Path
-                                        </Typography>
-                                        <Typography variant="body2" className="git-secrets-detail-value git-secrets-detail-value-code">
-                                          {finding.file}
-                                        </Typography>
-                                      </Box>
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                      <Box className="git-secrets-detail-item">
-                                        <Typography variant="caption" className="git-secrets-detail-label">
-                                          Line Number
-                                        </Typography>
-                                        <Typography variant="body2" className="git-secrets-detail-value">
-                                          {finding.line}
-                                        </Typography>
-                                      </Box>
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                      <Box className="git-secrets-detail-item">
-                                        <Typography variant="caption" className="git-secrets-detail-label">
-                                          Rule Type
-                                        </Typography>
-                                        <Typography variant="body2" className="git-secrets-detail-value">
-                                          {finding.rule}
-                                        </Typography>
-                                      </Box>
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                      <Box className="git-secrets-detail-item">
-                                        <Typography variant="caption" className="git-secrets-detail-label">
-                                          Severity Level
-                                        </Typography>
-                                        <Chip 
-                                          label={finding.severity}
-                                          size="small"
-                                          color="error"
-                                          className="git-secrets-detail-severity-chip"
-                                        />
-                                      </Box>
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                      <Box className="git-secrets-detail-item">
-                                        <Typography variant="caption" className="git-secrets-detail-label">
-                                          Detected Content
-                                        </Typography>
-                                        <Box className="git-secrets-detail-content-box">
-                                          <Typography variant="body2" className="git-secrets-detail-content-text">
-                                            {showSecrets ? finding.content : maskSecret(finding.content)}
-                                          </Typography>
-                                        </Box>
-                                      </Box>
-                                    </Grid>
-                                    {finding.pattern && (
-                                      <Grid item xs={12}>
-                                        <Box className="git-secrets-detail-item">
-                                          <Typography variant="caption" className="git-secrets-detail-label">
-                                            Detection Pattern
-                                          </Typography>
-                                          <Box className="git-secrets-detail-pattern-box">
-                                            <Typography variant="body2" className="git-secrets-detail-pattern-text">
-                                              {finding.pattern}
-                                            </Typography>
-                                          </Box>
-                                        </Box>
-                                      </Grid>
-                                    )}
-                                  </Grid>
-                                </Box>
-                              </Collapse>
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <Divider className="git-secrets-pagination-divider" />
-            <TablePagination
-              component="div"
-              count={filteredFindings.length}
-              page={page}
-              onPageChange={(_, nextPage) => setPage(nextPage)}
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={(e) => {
-                setRowsPerPage(parseInt(e.target.value, 10));
-                setPage(0);
-              }}
-              rowsPerPageOptions={[10, 25, 50]}
-              className="git-secrets-pagination"
-            />
-          </CardContent>
+        <Card className="overflow-hidden border-slate-200">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[940px] text-sm">
+              <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th className="px-3 py-3 text-left font-semibold">File</th>
+                  <th className="px-3 py-3 text-left font-semibold">Line</th>
+                  <th className="px-3 py-3 text-left font-semibold">Rule</th>
+                  <th className="px-3 py-3 text-left font-semibold">Detected Content</th>
+                  <th className="px-3 py-3 text-left font-semibold">Severity</th>
+                  <th className="px-3 py-3 text-left font-semibold">Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedFindings.map((finding, index) => {
+                  const rowKey = `${finding.file}:${finding.line}:${finding.rule}:${page}:${index}`;
+                  const isExpanded = expandedRows.has(rowKey);
+                  const severity = String(finding.severity || "HIGH").toUpperCase();
+                  return (
+                    <React.Fragment key={rowKey}>
+                      <tr className="border-t border-slate-100 hover:bg-slate-50/70">
+                        <td className="max-w-[320px] truncate px-3 py-3 text-slate-700" title={finding.file}>{finding.file}</td>
+                        <td className="px-3 py-3">
+                          <Badge variant="outline" className="border-slate-200 bg-white text-slate-700">L{finding.line}</Badge>
+                        </td>
+                        <td className="px-3 py-3">
+                          <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700">{finding.rule}</Badge>
+                        </td>
+                        <td className="max-w-[320px] truncate px-3 py-3 font-mono text-xs text-slate-700" title={maskSecret(finding.content)}>
+                          {maskSecret(finding.content)}
+                        </td>
+                        <td className="px-3 py-3">
+                          <span className={`rounded-full border px-2 py-0.5 text-xs font-medium ${severityStyles[severity] || severityStyles.HIGH}`}>
+                            {severity}
+                          </span>
+                        </td>
+                        <td className="px-3 py-3">
+                          <button
+                            type="button"
+                            onClick={() => toggleRowExpansion(rowKey)}
+                            className="inline-flex items-center gap-1 rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-700 hover:bg-slate-50"
+                          >
+                            <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                            {isExpanded ? "Hide" : "Show"}
+                          </button>
+                        </td>
+                      </tr>
+
+                      {isExpanded && (
+                        <tr className="border-t border-slate-100 bg-slate-50/60">
+                          <td colSpan={6} className="px-4 py-3">
+                            <div className="rounded-lg border border-slate-200 bg-white p-3">
+                              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Detected Content</p>
+                              <p className="mt-2 break-words rounded-md bg-slate-950 p-3 font-mono text-xs text-slate-100">
+                                {showSecrets ? finding.content : maskSecret(finding.content)}
+                              </p>
+                              {finding.pattern && (
+                                <>
+                                  <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Pattern</p>
+                                  <p className="mt-1 text-xs text-slate-700">{finding.pattern}</p>
+                                </>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-3 text-sm text-slate-600">
+            <div className="flex items-center gap-2">
+              <span>Rows per page</span>
+              <select
+                value={rowsPerPage}
+                onChange={(event) => {
+                  setRowsPerPage(Number(event.target.value));
+                  setPage(0);
+                }}
+                className="h-8 rounded border border-slate-200 bg-white px-2 text-xs"
+              >
+                {[10, 25, 50].map((size) => (
+                  <option key={size} value={size}>{size}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span>{visibleStart}-{visibleEnd} of {filteredFindings.length}</span>
+              <button
+                type="button"
+                onClick={() => setPage((prev) => Math.max(0, prev - 1))}
+                disabled={page === 0}
+                className="rounded border border-slate-200 p-1 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <span>{page + 1}/{totalPages}</span>
+              <button
+                type="button"
+                onClick={() => setPage((prev) => Math.min(totalPages - 1, prev + 1))}
+                disabled={page >= totalPages - 1}
+                className="rounded border border-slate-200 p-1 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
         </Card>
       )}
-    </Box>
+    </div>
   );
 }

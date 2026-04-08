@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import AzureScanApiService from '../services/AzureScanApiService';
 import CredentialsApiService from '../services/CredentialsApiService';
-import SnackbarNotification, { SNACKBAR_THEME } from '../components/common/SnackbarNotification';
+import { useToast } from '../components/common/ToastProvider';
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
 import { Input } from "../components/ui/input";
@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 
 const AzureScan = () => {
+  const { success, error } = useToast();
   const [isTriggerLoading, setIsTriggerLoading] = useState(false);
   const [isReportListLoading, setIsReportListLoading] = useState(false);
   const [isReportLoading, setIsReportLoading] = useState(false);
@@ -47,9 +48,6 @@ const AzureScan = () => {
   const [reportList, setReportList] = useState([]);
   const [selectedOpenSearchId, setSelectedOpenSearchId] = useState('');
   const [rawReport, setRawReport] = useState(null);
-
-  const [snackbarType, setSnackbarType] = useState(null);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isScanAvailable, setIsScanAvailable] = useState(true);
 
   const [page, setPage] = useState(0);
@@ -120,7 +118,7 @@ const AzureScan = () => {
         setTenantIds([]);
         setTenantOptions([]);
         setSelectedTenantId('');
-        showSnackbar('error', 'Failed to load Azure tenant IDs. Please add Azure credentials first.');
+        error('Failed to load Azure tenant IDs. Please add Azure credentials first.');
       } finally {
         setTenantIdsLoading(false);
       }
@@ -259,24 +257,23 @@ const AzureScan = () => {
   }, [reportList, isReportListLoading]);
 
   const showSnackbar = (type, message) => {
-    setSnackbarType(type);
-    setSnackbarMessage(message);
+    if (type === 'success') {
+      success(message);
+    } else {
+      error(message);
+    }
   };
 
-  const clearSnackbar = () => {
-    setSnackbarType(null);
-    setSnackbarMessage('');
-  };
+  const clearSnackbar = () => {};
 
   const handleTriggerScan = async () => {
-    clearSnackbar();
     if (!userId) {
-      showSnackbar('error', 'User ID not found. Please log in again.');
+      error('User ID not found. Please log in again.');
       return;
     }
 
     if (!selectedTenantId) {
-      showSnackbar('error', 'Please select an Azure tenant to scan.');
+      error('Please select an Azure tenant to scan.');
       return;
     }
 
@@ -288,12 +285,12 @@ const AzureScan = () => {
         const apiMessage =
           res.data?.message ||
           'Security scan command executed successfully. Please wait some time to see the results.';
-        showSnackbar('success', apiMessage);
+        success(apiMessage);
       } else if (res?.error) {
-        showSnackbar('error', res.error?.detail || res.error?.message || 'Failed to start scan.');
+        error(res.error?.detail || res.error?.message || 'Failed to start scan.');
       }
     } catch (err) {
-      showSnackbar('error', 'Something went wrong while triggering the scan.');
+      error('Something went wrong while triggering the scan.');
     } finally {
       setIsTriggerLoading(false);
     }
@@ -347,7 +344,7 @@ const AzureScan = () => {
         setIsScanAvailable(true);
       }
     } catch (err) {
-      showSnackbar('error', 'Something went wrong while loading scan reports.');
+      error('Something went wrong while loading scan reports.');
       setIsScanAvailable(true);
     } finally {
       setIsReportListLoading(false);
@@ -355,7 +352,6 @@ const AzureScan = () => {
   };
 
   const loadReport = async (openSearchId) => {
-    clearSnackbar();
     if (!openSearchId) return;
 
     try {
@@ -365,10 +361,10 @@ const AzureScan = () => {
         setRawReport(res.data);
         setPage(0);
       } else if (res?.error) {
-        showSnackbar('error', res.error?.detail || res.error?.message || 'Failed to load report.');
+        error(res.error?.detail || res.error?.message || 'Failed to load report.');
       }
     } catch (err) {
-      showSnackbar('error', 'Something went wrong while loading report.');
+      error('Something went wrong while loading report.');
     } finally {
       setIsReportLoading(false);
     }

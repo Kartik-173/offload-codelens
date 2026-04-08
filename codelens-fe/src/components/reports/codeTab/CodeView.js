@@ -3,6 +3,8 @@ import { Folder, FileText } from "lucide-react";
 import DirectoryView from "./DirectoryView/DirectoryView";
 import FileView from "./fileView/FileView";
 import RepoApiService from "../../../services/RepoApiService.js";
+import { Card, CardContent } from "../../ui/card";
+import { Badge } from "../../ui/badge";
 
 const Box = ({ children, className = "", ...rest }) => (
   <div className={className} {...rest}>{children}</div>
@@ -62,62 +64,73 @@ const CodeView = ({ loading, reportDetails }) => {
 
   if (loading) {
     return (
-      <Box className="code-tab-wrapper">
-        <Box className="code-tab-container">
-          <Box className="flex h-full items-center justify-center">
+      <Box className="code-tab-wrapper p-2">
+        <Card className="border-slate-200">
+          <CardContent className="flex min-h-[340px] items-center justify-center">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
-          </Box>
-        </Box>
+          </CardContent>
+        </Card>
       </Box>
     );
   }
 
   if (!reportDetails) {
     return (
-      <Box className="code-tab-wrapper">
-        <Box className="code-tab-container">
-          <Box className="flex h-full items-center justify-center">
+      <Box className="code-tab-wrapper p-2">
+        <Card className="border-slate-200">
+          <CardContent className="flex min-h-[340px] items-center justify-center">
             <Typography className="text-base text-slate-500">
               No report details available
             </Typography>
-          </Box>
-        </Box>
+          </CardContent>
+        </Card>
       </Box>
     );
   }
 
   return (
-    <Box className="code-tab-wrapper">
-      {/* ✅ Breadcrumb */}
-      <Box className="breadcrumb-container">
-        <div className="flex flex-wrap items-center gap-1" aria-label="breadcrumb">
+    <Box className="code-tab-wrapper space-y-4 p-2">
+      <Card className="overflow-hidden border-slate-200 bg-gradient-to-r from-slate-50 via-white to-cyan-50">
+        <CardContent className="space-y-4 p-4 sm:p-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h3 className="text-lg font-semibold text-slate-900">Code Explorer</h3>
+              <p className="text-sm text-slate-600">
+                Browse directories, inspect file-level metrics, and review source lines.
+              </p>
+            </div>
+            <Badge variant="outline" className="border-cyan-200 bg-cyan-50 text-cyan-700">
+              {viewMode === "directory" ? "Directory Mode" : "File Mode"}
+            </Badge>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2" aria-label="breadcrumb">
           {breadcrumbPath.map((crumb, idx) => {
             const isFile = crumb.includes(".");
             return (
-              <button
-                key={idx}
-                type="button"
-                className="breadcrumb-item"
-                onClick={() => handleBreadcrumbClick(idx)}
-              >
-                {isFile ? (
-                  <FileText className="breadcrumb-icon file" />
-                ) : (
-                  <Folder className="breadcrumb-icon folder" />
+              <React.Fragment key={idx}>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50"
+                  onClick={() => handleBreadcrumbClick(idx)}
+                >
+                  {isFile ? (
+                    <FileText className="h-3.5 w-3.5 text-blue-600" />
+                  ) : (
+                    <Folder className="h-3.5 w-3.5 text-amber-600" />
+                  )}
+                  <span className="max-w-[220px] truncate">{crumb}</span>
+                </button>
+                {idx < breadcrumbPath.length - 1 && (
+                  <span className="text-slate-300">/</span>
                 )}
-                {crumb}
-              </button>
+              </React.Fragment>
             );
           })}
         </div>
-        {/* <CopyIcon
-          fontSize="small"
-          onClick={handleCopyPath}
-          style={{ cursor: "pointer" }}
-        /> */}
-      </Box>
+        </CardContent>
+      </Card>
 
-      {/* ✅ Directory or File View */}
       {viewMode === "directory" ? (
         <DirectoryView
           searchQuery={searchQuery}

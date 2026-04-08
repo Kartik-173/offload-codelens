@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ReportSelector from "../components/reports/ReportSelector";
-import SnackbarNotification, {
-  SNACKBAR_THEME,
-} from "../components/common/SnackbarNotification";
+import { useToast } from "../components/common/ToastProvider";
 
 import ApiLoadTestDashboard from "../components/apiLoadTest/ApiLoadTestDashboard";
 import RunApiTestModal from "../components/apiLoadTest/RunApiTestModal";
@@ -11,23 +9,12 @@ import { useApiLoadTestList } from "../hooks/useApiLoadTestList";
 import { useApiLoadTest } from "../hooks/useApiLoadTest";
 
 const ApiLoadTest = () => {
-  const [snackbar, setSnackbar] = useState(null);
+  const { success, error } = useToast();
   const [selectedKey, setSelectedKey] = useState("");
   const [openRunModal, setOpenRunModal] = useState(false);
 
-  const showError = (msg) =>
-    setSnackbar({
-      id: Date.now(),
-      type: "error",
-      msg,
-    });
-
-  const showSuccess = (msg) =>
-    setSnackbar({
-      id: Date.now(),
-      type: "success",
-      msg,
-    });
+  const showError = (msg) => error(msg);
+  const showSuccess = (msg) => success(msg);
 
   const { reportList, loading } = useApiLoadTestList(showError);
 
@@ -77,22 +64,6 @@ const ApiLoadTest = () => {
         onSuccess={showSuccess}
         onError={showError}
       />
-
-      {snackbar && (
-        <SnackbarNotification
-          key={snackbar.id}
-          initialOpen={true}
-          message={snackbar.msg}
-          theme={
-            snackbar.type === "error"
-              ? SNACKBAR_THEME.RED
-              : SNACKBAR_THEME.GREEN
-          }
-          yPosition="top"
-          xPosition="center"
-          onCloseHandler={() => setSnackbar(null)}
-        />
-      )}
     </div>
   );
 };

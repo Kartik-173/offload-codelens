@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from "react";
-import { Copy } from "lucide-react";
+import { Copy, ExternalLink, AlertCircle } from "lucide-react";
 import Editor from "@monaco-editor/react";
+import { Button } from "../../../../ui/button";
+import { Badge } from "../../../../ui/badge";
 
 const RiskTab = ({ filePath, codeValue, hotspot, handleCopyPath, handleEditorMount }) => {
   const editorRef = useRef(null);
@@ -19,7 +21,7 @@ const RiskTab = ({ filePath, codeValue, hotspot, handleCopyPath, handleEditorMou
 
     let { startLine, startOffset, endLine, endOffset } = hotspot.textRange;
 
-    // ✅ Highlight error
+    // ✅ Highlight error with red underline
     editorRef.current.deltaDecorations([], [
       {
         range: new monacoRef.current.Range(
@@ -31,6 +33,9 @@ const RiskTab = ({ filePath, codeValue, hotspot, handleCopyPath, handleEditorMou
         options: {
           inlineClassName: "highlight-error",
           hoverMessage: { value: "⚠️ " + hotspot.message },
+          className: "highlight-error",
+          overviewRuler: { color: "#ef4444", position: 4 },
+          minimap: { color: "#ef4444", position: 2 },
         },
       },
     ]);
@@ -70,28 +75,52 @@ const RiskTab = ({ filePath, codeValue, hotspot, handleCopyPath, handleEditorMou
   }, [hotspot]);
 
   return (
-    <div className="hotspot-code-card">
-      <div className="hotspot-code-header">
-        <div className="hotspot-code-header-left">
-          <p className="hotspot-code-path text-sm text-slate-700">{filePath}</p>
-          <Copy
+    <div className="space-y-3">
+      {/* Inline styles for Monaco editor highlighting */}
+      <style>{`
+        .highlight-error {
+          background-color: rgba(239, 68, 68, 0.15) !important;
+          border-bottom: 2px solid #ef4444;
+          text-decoration: underline wavy #ef4444;
+          text-underline-offset: 2px;
+        }
+      `}</style>
+
+      {/* File Path Header */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <span className="text-sm text-slate-700 truncate font-mono">{filePath}</span>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-6 w-6 flex-shrink-0"
             onClick={handleCopyPath}
-            className="file-view-copy-icon h-4 w-4 cursor-pointer"
-          />
+            title="Copy path"
+          >
+            <Copy className="h-3.5 w-3.5 text-slate-400" />
+          </Button>
         </div>
-        <button type="button" className="open-ide-btn rounded-md border px-3 py-1.5 text-sm hover:bg-slate-50">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="flex-shrink-0 text-xs h-8"
+        >
+          <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
           Open in IDE
-        </button>
+        </Button>
       </div>
 
-      <div className="hotspot-callout">
-        <p className="hotspot-callout-text">{hotspot.message}</p>
+      {/* Alert Callout */}
+      <div className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-md">
+        <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
+        <p className="text-sm text-red-700 font-medium">{hotspot.message}</p>
       </div>
 
-      <div className="monaco-wrapper">
+      {/* Code Editor */}
+      <div className="border border-slate-200 rounded-md overflow-hidden">
         <Editor
-          height="370px"
-          defaultLanguage="typescript"
+          height="300px"
+          defaultLanguage="javascript"
           value={codeValue}
           onMount={handleEditorDidMount}
           options={{
@@ -101,8 +130,8 @@ const RiskTab = ({ filePath, codeValue, hotspot, handleCopyPath, handleEditorMou
             folding: false,
             lineNumbers: "on",
             scrollBeyondLastLine: false,
-            renderLineHighlight: "none",
-            automaticLayout: false,
+            renderLineHighlight: "line",
+            automaticLayout: true,
           }}
           className="hotspot-monaco-editor"
         />

@@ -1,16 +1,13 @@
 import React, { useState } from "react";
 import { Loader2, FileArchive, UploadCloud } from "lucide-react";
 import RepoApiService from "../services/RepoApiService";
-import SnackbarNotification, {
-  SNACKBAR_THEME,
-} from "../components/common/SnackbarNotification";
+import { useToast } from "../components/common/ToastProvider";
 import { ENV } from '../config/env';
 
 const UploadZip = () => {
+  const { success, error } = useToast();
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [snackbarStatus, setSnackbarStatus] = useState("");
-  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const organization = ENV.ORGANIZATION_NAME;
 
@@ -18,12 +15,9 @@ const UploadZip = () => {
     const file = event.target.files[0];
     if (file && file.name.toLowerCase().endsWith(".zip")) {
       setSelectedFile(file);
-      setSnackbarStatus("");
-      setSnackbarMessage("");
     } else {
       setSelectedFile(null);
-      setSnackbarStatus("error");
-      setSnackbarMessage("Please select a valid ZIP file");
+      error("Please select a valid ZIP file");
     }
   };
 
@@ -31,21 +25,17 @@ const UploadZip = () => {
     event.preventDefault();
 
     if (!selectedFile) {
-      setSnackbarStatus("error");
-      setSnackbarMessage("Please select a ZIP file to upload");
+      error("Please select a ZIP file to upload");
       return;
     }
 
     const userId = localStorage.getItem("userId");
     if (!userId) {
-      setSnackbarStatus("error");
-      setSnackbarMessage("User ID not found. Please log in again.");
+      error("User ID not found. Please log in again.");
       return;
     }
 
     setIsUploading(true);
-    setSnackbarStatus("");
-    setSnackbarMessage("");
 
     const formData = new FormData();
     formData.append("file", selectedFile);
@@ -64,8 +54,7 @@ const UploadZip = () => {
         } catch (_) {}
       }
 
-      setSnackbarStatus("success");
-      setSnackbarMessage(
+      success(
         result.data?.message ||
           "ZIP scan started successfully. Your repository is being analyzed."
       );
@@ -78,10 +67,9 @@ const UploadZip = () => {
           window.location.assign(`/report-list?activeProjectKey=${encodeURIComponent(startedProjectKey)}`);
         }, 600);
       }
-    } catch (error) {
-      setSnackbarStatus("error");
-      setSnackbarMessage(
-        error.response?.data?.message ||
+    } catch (err) {
+      error(
+        err.response?.data?.message ||
           "Failed to upload ZIP file. Please try again."
       );
     } finally {
@@ -153,22 +141,6 @@ const UploadZip = () => {
           </button>
         </form>
       </div>
-
-      {snackbarStatus && (
-        <SnackbarNotification
-          initialOpen={true}
-          duration={5000}
-          message={snackbarMessage}
-          actionButtonName={"Ok"}
-          theme={
-            snackbarStatus === "success"
-              ? SNACKBAR_THEME.GREEN
-              : SNACKBAR_THEME.RED
-          }
-          yPosition={"top"}
-          xPosition={"center"}
-        />
-      )}
     </div>
   );
 };

@@ -1,112 +1,48 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  Package as Inventory2Icon,
-  TriangleAlert as WarningAmberIcon,
-  ShieldAlert as SecurityIcon,
-  Shield as ShieldIcon,
-  Flame as LocalFireDepartmentIcon,
-  CircleAlert as ErrorOutlineIcon,
-  AlertTriangle as ReportProblemIcon,
-  Info as InfoOutlinedIcon,
-  Link2 as LinkIcon,
-  ChevronDown as ExpandMoreIcon,
-  CheckCircle as CheckCircleIcon,
+  Package,
+  TriangleAlert,
+  ShieldAlert,
+  Shield,
+  Flame,
+  CircleAlert,
+  AlertTriangle,
+  Info,
+  Link2,
+  ChevronDown,
+  CheckCircle,
 } from "lucide-react";
+import { Card, CardContent } from "../../ui/card";
+import { Badge } from "../../ui/badge";
 
-const Box = ({ children, className = "", ...props }) => (
-  <div className={className} {...props}>{children}</div>
-);
-
-const Card = ({ children, className = "" }) => (
-  <div className={className}>{children}</div>
-);
-
-const CardContent = ({ children, className = "" }) => (
-  <div className={className}>{children}</div>
-);
-
-const Typography = ({ children, className = "", ...props }) => (
-  <p className={className} {...props}>{children}</p>
-);
-
-const Grid = ({ children, className = "" }) => (
-  <div className={className}>{children}</div>
-);
-
-const Tooltip = ({ children, title }) => (
-  <span title={typeof title === "string" ? title : undefined}>{children}</span>
-);
-
-const Chip = ({ label, className = "", icon, ...props }) => (
-  <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${className}`.trim()} {...props}>
-    {icon}
-    {label}
-  </span>
-);
-
-const IconButton = ({ children, className = "", onClick }) => (
-  <button type="button" className={className} onClick={onClick}>{children}</button>
-);
-
-const Collapse = ({ in: open, children }) => (open ? <>{children}</> : null);
-
-const Divider = ({ className = "" }) => <div className={className} />;
-
-const CircularProgress = ({ size = 40 }) => (
-  <div
-    className="animate-spin rounded-full border-2 border-slate-300 border-t-slate-700"
-    style={{ width: size, height: size }}
-  />
-);
+const severityMeta = {
+  CRITICAL: {
+    icon: Flame,
+    className: "border-red-200 bg-red-50 text-red-700",
+    dot: "bg-red-500",
+  },
+  HIGH: {
+    icon: CircleAlert,
+    className: "border-orange-200 bg-orange-50 text-orange-700",
+    dot: "bg-orange-500",
+  },
+  MEDIUM: {
+    icon: AlertTriangle,
+    className: "border-amber-200 bg-amber-50 text-amber-700",
+    dot: "bg-amber-500",
+  },
+  LOW: {
+    icon: Info,
+    className: "border-sky-200 bg-sky-50 text-sky-700",
+    dot: "bg-sky-500",
+  },
+};
 
 export default function CVEView({ loading, cveReport }) {
   const [expandedPkg, setExpandedPkg] = useState({});
   const [expandedVuln, setExpandedVuln] = useState({});
 
-  const items = useMemo(
-    () => (Array.isArray(cveReport?.items) ? cveReport.items : []),
-    [cveReport]
-  );
-
-  const firstPkgKey = useMemo(() => {
-    if (!items.length) return null;
-    const first = items[0];
-    return `${first.name}@${first.version}`;
-  }, [items]);
-
-  const reportKey = useMemo(() => {
-    const s = cveReport?.summary;
-    if (!s) return "no-report";
-    return `${s.totalPackages}-${s.totalVulns}-${items[0]?.name || ""}-${items[0]?.version || ""}`;
-  }, [cveReport, items]);
-
-  useEffect(() => {
-    // Reset expansion when switching to a different report, and open the first package by default
-    if (!firstPkgKey) {
-      setExpandedPkg({});
-      setExpandedVuln({});
-      return;
-    }
-    setExpandedPkg({ [firstPkgKey]: true });
-    setExpandedVuln({});
-  }, [reportKey, firstPkgKey]);
-
-  if (loading) {
-    return (
-      <Box className="cve-loading">
-        <CircularProgress size={40} />
-        <Typography variant="body2">Loading CVE data...</Typography>
-      </Box>
-    );
-  }
-
-  const togglePackage = (pkgKey) => {
-    setExpandedPkg((prev) => ({ ...prev, [pkgKey]: !prev[pkgKey] }));
-  };
-
-  const toggleVuln = (vulnKey) => {
-    setExpandedVuln((prev) => ({ ...prev, [vulnKey]: !prev[vulnKey] }));
-  };
+  const items = useMemo(() => (Array.isArray(cveReport?.items) ? cveReport.items : []), [cveReport]);
 
   const summary = cveReport?.summary || {
     totalPackages: 0,
@@ -118,224 +54,203 @@ export default function CVEView({ loading, cveReport }) {
     low: 0,
   };
 
-  return (
-    <Box className="cve-view">
-      <Box className="cve-summary-wrap">
-        <Grid container spacing={2} className="cve-summary-grid">
-          <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-            <Card className="cve-summary-card">
-              <CardContent className="cve-summary-card-content">
-                <Tooltip title="Total packages detected from package.json" arrow>
-                  <Box className="cve-card-icon-wrapper">
-                    <Inventory2Icon className="cve-card-icon cve-icon-primary" />
-                  </Box>
-                </Tooltip>
-                <Typography variant="h6" className="cve-card-title">Packages</Typography>
-                <Typography variant="h3" className="cve-card-value">{summary.totalPackages}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-          <Card className="cve-summary-card cve-card-affected">
-            <CardContent className="cve-summary-card-content">
-              <Tooltip title="Packages that have at least one vulnerability" arrow>
-                <Box className="cve-card-icon-wrapper">
-                  <WarningAmberIcon className="cve-card-icon cve-icon-warning" />
-                </Box>
-              </Tooltip>
-              <Typography variant="h6" className="cve-card-title">Affected</Typography>
-              <Typography variant="h3" className="cve-card-value">{summary.affectedPackages}</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-          <Card className="cve-summary-card cve-card-vulns">
-            <CardContent className="cve-summary-card-content">
-              <Tooltip title="Total vulnerabilities found across all packages" arrow>
-                <Box className="cve-card-icon-wrapper">
-                  <SecurityIcon className="cve-card-icon cve-icon-danger" />
-                </Box>
-              </Tooltip>
-              <Typography variant="h6" className="cve-card-title">Vulnerabilities</Typography>
-              <Typography variant="h3" className="cve-card-value">{summary.totalVulns}</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-          <Card className="cve-summary-card cve-card-severity">
-            <CardContent className="cve-summary-card-content">
-              <Tooltip title="Severity distribution of vulnerabilities" arrow>
-                <Box className="cve-card-icon-wrapper">
-                  <ShieldIcon className="cve-card-icon cve-icon-shield" />
-                </Box>
-              </Tooltip>
-              <Typography variant="h6" className="cve-card-title">Severity</Typography>
-              <Box className="cve-severity-row">
-                {summary.critical > 0 && (
-                  <Tooltip title="Critical vulnerabilities (CVSS 9.0 - 10.0)" arrow>
-                    <span>
-                      <Chip label={`${summary.critical}`} size="small" className="sev-chip sev-chip-critical" icon={<LocalFireDepartmentIcon className="sev-chip-icon" />} />
-                    </span>
-                  </Tooltip>
-                )}
-                {summary.high > 0 && (
-                  <Tooltip title="High vulnerabilities (CVSS 7.0 - 8.9)" arrow>
-                    <span>
-                      <Chip label={`${summary.high}`} size="small" className="sev-chip sev-chip-high" icon={<ErrorOutlineIcon className="sev-chip-icon" />} />
-                    </span>
-                  </Tooltip>
-                )}
-                {summary.medium > 0 && (
-                  <Tooltip title="Medium vulnerabilities (CVSS 4.0 - 6.9)" arrow>
-                    <span>
-                      <Chip label={`${summary.medium}`} size="small" className="sev-chip sev-chip-medium" icon={<ReportProblemIcon className="sev-chip-icon" />} />
-                    </span>
-                  </Tooltip>
-                )}
-                {summary.low > 0 && (
-                  <Tooltip title="Low vulnerabilities (CVSS 0.1 - 3.9)" arrow>
-                    <span>
-                      <Chip label={`${summary.low}`} size="small" className="sev-chip sev-chip-low" icon={<InfoOutlinedIcon className="sev-chip-icon" />} />
-                    </span>
-                  </Tooltip>
-                )}
-                {summary.totalVulns === 0 && (
-                  <Tooltip title="No vulnerabilities detected" arrow>
-                    <span>
-                      <Chip label="None" size="small" className="sev-chip sev-chip-none" icon={<CheckCircleIcon />} />
-                    </span>
-                  </Tooltip>
-                )}
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-        </Grid>
-      </Box>
+  useEffect(() => {
+    const first = items[0];
+    if (!first) {
+      setExpandedPkg({});
+      setExpandedVuln({});
+      return;
+    }
+    setExpandedPkg({ [`${first.name}@${first.version}`]: true });
+    setExpandedVuln({});
+  }, [items]);
 
-      <Box className="cve-list">
-        {items.length === 0 ? (
-          <Card className="cve-empty">
-            <CardContent className="cve-empty-content">
-              <CheckCircleIcon className="cve-empty-icon" />
-              <Typography variant="h6">No CVEs detected</Typography>
-              <Typography variant="body2">All Node.js dependencies are secure.</Typography>
-            </CardContent>
-          </Card>
-        ) : (
-          items.map((pkg, pkgIdx) => {
+  const togglePackage = (pkgKey) => {
+    setExpandedPkg((prev) => ({ ...prev, [pkgKey]: !prev[pkgKey] }));
+  };
+
+  const toggleVuln = (vulnKey) => {
+    setExpandedVuln((prev) => ({ ...prev, [vulnKey]: !prev[vulnKey] }));
+  };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[340px] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 p-2">
+      <Card className="border-slate-200 bg-gradient-to-r from-slate-50 via-white to-rose-50">
+        <CardContent className="space-y-4 p-4 sm:p-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h3 className="text-lg font-semibold text-slate-900">CVE Detection</h3>
+              <p className="text-sm text-slate-600">Dependency risk overview with package-level vulnerability breakdown.</p>
+            </div>
+            <Badge variant="outline" className="border-rose-200 bg-rose-50 text-rose-700">
+              {summary.totalVulns} findings
+            </Badge>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div className="rounded-xl border border-slate-200 bg-white p-3">
+              <Package className="h-4 w-4 text-blue-600" />
+              <p className="mt-2 text-xs uppercase tracking-wide text-slate-500">Packages</p>
+              <p className="text-2xl font-semibold text-slate-900">{summary.totalPackages}</p>
+            </div>
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+              <TriangleAlert className="h-4 w-4 text-amber-600" />
+              <p className="mt-2 text-xs uppercase tracking-wide text-amber-700">Affected</p>
+              <p className="text-2xl font-semibold text-amber-900">{summary.affectedPackages}</p>
+            </div>
+            <div className="rounded-xl border border-red-200 bg-red-50 p-3">
+              <ShieldAlert className="h-4 w-4 text-red-600" />
+              <p className="mt-2 text-xs uppercase tracking-wide text-red-700">Vulnerabilities</p>
+              <p className="text-2xl font-semibold text-red-900">{summary.totalVulns}</p>
+            </div>
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+              <Shield className="h-4 w-4 text-emerald-600" />
+              <p className="mt-2 text-xs uppercase tracking-wide text-emerald-700">Severity Mix</p>
+              <div className="mt-1 flex flex-wrap gap-1.5">
+                {Object.entries({
+                  CRITICAL: summary.critical,
+                  HIGH: summary.high,
+                  MEDIUM: summary.medium,
+                  LOW: summary.low,
+                })
+                  .filter(([, value]) => value > 0)
+                  .map(([severity, value]) => {
+                    const Icon = severityMeta[severity].icon;
+                    return (
+                      <span
+                        key={severity}
+                        className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${severityMeta[severity].className}`}
+                      >
+                        <Icon className="h-3 w-3" />
+                        {value}
+                      </span>
+                    );
+                  })}
+                {summary.totalVulns === 0 && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-xs text-emerald-700">
+                    <CheckCircle className="h-3 w-3" />
+                    None
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {items.length === 0 ? (
+        <Card className="border-slate-200">
+          <CardContent className="flex flex-col items-center gap-2 py-12 text-center">
+            <CheckCircle className="h-10 w-10 text-emerald-500" />
+            <p className="text-base font-semibold text-slate-900">No CVEs detected</p>
+            <p className="text-sm text-slate-500">All scanned dependencies are currently clear of known vulnerabilities.</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {items.map((pkg) => {
             const pkgKey = `${pkg.name}@${pkg.version}`;
             const isPkgExpanded = !!expandedPkg[pkgKey];
+
             return (
-              <Card key={pkgKey} className="cve-item">
-                <Box
-                  className="cve-item-header"
-                  role="button"
-                  tabIndex={0}
+              <Card key={pkgKey} className="overflow-hidden border-slate-200">
+                <button
+                  type="button"
+                  className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-slate-50"
                   onClick={() => togglePackage(pkgKey)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePackage(pkgKey); } }}
                 >
-                  <Box className="cve-item-header-left">
-                    <Inventory2Icon className="cve-pkg-icon" />
-                    <Box className="cve-item-title-group">
-                      <Typography variant="h6" className="cve-pkg-name">{pkg.name}</Typography>
-                      <Typography variant="body2" className="cve-item-version">v{pkg.version}</Typography>
-                    </Box>
-                  </Box>
-                  <Box className="cve-item-header-right">
-                    <Chip 
-                      label={`${pkg.count} vuln${pkg.count !== 1 ? 's' : ''}`} 
-                      size="small" 
-                      className="cve-vuln-count-chip"
-                      color="error"
-                      variant="outlined"
-                    />
-                    <Tooltip title={isPkgExpanded ? "Collapse package" : "Expand package"} arrow>
-                      <IconButton 
-                        className={`cve-expand-btn ${isPkgExpanded ? 'cve-expand-btn-open' : ''}`}
-                        size="small"
-                        onClick={(e) => { e.stopPropagation(); togglePackage(pkgKey); }}
-                      >
-                        <ExpandMoreIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                </Box>
-                <Collapse in={isPkgExpanded} timeout="auto" unmountOnExit>
-                  <Divider className="cve-item-divider" />
-                  <Box className="cve-vuln-list">
-                    {pkg.vulnerabilities.map((v, vIdx) => {
-                      const vulnKey = `${pkgKey}-${v.id}`;
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-slate-900">{pkg.name}</p>
+                    <p className="text-xs text-slate-500">v{pkg.version}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="border-red-200 bg-red-50 text-red-700">
+                      {pkg.count} vuln{pkg.count !== 1 ? "s" : ""}
+                    </Badge>
+                    <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${isPkgExpanded ? "rotate-180" : ""}`} />
+                  </div>
+                </button>
+
+                {isPkgExpanded && (
+                  <CardContent className="space-y-2 border-t border-slate-100 p-4">
+                    {pkg.vulnerabilities?.map((vuln) => {
+                      const vulnKey = `${pkgKey}-${vuln.id}`;
                       const isVulnExpanded = !!expandedVuln[vulnKey];
-                      const cveAlias = Array.isArray(v.aliases) ? v.aliases.find((a) => a.startsWith('CVE-')) : null;
+                      const severity = String(vuln.severity || "LOW").toUpperCase();
+                      const meta = severityMeta[severity] || severityMeta.LOW;
+                      const cveAlias = Array.isArray(vuln.aliases)
+                        ? vuln.aliases.find((alias) => alias.startsWith("CVE-"))
+                        : null;
+
                       return (
-                        <Box key={v.id} className="cve-vuln-row">
-                          <Box
-                            className="cve-vuln-header"
-                            role="button"
-                            tabIndex={0}
+                        <div key={vuln.id} className="rounded-lg border border-slate-200">
+                          <button
+                            type="button"
+                            className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left"
                             onClick={() => toggleVuln(vulnKey)}
-                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleVuln(vulnKey); } }}
                           >
-                            <Box className="cve-vuln-header-left">
-                              <span className={`sev-dot sev-${String(v.severity || 'UNKNOWN').toLowerCase()}`} />
-                              <Box className="cve-vuln-title-group">
-                                <Typography variant="body1" className="cve-vuln-id">{v.id}</Typography>
+                            <div className="min-w-0">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className={`h-2 w-2 rounded-full ${meta.dot}`} />
+                                <span className="text-sm font-medium text-slate-800">{vuln.id}</span>
                                 {cveAlias && (
-                                  <Chip size="small" variant="outlined" label={cveAlias} className="cve-id-chip" />
+                                  <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-600">
+                                    {cveAlias}
+                                  </span>
                                 )}
-                              </Box>
-                            </Box>
-                            <Tooltip title={isVulnExpanded ? "Hide details" : "Show details"} arrow>
-                              <IconButton 
-                                className={`cve-vuln-expand-btn ${isVulnExpanded ? 'cve-vuln-expand-btn-open' : ''}`}
-                                size="small"
-                                onClick={(e) => { e.stopPropagation(); toggleVuln(vulnKey); }}
-                              >
-                                <ExpandMoreIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          </Box>
-                          {v.summary && (
-                            <Typography variant="body2" className="cve-vuln-summary">{v.summary}</Typography>
+                              </div>
+                              {vuln.summary && (
+                                <p className="mt-1 line-clamp-2 text-xs text-slate-500">{vuln.summary}</p>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className={`rounded-full border px-2 py-0.5 text-xs ${meta.className}`}>
+                                {severity}
+                              </span>
+                              <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${isVulnExpanded ? "rotate-180" : ""}`} />
+                            </div>
+                          </button>
+
+                          {isVulnExpanded && Array.isArray(vuln.references) && vuln.references.length > 0 && (
+                            <div className="border-t border-slate-100 px-3 py-3">
+                              <p className="mb-2 flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                <Link2 className="h-3.5 w-3.5" />
+                                References
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                {vuln.references.slice(0, 6).map((ref, idx) => (
+                                  <a
+                                    key={`${ref.url}-${idx}`}
+                                    href={ref.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-flex max-w-full items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-700 transition hover:border-blue-200 hover:text-blue-700"
+                                    title={ref.url}
+                                  >
+                                    {(ref.type || `Ref ${idx + 1}`).toUpperCase()}
+                                  </a>
+                                ))}
+                              </div>
+                            </div>
                           )}
-                          <Collapse in={isVulnExpanded} timeout="auto" unmountOnExit>
-                            {Array.isArray(v.references) && v.references.length > 0 && (
-                              <Box className="cve-refs">
-                                <Typography variant="caption" className="cve-refs-title">
-                                  <LinkIcon className="cve-refs-icon" />
-                                  References:
-                                </Typography>
-                                <Box className="cve-refs-list">
-                                  {v.references.slice(0, 5).map((r, i) => (
-                                    <a key={i} href={r.url} target="_blank" rel="noreferrer" className="cve-ref-link">
-                                      <Tooltip title={r.url} arrow>
-                                        <span>
-                                          <Chip 
-                                            label={r.type || `Ref ${i + 1}`} 
-                                            size="small" 
-                                            variant="outlined"
-                                            className="cve-ref-chip"
-                                            clickable
-                                          />
-                                        </span>
-                                      </Tooltip>
-                                    </a>
-                                  ))}
-                                </Box>
-                              </Box>
-                            )}
-                          </Collapse>
-                        </Box>
+                        </div>
                       );
                     })}
-                  </Box>
-                </Collapse>
+                  </CardContent>
+                )}
               </Card>
             );
-          })
-        )}
-      </Box>
-    </Box>
+          })}
+        </div>
+      )}
+    </div>
   );
 }

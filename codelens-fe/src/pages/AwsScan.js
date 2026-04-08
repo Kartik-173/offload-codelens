@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import AWSScanApiService from '../services/AWSScanApiService';
 import CredentialsApiService from '../services/CredentialsApiService';
-import SnackbarNotification, { SNACKBAR_THEME } from '../components/common/SnackbarNotification';
+import { useToast } from '../components/common/ToastProvider';
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import {
@@ -234,6 +234,7 @@ const TablePagination = ({
 };
 
 const AwsScan = () => {
+  const { success, error } = useToast();
   const [isTriggerLoading, setIsTriggerLoading] = useState(false);
   const [isReportListLoading, setIsReportListLoading] = useState(false);
   const [isReportLoading, setIsReportLoading] = useState(false);
@@ -246,9 +247,6 @@ const AwsScan = () => {
   const [reportList, setReportList] = useState([]);
   const [selectedOpenSearchId, setSelectedOpenSearchId] = useState('');
   const [rawReport, setRawReport] = useState(null);
-
-  const [snackbarType, setSnackbarType] = useState(null);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isScanAvailable, setIsScanAvailable] = useState(true);
 
   const [page, setPage] = useState(0);
@@ -319,7 +317,7 @@ const AwsScan = () => {
         setAccountIds([]);
         setAccountOptions([]);
         setSelectedAccountId('');
-        showSnackbar('error', 'Failed to load AWS account IDs. Please add AWS credentials first.');
+        error('Failed to load AWS account IDs. Please add AWS credentials first.');
       } finally {
         setAccountIdsLoading(false);
       }
@@ -461,24 +459,21 @@ const AwsScan = () => {
   }, [reportList, isReportListLoading]);
 
   const showSnackbar = (type, message) => {
-    setSnackbarType(type);
-    setSnackbarMessage(message);
-  };
-
-  const clearSnackbar = () => {
-    setSnackbarType(null);
-    setSnackbarMessage('');
+    if (type === 'success') {
+      success(message);
+    } else {
+      error(message);
+    }
   };
 
   const handleTriggerScan = async () => {
-    clearSnackbar();
     if (!userId) {
-      showSnackbar('error', 'User ID not found. Please log in again.');
+      error('User ID not found. Please log in again.');
       return;
     }
 
     if (!selectedAccountId) {
-      showSnackbar('error', 'Please select an AWS account to scan.');
+      error('Please select an AWS account to scan.');
       return;
     }
 
@@ -490,22 +485,18 @@ const AwsScan = () => {
         const apiMessage =
           res.data?.message ||
           'Security scan command executed successfully. Please wait some time to see the results.';
-        showSnackbar('success', apiMessage);
+        success(apiMessage);
       } else if (res?.error) {
-        showSnackbar(
-          'error',
-          res.error?.detail || res.error?.message || 'Failed to start scan.'
-        );
+        error(res.error?.detail || res.error?.message || 'Failed to start scan.');
       }
     } catch (err) {
-      showSnackbar('error', 'Something went wrong while triggering the scan.');
+      error('Something went wrong while triggering the scan.');
     } finally {
       setIsTriggerLoading(false);
     }
   };
 
   const loadReportList = async () => {
-    clearSnackbar();
     if (!userId) return;
 
     try {
@@ -555,7 +546,7 @@ const AwsScan = () => {
         setIsScanAvailable(true);
       }
     } catch (err) {
-      showSnackbar('error', 'Something went wrong while loading scan reports.');
+      error('Something went wrong while loading scan reports.');
       setIsScanAvailable(true);
     } finally {
       setIsReportListLoading(false);
@@ -563,7 +554,6 @@ const AwsScan = () => {
   };
 
   const loadReport = async (openSearchId) => {
-    clearSnackbar();
     if (!openSearchId) return;
 
     try {
@@ -573,13 +563,10 @@ const AwsScan = () => {
         setRawReport(res.data);
         setPage(0);
       } else if (res?.error) {
-        showSnackbar(
-          'error',
-          res.error?.detail || res.error?.message || 'Failed to load report.'
-        );
+        error(res.error?.detail || res.error?.message || 'Failed to load report.');
       }
     } catch (err) {
-      showSnackbar('error', 'Something went wrong while loading report.');
+      error('Something went wrong while loading report.');
     } finally {
       setIsReportLoading(false);
     }
@@ -1384,24 +1371,6 @@ const AwsScan = () => {
           )}
         </div>
       </Grid>
-
-      {snackbarType && (
-        <Grid size={12} className="aws-scan-snackbar-row">
-          <SnackbarNotification
-            initialOpen
-            duration={5000}
-            message={snackbarMessage}
-            actionButtonName="Ok"
-            theme={
-              snackbarType === 'success'
-                ? SNACKBAR_THEME.GREEN
-                : SNACKBAR_THEME.RED
-            }
-            yPosition="top"
-            xPosition="center"
-          />
-        </Grid>
-      )}
     </Grid>
   );
 };

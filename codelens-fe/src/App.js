@@ -19,10 +19,12 @@ import SidebarLayout from "./pages/SidebarLayout.js";
 import GitHubConnections from "./pages/GitHubConnections.js";
 import BitBucketConnections from "./pages/BitBucketConnections.js";
 import ProtectedRoute from "./components/common/ProtectedRoute"; 
+import { ToastProvider } from "./components/common/ToastProvider"; 
 
 function App() {
   return (
-    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <ToastProvider>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route
           path="/"
@@ -48,7 +50,8 @@ function App() {
         <Route path="/form" element={<FormPage />} />
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
-    </Router>
+      </Router>
+    </ToastProvider>
   );
 }
 

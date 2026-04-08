@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Cloud, Trash2 } from "lucide-react";
-import SnackbarNotification, {
-  SNACKBAR_THEME,
-} from "../common/SnackbarNotification";
+import { useToast } from "../common/ToastProvider";
 import CredentialsApiService from "../../services/CredentialsApiService";
 
 const Box = ({ children, className = "" }) => <div className={className}>{children}</div>;
@@ -17,18 +15,14 @@ const EMPTY_FORM = {
 };
 
 const AwsAccountsManager = () => {
+  const { success, error } = useToast();
   const userId = localStorage.getItem("userId");
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
   const [accounts, setAccounts] = useState([]);
   const [selected, setSelected] = useState(null);
-
   const [form, setForm] = useState(EMPTY_FORM);
-
-  const [snackbar, setSnackbar] = useState(null);
-
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
@@ -36,11 +30,8 @@ const AwsAccountsManager = () => {
   /* Utils */
   /* ---------------------------------- */
 
-  const showSuccess = (msg) =>
-    setSnackbar({ type: "success", msg });
-
-  const showError = (msg) =>
-    setSnackbar({ type: "error", msg });
+  const showSuccess = (msg) => success(msg);
+  const showError = (msg) => error(msg);
 
   const resetForm = () => {
     setForm(EMPTY_FORM);
@@ -398,22 +389,6 @@ const AwsAccountsManager = () => {
         </Box>
 
       </Box>
-
-      {/* Snackbar */}
-
-      {snackbar && (
-        <SnackbarNotification
-          initialOpen
-          duration={4000}
-          message={snackbar.msg}
-          theme={
-            snackbar.type === "success"
-              ? SNACKBAR_THEME.GREEN
-              : SNACKBAR_THEME.RED
-          }
-          onCloseHandler={() => setSnackbar(null)}
-        />
-      )}
 
       {deleteDialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">

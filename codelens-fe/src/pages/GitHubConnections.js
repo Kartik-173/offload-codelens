@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Loader2, Check } from "lucide-react";
-
-import SnackbarNotification, {
-  SNACKBAR_THEME,
-} from "../components/common/SnackbarNotification";
+import { useToast } from "../components/common/ToastProvider";
 import GithubApiService from "../services/GithubApiService";
 import { ENV } from '../config/env';
 
@@ -58,8 +55,7 @@ const GITHUB_STEPS = [
 ];
 
 const GitHubConnections = () => {
-  const [snackbarStatus, setSnackbarStatus] = useState(null);
-  const [snackbarMessage, setSnackbarMessage] = useState(null);
+  const { success, error } = useToast();
   const [githubUser, setGithubUser] = useState(null);
   const [loadingConfig, setLoadingConfig] = useState(true);
   const [hasOrgOAuthConfig, setHasOrgOAuthConfig] = useState(false);
@@ -92,10 +88,7 @@ const GitHubConnections = () => {
         const res = await GithubApiService.fetchGithubOAuthStatus(oauthKey);
         setHasOrgOAuthConfig(Boolean(res?.exists));
       } catch (error) {
-        setSnackbarStatus("error");
-        setSnackbarMessage(
-          "Failed to check GitHub OAuth configuration. Please try again."
-        );
+        error("Failed to check GitHub OAuth configuration. Please try again.");
       } finally {
         setLoadingConfig(false);
       }
@@ -113,14 +106,11 @@ const GitHubConnections = () => {
     e.preventDefault();
 
     if (!clientId || !clientSecret) {
-      setSnackbarStatus("error");
-      setSnackbarMessage("Please provide both Client ID and Client Secret.");
+      error("Please provide both Client ID and Client Secret.");
       return;
     }
 
     setSavingConfig(true);
-    setSnackbarStatus(null);
-    setSnackbarMessage(null);
 
     try {
       await GithubApiService.saveGithubOAuthConfig({
@@ -132,11 +122,9 @@ const GitHubConnections = () => {
       setHasOrgOAuthConfig(true);
       setClientId("");
       setClientSecret("");
-      setSnackbarStatus("success");
-      setSnackbarMessage("GitHub OAuth app configuration saved successfully.");
+      success("GitHub OAuth app configuration saved successfully.");
     } catch (error) {
-      setSnackbarStatus("error");
-      setSnackbarMessage(
+      error(
         error?.response?.data?.message ||
           "Failed to save GitHub OAuth configuration. Please try again."
       );
@@ -152,11 +140,9 @@ const GitHubConnections = () => {
       localStorage.removeItem("github_username");
       localStorage.removeItem("github_avatar_url");
       setGithubUser(null);
-      setSnackbarStatus("success");
-      setSnackbarMessage("GitHub account removed successfully.");
+      success("GitHub account removed successfully.");
     } catch (error) {
-      setSnackbarStatus("error");
-      setSnackbarMessage("Failed to remove GitHub account.");
+      error("Failed to remove GitHub account.");
     }
   };
 
@@ -381,22 +367,6 @@ const GitHubConnections = () => {
           </div>
         )}
       </div>
-
-      {snackbarStatus && (
-        <SnackbarNotification
-          initialOpen={true}
-          duration={5000}
-          message={snackbarMessage}
-          actionButtonName={"Ok"}
-          theme={
-            snackbarStatus === "success"
-              ? SNACKBAR_THEME.GREEN
-              : SNACKBAR_THEME.RED
-          }
-          yPosition={"top"}
-          xPosition={"center"}
-        />
-      )}
     </div>
   );
 };

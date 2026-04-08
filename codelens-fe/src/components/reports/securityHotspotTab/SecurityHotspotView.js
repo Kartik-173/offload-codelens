@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { Shield, AlertTriangle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card";
 import HotspotList from "./HotspotList";
 import HotspotDetails from "./HotspotDetails/HotspotDetails.js";
 
@@ -70,36 +72,59 @@ const SecurityHotspotView = ({ loading, reportDetails }) => {
 
   if (loading) {
     return (
-      <div className="hotspot-container flex min-h-[300px] items-center justify-center">
+      <div className="flex min-h-[400px] items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
       </div>
     );
   }
 
-  return (
-    <div className="hotspot-container">
-      <HotspotList
-        selectedTab={selectedTab}
-        handleTabChange={handleTabChange}
-        grouped={grouped}
-        expandedCategories={expandedCategories}
-        toggleCategory={(priority, category) => {
-          const key = `${priority}-${category}`;
-          setExpandedCategories((prev) => ({
-            ...prev,
-            [key]: !prev[key],
-          }));
-        }}
-        filteredHotspots={filteredHotspots}
-        selectedHotspotKey={selectedHotspotKey}
-        setSelectedHotspotKey={setSelectedHotspotKey}
-        setSelectedHotspot={(h) => setSelectedHotspot(normalizeHotspot(h))}
-      />
+  const totalHotspots = reportDetails?.hotspots?.total || 0;
 
-      <HotspotDetails
-        selectedHotspot={selectedHotspot}
-        hotspotSource={selectedHotspot?.component || {}}
-      />
+  return (
+    <div className="flex flex-row gap-6 w-full h-[calc(100vh-180px)]">
+      {/* Left Sidebar - Hotspot List */}
+      <div className="w-[35%] min-w-[350px] flex-shrink-0 h-full">
+        <Card className="border border-slate-200 shadow-sm h-full flex flex-col">
+          <CardHeader className="pb-3 border-b border-slate-100 flex-shrink-0">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                <Shield className="h-4 w-4 text-slate-500" />
+                Security Hotspots
+              </CardTitle>
+              <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full font-medium">
+                {totalHotspots} total
+              </span>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-4 px-0 flex-1 overflow-hidden">
+            <HotspotList
+              selectedTab={selectedTab}
+              handleTabChange={handleTabChange}
+              grouped={grouped}
+              expandedCategories={expandedCategories}
+              toggleCategory={(priority, category) => {
+                const key = `${priority}-${category}`;
+                setExpandedCategories((prev) => ({
+                  ...prev,
+                  [key]: !prev[key],
+                }));
+              }}
+              filteredHotspots={filteredHotspots}
+              selectedHotspotKey={selectedHotspotKey}
+              setSelectedHotspotKey={setSelectedHotspotKey}
+              setSelectedHotspot={(h) => setSelectedHotspot(normalizeHotspot(h))}
+            />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Right Panel - Hotspot Details */}
+      <div className="flex-1 min-w-0 h-full overflow-y-auto">
+        <HotspotDetails
+          selectedHotspot={selectedHotspot}
+          hotspotSource={selectedHotspot?.component || {}}
+        />
+      </div>
     </div>
   );
 };

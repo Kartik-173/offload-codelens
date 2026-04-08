@@ -6,12 +6,12 @@ const Typography = ({ children, className = "" }) => <p className={className}>{c
 
 const MetricCard = ({ label, value, children }) => {
   return (
-    <Paper className="file-view-metric-card">
-      <Box className="file-view-metric-content">
-        <Typography className="file-view-metric-label">
+    <Paper className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 shadow-sm">
+      <Box className="flex items-baseline gap-1.5">
+        <Typography className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
           {label}
         </Typography>
-        <Typography className="file-view-metric-value">
+        <Typography className="text-sm font-semibold text-slate-900">
           {value}
         </Typography>
       </Box>
