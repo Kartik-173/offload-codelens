@@ -8,13 +8,10 @@ import {
   BarChart3,
   Zap,
   Shield,
-  Cloud,
   Globe,
   ChevronDown,
   ChevronUp,
   LogOut,
-  KeyRound,
-  Lock,
   Home,
   Target,
 } from "lucide-react";
@@ -30,10 +27,7 @@ const iconMap = {
   AssessmentIcon: BarChart3,
   SpeedIcon: Zap,
   PolicyIcon: Shield,
-  CloudOutlinedIcon: Cloud,
   LanguageIcon: Globe,
-  ManageAccountsIcon: KeyRound,
-  SecurityIcon: Lock,
   Shield: Shield,
   TargetIcon: Target,
   ExitToAppIcon: LogOut,
@@ -66,31 +60,9 @@ const SidebarMenuItems = [
     route: "/report-list",
   },
   {
-    label: "Cloud Security",
-    icon: "CloudOutlinedIcon",
-    expandable: true,
-    children: [
-      {
-        label: "Credentials",
-        icon: "ManageAccountsIcon",
-        route: "/credentials",
-      },
-      {
-        label: "Security Scan",
-        icon: "SecurityIcon",
-        route: "/security-scan",
-      },
-    ],
-  },
-  {
     label: "Load Testing",
     icon: "SpeedIcon",
     route: "/vegeta-scan",
-  },
-  {
-    label: "WAF Scan",
-    icon: "PolicyIcon",
-    route: "/waf-scan",
   },
   {
     label: "OpenShield",

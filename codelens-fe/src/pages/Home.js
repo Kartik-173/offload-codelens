@@ -10,7 +10,6 @@ import {
   Shield,
   Lock,
   FolderGit,
-  Cloud,
   Zap,
   Rocket,
   ChevronRight,
@@ -99,17 +98,6 @@ const Home = () => {
       gradient: "from-slate-600 to-gray-700",
       action: () => navigate("/github-connections"),
       actionLabel: "Connect",
-    },
-    {
-      id: "cloud-security",
-      icon: <Cloud className="h-6 w-6 text-white" />,
-      title: "Cloud Security Scan",
-      description: "Secure AWS credentials and run comprehensive cloud infrastructure scans.",
-      badge: "AWS Ready",
-      badgeColor: "bg-orange-500/20 text-orange-300 border-orange-500/30",
-      gradient: "from-orange-600 to-amber-700",
-      action: () => navigate("/credentials"),
-      actionLabel: "Configure",
     },
   ];
 

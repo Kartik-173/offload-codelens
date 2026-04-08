@@ -13,10 +13,6 @@ import {
   Archive,
   ClipboardList,
   Gauge,
-  ShieldCheck,
-  Cloud,
-  UserCog,
-  ShieldAlert,
   Globe,
 } from 'lucide-react';
 import RepositoryService from '../services/RepositoryService';
@@ -243,28 +239,6 @@ export const SidebarMenu = (navigate) => [
     route: "/vegeta-scan",
   },
   {
-    label: "WAF Scan",
-    icon: <ShieldCheck />,
-    route: "/waf-scan",
-  },
-  {
-    label: "Clouds Security Scan",
-    icon: <Cloud />,
-    expandable: true,
-    children: [
-      {
-        label: "Clouds Credentials",
-        icon: <UserCog />,
-        route: "/credentials",
-      },
-      {
-        label: "Security Scan",
-        icon: <ShieldAlert />,
-        route: "/security-scan",
-      },
-    ],
-  },
-  {
     label: "OpenShield",
     icon: <Shield />,
     external: () => {
@@ -345,14 +319,6 @@ const HomeData = (navigate) => [
     buttons: [
       { label: "Connect GitHub", action: () => navigate("/github-connections") },
       { label: "Connect Bitbucket", action: () => navigate("/bitbucket-connections") },
-    ],
-  },
-  {
-    icon: <Shield className="h-8 w-8 text-indigo-500" />,
-    title: "Secure AWS Credentials",
-    text: "Store and manage credentials safely for scans and Terraform jobs.",
-    buttons: [
-      { label: "Manage Credentials", action: () => navigate("/credentials") },
     ],
   },
 ];
