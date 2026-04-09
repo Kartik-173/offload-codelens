@@ -4,7 +4,7 @@ import { ChevronDown, FolderOpen } from "lucide-react";
 
 const ReportSelector = ({ reports, selected, onChange, loading }) => {
   return (
-    <div className="report-selector">
+    <div className="rounded-lg border border-slate-200 bg-slate-50/60 p-3">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
           <FolderOpen className="h-5 w-5" />
