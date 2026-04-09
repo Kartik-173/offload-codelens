@@ -3,12 +3,13 @@ import { Copy, AlertCircle, ChevronUp, ChevronDown, ChevronsUp, Shield, User } f
 import { Card, CardContent, CardHeader, CardTitle } from "../../../ui/card";
 import { Badge } from "../../../ui/badge";
 import { Button } from "../../../ui/button";
+import { useToast } from "../../../common/ToastProvider";
 import HotspotHeader from "./HotspotHeader";
 import HotspotTabs from "./HotspotTabs";
 
 const HotspotDetails = ({ selectedHotspot }) => {
   const [activeTab, setActiveTab] = useState("risk");
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const { success } = useToast();
 
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
@@ -40,7 +41,7 @@ const getPriorityIcon = (priority) => {
   const handleCopyPath = () => {
     if (filePath) {
       navigator.clipboard.writeText(filePath);
-      setSnackbarOpen(true);
+      success("File path copied to clipboard");
     }
   };
 
@@ -189,12 +190,6 @@ const getPriorityIcon = (priority) => {
         </CardContent>
       </Card>
 
-      {/* Snackbar */}
-      {snackbarOpen && (
-        <div className="fixed left-1/2 top-5 z-50 -translate-x-1/2 rounded-md bg-emerald-600 px-4 py-2 text-sm text-white shadow-lg">
-          Copied to clipboard!
-        </div>
-      )}
     </div>
   );
 };

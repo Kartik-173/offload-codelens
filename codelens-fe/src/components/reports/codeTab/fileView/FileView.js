@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { FileText as InsertDriveFileOutlinedIcon, Copy as ContentCopyIcon } from "lucide-react";
 import Editor from "@monaco-editor/react";
+import { useToast } from "../../../common/ToastProvider";
 
 import MetricCard from "./MetricCard.js";
 import MetricMenu from "./MetricMenu.js";
@@ -15,7 +16,7 @@ const Typography = ({ children, className = "", component = "p", ...rest }) => {
 const Paper = ({ children, className = "" }) => <div className={className}>{children}</div>;
 
 const FileView = ({ currentFile, fileContent }) => {
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const { success } = useToast();
 
   if (!currentFile || !fileContent) {
     return (
@@ -29,8 +30,7 @@ const FileView = ({ currentFile, fileContent }) => {
 
   const handleCopyPath = () => {
     navigator.clipboard.writeText(displayPath);
-    setSnackbarOpen(true);
-    setTimeout(() => setSnackbarOpen(false), 1600);
+    success("File path copied to clipboard");
   };
 
   const overviewMetrics = [
@@ -207,11 +207,6 @@ const FileView = ({ currentFile, fileContent }) => {
         </Box>
       </Paper>
 
-      {snackbarOpen && (
-        <div className="fixed right-4 top-4 z-50 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800 shadow">
-          Copied to clipboard!
-        </div>
-      )}
     </Box>
   );
 };
