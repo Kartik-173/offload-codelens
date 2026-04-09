@@ -60,55 +60,6 @@ module.exports = {
     },
   },
 
-  // ---------------- AWS ----------------
-  awsDeploy: {
-    reqBody: {
-      type: 'object',
-      required: ['userId', 'userAccountId'],
-      properties: {
-        userId: { type: 'string' },
-        userAccountId: { type: 'integer' },
-      },
-    },
-  },
-
-  storeCredentials: {
-    reqBody: {
-      type: 'object',
-      required: ['accountId', 'userId', 'accessKey', 'secretKey', 'name'],
-      properties: {
-        accountId: { type: ['integer', 'string'] },
-        userId: { type: 'string' },
-        accessKey: { type: 'string' },
-        secretKey: { type: 'string' },
-        name: { type: 'string' },
-      },
-    },
-  },
-
-  getCredentials: {
-    reqBody: {
-      type: 'object',
-      required: ['accountId', 'userId'],
-      properties: {
-        accountId: { type: ['integer', 'string'] },
-        userId: { type: 'string' },
-      },
-    },
-  },
-
-  deleteCredentials: {
-    reqBody: {
-      type: 'object',
-      required: ['accountId', 'userId'],
-      properties: {
-        accountId: { type: ['integer', 'string'] },
-        userId: { type: 'string' },
-      },
-      additionalProperties: false,
-    },
-  },
-
   // ---------------- GitHub ----------------
   storeGithubCredentials: {
     reqBody: {
@@ -177,44 +128,4 @@ module.exports = {
     },
   },
 
-  // ---------------- Azure ----------------
-  storeAzureCredentials: {
-    reqBody: {
-      type: 'object',
-      required: ['userId', 'tenantId', 'clientId', 'clientSecret', 'subscriptionId', 'name'],
-      properties: {
-        userId: { type: 'string' },
-        tenantId: { type: 'string' },
-        clientId: { type: 'string' },
-        clientSecret: { type: 'string' },
-        subscriptionId: { type: 'string' },
-        name: { type: 'string' },
-      },
-      additionalProperties: false,
-    },
-  },
-
-  getAzureCredentials: {
-    reqBody: {
-      type: 'object',
-      required: ['userId', 'tenantId'],
-      properties: {
-        userId: { type: 'string' },
-        tenantId: { type: 'string' },
-      },
-      additionalProperties: false,
-    },
-  },
-
-  deleteAzureCredentials: {
-    reqBody: {
-      type: 'object',
-      required: ['userId', 'tenantId'],
-      properties: {
-        userId: { type: 'string' },
-        tenantId: { type: 'string' },
-      },
-      additionalProperties: false,
-    },
-  },
 };

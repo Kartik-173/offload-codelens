@@ -10,9 +10,6 @@ const { errorResponse } = require('./middlewares/errorHandlers');
 const cognitoAuthMiddleware = require('./middlewares/cognitoAuthMiddleware');
 const router = require('./routers');
 const serviceMonitor = require('./utils/serviceMonitor');
-const { healthMonitor } = require('./controllers/healthMonitorController');
-const { initializeCassandra, shutdownCassandra } = require('./config/cassandra');
-const albAutoDeregisterSchedulerService = require('./services/albAutoDeregisterSchedulerService');
 
 const app = express();
 const cors = require('cors');
@@ -85,29 +82,6 @@ app.use(errorResponse);
 // Start service connection monitoring
 serviceMonitor.start(30); // Check every 30 seconds
 
-// Start health monitor service for ALB targets
-if (process.env.ENABLE_HEALTH_CHECK_EMAILS === 'true') {
-  healthMonitor.start();
-  console.log('Health monitoring service started');
-} else {
-  console.log('Health monitoring service disabled (ENABLE_HEALTH_CHECK_EMAILS=false)');
-}
-
-// Initialize Cassandra connection
-initializeCassandra()
-  .then(() => {
-    console.log('✅ Cassandra initialized successfully');
-
-    if (process.env.ENABLE_AUTO_DEREGISTER_SCHEDULER !== 'false') {
-      albAutoDeregisterSchedulerService.start();
-    } else {
-      console.log('Auto-deregister scheduler disabled (ENABLE_AUTO_DEREGISTER_SCHEDULER=false)');
-    }
-  })
-  .catch((error) => {
-    console.error('❌ Failed to initialize Cassandra:', error);
-    console.error('⚠️ ALB account settings will not be available');
-  });
 
 
 process.on('unhandledRejection', (reason, promise) => {
@@ -119,16 +93,6 @@ process.on('unhandledRejection', (reason, promise) => {
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully');
   serviceMonitor.stop();
-  healthMonitor.stop();
-  albAutoDeregisterSchedulerService.stop();
-  
-  // Shutdown Cassandra connection
-  try {
-    await shutdownCassandra();
-    console.log('✅ Cassandra connection closed');
-  } catch (error) {
-    console.error('❌ Error closing Cassandra connection:', error);
-  }
   
   process.exit(0);
 });
@@ -136,16 +100,6 @@ process.on('SIGTERM', async () => {
 process.on('SIGINT', async () => {
   console.log('SIGINT received, shutting down gracefully');
   serviceMonitor.stop();
-  healthMonitor.stop();
-  albAutoDeregisterSchedulerService.stop();
-  
-  // Shutdown Cassandra connection
-  try {
-    await shutdownCassandra();
-    console.log('✅ Cassandra connection closed');
-  } catch (error) {
-    console.error('❌ Error closing Cassandra connection:', error);
-  }
   
   process.exit(0);
 });

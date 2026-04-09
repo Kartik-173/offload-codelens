@@ -56,8 +56,6 @@ const PUBLIC_ROUTES = [
   '/api/auth/github/callback',
   '/api/auth/bitbucket',
   '/api/auth/bitbucket/callback',
-  '/api/credential/get-github-cred/*',
-  '/api/credential/get-creds/*',
   '/api/redirect/compliance',
 ];
 
