@@ -18,53 +18,59 @@ const Typography = ({ children, className = "" }) => (
   <span className={className}>{children}</span>
 );
 
+const SEVERITY_CLASS = {
+  CRITICAL: "border-rose-200 bg-rose-50 text-rose-700",
+  HIGH: "border-orange-200 bg-orange-50 text-orange-700",
+  MEDIUM: "border-amber-200 bg-amber-50 text-amber-700",
+  LOW: "border-emerald-200 bg-emerald-50 text-emerald-700",
+};
+
 const SeverityChip = ({ severity }) => (
   <Chip
     label={severity}
-    size="small"
-    className={`severity-chip ${severity.toLowerCase()}`}
+    className={SEVERITY_CLASS[severity?.toUpperCase?.()] || "border-slate-200 bg-slate-50 text-slate-700"}
   />
 );
 
 const FindingsTable = ({ rows, onRowClick }) => {
   return (
-    <Box className={`findings-table ${rows.length === 0 ? "is-empty" : ""}`}>
+    <Box className="overflow-hidden rounded-xl border border-slate-200 bg-white">
       {rows.length === 0 ? (
-        <div className="p-4 text-sm text-slate-500">No findings detected 🎉</div>
+        <div className="p-6 text-sm text-slate-500">No findings detected 🎉</div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[920px] text-sm">
             <thead>
-              <tr className="border-b bg-slate-50 text-left">
-                <th className="px-3 py-2">Rule</th>
-                <th className="px-3 py-2 text-center">Severity</th>
-                <th className="px-3 py-2">File</th>
-                <th className="px-3 py-2 text-center">Line</th>
-                <th className="px-3 py-2">Category</th>
-                <th className="px-3 py-2 text-center">CWE</th>
+              <tr className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+                <th className="px-3 py-3 font-semibold">Rule</th>
+                <th className="px-3 py-3 text-center font-semibold">Severity</th>
+                <th className="px-3 py-3 font-semibold">File</th>
+                <th className="px-3 py-3 text-center font-semibold">Line</th>
+                <th className="px-3 py-3 font-semibold">Category</th>
+                <th className="px-3 py-3 text-center font-semibold">CWE</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((row) => (
                 <tr
                   key={row.finding_id}
-                  className="cursor-pointer border-b hover:bg-slate-50"
+                  className="cursor-pointer border-t border-slate-100 transition-colors hover:bg-cyan-50/40"
                   onClick={() => onRowClick(row)}
                 >
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-3">
                     <Tooltip title={row.rule_id}>
-                      <Typography className="rule-cell">{row.rule_id}</Typography>
+                      <Typography className="font-medium text-slate-800">{row.rule_id}</Typography>
                     </Tooltip>
                   </td>
-                  <td className="px-3 py-2 text-center">
+                  <td className="px-3 py-3 text-center">
                     <SeverityChip severity={row.severity} />
                   </td>
-                  <td className="px-3 py-2">
-                    <Typography className="file-cell">{row.file_path}</Typography>
+                  <td className="max-w-[380px] px-3 py-3">
+                    <Typography className="block truncate font-mono text-xs text-slate-700">{row.file_path}</Typography>
                   </td>
-                  <td className="px-3 py-2 text-center">{row.line_start}</td>
-                  <td className="px-3 py-2">{row.category}</td>
-                  <td className="px-3 py-2 text-center">{row.cwe || "-"}</td>
+                  <td className="px-3 py-3 text-center text-slate-700">{row.line_start}</td>
+                  <td className="px-3 py-3 text-slate-700">{row.category}</td>
+                  <td className="px-3 py-3 text-center text-slate-700">{row.cwe || "-"}</td>
                 </tr>
               ))}
             </tbody>

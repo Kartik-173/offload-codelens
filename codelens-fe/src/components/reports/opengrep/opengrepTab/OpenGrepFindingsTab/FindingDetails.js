@@ -33,6 +33,13 @@ const Tooltip = ({ children, title }) => (
   <span title={typeof title === "string" ? title : undefined}>{children}</span>
 );
 
+const SEVERITY_CLASS = {
+  CRITICAL: "border-rose-200 bg-rose-50 text-rose-700",
+  HIGH: "border-orange-200 bg-orange-50 text-orange-700",
+  MEDIUM: "border-amber-200 bg-amber-50 text-amber-700",
+  LOW: "border-emerald-200 bg-emerald-50 text-emerald-700",
+};
+
 const FindingDetails = ({ finding, onClose }) => {
   const [copied, setCopied] = useState(false);
   if (!finding) return null;
@@ -45,10 +52,10 @@ const FindingDetails = ({ finding, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-40 flex justify-end bg-black/20" onClick={onClose}>
-      <div className="finding-drawer h-full w-full max-w-xl overflow-y-auto bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
-      <Box className="finding-details">
-        <Box className="finding-header">
-          <Typography className="finding-title">
+      <div className="h-full w-full max-w-xl overflow-y-auto bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
+      <Box className="space-y-4 p-4">
+        <Box className="flex items-start gap-2">
+          <Typography className="flex-1 text-sm font-semibold text-slate-900">
             {finding.rule_id}
           </Typography>
 
@@ -58,57 +65,57 @@ const FindingDetails = ({ finding, onClose }) => {
 
           <Chip
             label={finding.severity}
-            className={`severity-chip ${finding.severity.toLowerCase()}`}
+            className={SEVERITY_CLASS[finding.severity?.toUpperCase?.()] || "border-slate-200 bg-slate-50 text-slate-700"}
           />
         </Box>
 
-        <Divider />
+        <Divider className="h-px bg-slate-200" />
 
-        <Box className="details-section">
-          <div className="detail-row">
-            <LabelOutlinedIcon />
-            <span className="label">Category</span>
-            <span className="value">{finding.category}</span>
+        <Box className="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
+          <div className="flex items-center gap-2 text-sm text-slate-700">
+            <LabelOutlinedIcon className="h-4 w-4 text-slate-500" />
+            <span className="text-slate-500">Category</span>
+            <span className="font-medium text-slate-800">{finding.category || "-"}</span>
           </div>
 
-          <div className="detail-row">
-            <FolderOutlinedIcon />
-            <span className="label">File</span>
-            <span className="value mono">{finding.file_path}</span>
+          <div className="flex items-center gap-2 text-sm text-slate-700">
+            <FolderOutlinedIcon className="h-4 w-4 text-slate-500" />
+            <span className="text-slate-500">File</span>
+            <span className="truncate font-mono text-xs text-slate-800">{finding.file_path || "-"}</span>
           </div>
 
-          <div className="detail-row">
-            <NumbersOutlinedIcon />
-            <span className="label">Line</span>
-            <span className="value">{finding.line_start}</span>
+          <div className="flex items-center gap-2 text-sm text-slate-700">
+            <NumbersOutlinedIcon className="h-4 w-4 text-slate-500" />
+            <span className="text-slate-500">Line</span>
+            <span className="font-medium text-slate-800">{finding.line_start ?? "-"}</span>
           </div>
 
           {finding.cwe && (
-            <div className="detail-row">
-              <CodeOutlinedIcon />
-              <span className="label">CWE</span>
-              <span className="value">{finding.cwe}</span>
+            <div className="flex items-center gap-2 text-sm text-slate-700">
+              <CodeOutlinedIcon className="h-4 w-4 text-slate-500" />
+              <span className="text-slate-500">CWE</span>
+              <span className="font-medium text-slate-800">{finding.cwe}</span>
             </div>
           )}
         </Box>
 
-        <Box className="code-section">
-          <Box className="code-header">
-            <Typography className="detail-subtitle">
+        <Box className="space-y-2">
+          <Box className="flex items-center justify-between">
+            <Typography className="text-sm font-semibold text-slate-900">
               Code Snippet
             </Typography>
 
             <Tooltip title={copied ? "Copied" : "Copy"}>
               <IconButton
                 onClick={handleCopy}
-                className="copy-btn"
+                className="rounded-md border border-slate-200 bg-white p-1.5 text-slate-600 hover:bg-slate-50"
               >
                 {copied ? <CheckIcon className="h-4 w-4" /> : <ContentCopyIcon className="h-4 w-4" />}
               </IconButton>
             </Tooltip>
           </Box>
 
-          <pre className="code-snippet">
+          <pre className="max-h-[48vh] overflow-auto rounded-lg border border-slate-200 bg-slate-950 p-3 font-mono text-xs leading-6 text-slate-100">
 {finding.code_snippet || "No code snippet available"}
           </pre>
         </Box>

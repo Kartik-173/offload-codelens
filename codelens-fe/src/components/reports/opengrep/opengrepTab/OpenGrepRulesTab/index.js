@@ -33,38 +33,36 @@ const OpenGrepRulesTab = ({ details }) => {
 
   if (!rules.length) {
     return (
-      <Box className="opengrep-rules-empty">
-        <Typography>No rules data available</Typography>
+      <Box className="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
+        <Typography>No rules data available.</Typography>
       </Box>
     );
   }
 
   return (
-    <Box className="opengrep-rules">
-      {/* Header */}
-      <Box className="opengrep-rules-header">
-        <Box className="opengrep-rules-header-top">
-          <Typography variant="h6" className="opengrep-rules-title">
+    <Box className="space-y-4">
+      <Box className="rounded-xl border border-slate-200 bg-white p-4">
+        <Box className="flex flex-wrap items-center justify-between gap-2">
+          <Typography className="text-sm font-semibold text-slate-900">
             Rules Summary
           </Typography>
 
-          <Box
-            className="opengrep-rules-sort"
-            onClick={() =>
-              setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"))
-            }
+          <button
+            type="button"
+            className="rounded-md border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-100"
+            onClick={() => setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"))}
           >
             Sort: Hit Count ({sortOrder === "desc" ? "High → Low" : "Low → High"})
-          </Box>
+          </button>
         </Box>
 
-        <Box className="opengrep-rules-meta">
-          <Typography className="opengrep-rules-meta-item">
-            Total Rules Executed: <strong>{totalRules}</strong>
-          </Typography>
-          <Typography className="opengrep-rules-meta-item">
-            Rules Triggered: <strong>{triggeredRules}</strong>
-          </Typography>
+        <Box className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-600">
+          <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1">
+            Total Rules Executed: <strong>{totalRules ?? "-"}</strong>
+          </span>
+          <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1">
+            Rules Triggered: <strong>{triggeredRules ?? "-"}</strong>
+          </span>
         </Box>
 
         <input
@@ -72,37 +70,32 @@ const OpenGrepRulesTab = ({ details }) => {
           placeholder="Search by rule ID..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="opengrep-rules-search h-9 rounded-md border border-input bg-background px-3 text-sm"
+          className="mt-3 h-9 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100"
         />
       </Box>
 
-      {/* Table */}
-      <Box className="opengrep-rules-table">
-        <Box className="opengrep-rules-row opengrep-rules-row-header">
-          <Typography className="opengrep-rules-col rule-id">
-            Rule ID
-          </Typography>
-          <Typography className="opengrep-rules-col hit-count">
-            Hit Count
-          </Typography>
+      <Box className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+        <Box className="grid grid-cols-[minmax(0,1fr)_120px] bg-slate-50 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <Typography>Rule ID</Typography>
+          <Typography className="text-center">Hit Count</Typography>
         </Box>
 
         {filteredRules.length === 0 && (
-          <Box className="opengrep-rules-no-match">
-            <Typography>No matching rules found</Typography>
+          <Box className="px-3 py-6 text-sm text-slate-500">
+            <Typography>No matching rules found.</Typography>
           </Box>
         )}
 
         {filteredRules.map((rule) => (
           <Box
             key={rule.rule_id}
-            className="opengrep-rules-row opengrep-rules-row-data"
+            className="grid grid-cols-[minmax(0,1fr)_120px] items-center border-t border-slate-100 px-3 py-2.5"
           >
-            <Typography className="opengrep-rules-col rule-id">
+            <Typography className="truncate font-mono text-xs text-slate-800">
               {rule.rule_id}
             </Typography>
 
-            <Box className="opengrep-rules-hit-badge">
+            <Box className="mx-auto inline-flex min-w-12 items-center justify-center rounded-full border border-cyan-200 bg-cyan-50 px-2 py-0.5 text-xs font-semibold text-cyan-700">
               {rule.hit_count}
             </Box>
           </Box>

@@ -8,6 +8,8 @@ const Box = ({ children, className = "" }) => (
 );
 
 const OpenGrepFindingsTab = ({ findings }) => {
+  const findingRows = findings || [];
+
   const [filters, setFilters] = useState({
     severity: "ALL",
     category: "ALL",
@@ -18,14 +20,14 @@ const OpenGrepFindingsTab = ({ findings }) => {
   const [selectedFinding, setSelectedFinding] = useState(null);
 
   const cweOptions = useMemo(
-    () => [...new Set(findings.map((f) => f.cwe).filter(Boolean))],
-    [findings]
+    () => [...new Set(findingRows.map((f) => f.cwe).filter(Boolean))],
+    [findingRows]
   );
 
   const filteredFindings = useMemo(() => {
     const q = filters.search.toLowerCase();
 
-    return findings.filter((f) => {
+    return findingRows.filter((f) => {
       if (filters.severity !== "ALL" && f.severity !== filters.severity)
         return false;
 
@@ -44,10 +46,10 @@ const OpenGrepFindingsTab = ({ findings }) => {
 
       return true;
     });
-  }, [filters, findings]);
+  }, [filters, findingRows]);
 
   return (
-    <Box className="opengrep-findings-container">
+    <Box className="space-y-4">
       <FindingsFilters
         filters={filters}
         onChange={setFilters}

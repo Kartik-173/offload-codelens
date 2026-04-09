@@ -16,7 +16,6 @@ const OPENGREP_TABS = [
   { label: "Rules" },
   { label: "Code" },
   { label: "Scan Info" },
-  { label: "Languages" }
 ];
 
 const OpenGrepDashboard = ({ projectKey, onError }) => {
@@ -36,14 +35,16 @@ const OpenGrepDashboard = ({ projectKey, onError }) => {
 
   if (!details) {
     return (
-      <p className="p-2 text-sm text-slate-600">
-        No OpenGrep data available
-      </p>
+      <div className="rounded-lg border border-slate-200 bg-white p-6 text-sm text-slate-600">
+        No OpenGrep data available.
+      </div>
     );
   }
 
+  const findings = details.findings || [];
+
   return (
-    <>
+    <div className="space-y-4">
       <ReportTabs
         value={selectedTab}
         onChange={setSelectedTab}
@@ -55,7 +56,7 @@ const OpenGrepDashboard = ({ projectKey, onError }) => {
       )}
 
       {selectedTab === 1 && (
-        <OpenGrepFindingsTab findings={details.findings} />
+        <OpenGrepFindingsTab findings={findings} />
       )}
 
       {selectedTab === 2 && (
@@ -63,7 +64,7 @@ const OpenGrepDashboard = ({ projectKey, onError }) => {
       )}
 
       {selectedTab === 3 && (
-        <OpenGrepCodeTab findings={details.findings} />
+        <OpenGrepCodeTab findings={findings} />
       )}
 
       {selectedTab === 4 && (
@@ -73,12 +74,7 @@ const OpenGrepDashboard = ({ projectKey, onError }) => {
         />
       )}
 
-      {/* {selectedTab === 5 && (
-        <OpenGrepLanguagesTab
-          languages={details.summary.languages}
-        />
-      )} */}
-    </>
+    </div>
   );
 };
 

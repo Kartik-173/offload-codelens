@@ -21,56 +21,56 @@ const CARDS = [
     label: "Total Findings",
     valueKey: "total_findings",
     icon: <Bug className="h-4 w-4" />,
-    className: "card-total"
+    tone: "border-slate-200 bg-white text-slate-700"
   },
   {
     key: "CRITICAL",
     label: "Critical",
     icon: <CircleAlert className="h-4 w-4" />,
-    className: "card-critical"
+    tone: "border-rose-200 bg-rose-50 text-rose-700"
   },
   {
     key: "HIGH",
     label: "High",
     icon: <TriangleAlert className="h-4 w-4" />,
-    className: "card-high"
+    tone: "border-orange-200 bg-orange-50 text-orange-700"
   },
   {
     key: "MEDIUM",
     label: "Medium",
     icon: <Info className="h-4 w-4" />,
-    className: "card-medium"
+    tone: "border-amber-200 bg-amber-50 text-amber-700"
   },
   {
     key: "LOW",
     label: "Low",
     icon: <CircleCheck className="h-4 w-4" />,
-    className: "card-low"
+    tone: "border-emerald-200 bg-emerald-50 text-emerald-700"
   }
 ];
 
 const OverviewCards = ({ summary }) => {
   return (
-    <Box className="opengrep-overview-cards">
+    <Box className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
       {CARDS.map((card) => {
         const value = card.valueKey
-          ? summary[card.valueKey]
+          ? summary?.[card.valueKey] ?? 0
           : summary.severity_count?.[card.key] ?? 0;
 
         return (
           <Box
             key={card.key}
-            className={`overview-card ${card.className}`}
+            className={`rounded-xl border px-4 py-3 ${card.tone}`}
           >
-            <Box className="overview-card-icon">
+            <Box className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-md border border-current/20 bg-white/60">
               {card.icon}
             </Box>
 
-            <Typography className="overview-card-label">
+            <Typography className="text-xs uppercase tracking-wide text-slate-500">
               {card.label}
             </Typography>
 
-            <Typography className="overview-card-value">
+            <Typography className="mt-1 text-2xl font-semibold text-slate-900">
               {value}
             </Typography>
           </Box>

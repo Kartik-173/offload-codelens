@@ -13,12 +13,12 @@ const Typography = ({ children, className = "" }) => (
 const CWESummary = ({ cwe }) => {
   if (!cwe || Object.keys(cwe).length === 0) {
     return (
-      <Box className="cwe-panel">
-        <Typography className="panel-title">
-          <SecurityIcon className="h-4 w-4" />
+      <Box className="rounded-xl border border-slate-200 bg-white p-4">
+        <Typography className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-900">
+          <SecurityIcon className="h-4 w-4 text-rose-600" />
           CWE Summary
         </Typography>
-        <Typography className="cwe-empty">
+        <Typography className="text-sm text-slate-500">
           No CWE data available
         </Typography>
       </Box>
@@ -32,34 +32,32 @@ const CWESummary = ({ cwe }) => {
   const max = Math.max(...entries.map(([, v]) => v));
 
   return (
-    <Box className="cwe-panel">
-      <Typography className="panel-title">
-        <SecurityIcon className="h-4 w-4" />
+    <Box className="rounded-xl border border-slate-200 bg-white p-4">
+      <Typography className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-900">
+        <SecurityIcon className="h-4 w-4 text-rose-600" />
         Top CWEs
       </Typography>
 
-      <Box className="cwe-scroll">
-        <Box className="cwe-list">
-          {entries.map(([id, count]) => (
-            <Box key={id} className="cwe-item">
-              <Box className="cwe-header">
-                <Typography className="cwe-id">{id}</Typography>
-                <Typography className="cwe-count">{count}</Typography>
-              </Box>
-
-              <Typography className="cwe-name">
-                {CWE_LABELS[id] || "Security Weakness"}
-              </Typography>
-
-              <div className="cwe-bar h-2 w-full overflow-hidden rounded bg-slate-200">
-                <div
-                  className="h-full bg-blue-600"
-                  style={{ width: `${(count / max) * 100}%` }}
-                />
-              </div>
+      <Box className="max-h-[360px] space-y-3 overflow-y-auto pr-1">
+        {entries.map(([id, count]) => (
+          <Box key={id} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <Box className="flex items-center justify-between">
+              <Typography className="text-xs font-semibold text-slate-700">{id}</Typography>
+              <Typography className="text-xs font-semibold text-slate-900">{count}</Typography>
             </Box>
-          ))}
-        </Box>
+
+            <Typography className="mt-1 text-xs text-slate-600">
+              {CWE_LABELS[id] || "Security Weakness"}
+            </Typography>
+
+            <div className="mt-2 h-2 w-full overflow-hidden rounded bg-slate-200">
+              <div
+                className="h-full bg-blue-600"
+                style={{ width: `${(count / max) * 100}%` }}
+              />
+            </div>
+          </Box>
+        ))}
       </Box>
     </Box>
   );
