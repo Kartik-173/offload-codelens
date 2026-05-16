@@ -128,7 +128,7 @@ const Sidebar = () => {
           </div>
           <div className="ml-3">
             <h1 className="text-white text-sm font-semibold">CodeLens</h1>
-            <p className="text-slate-400 text-xs">Security Platform</p>
+            <p className="text-slate-400 text-xs">Security Operations Center</p>
           </div>
         </div>
       </div>
